@@ -1,6 +1,10 @@
 # OpenBuild - Open Source Website Builder
 
 <div align="center">
+  <img src="PreviewOpenBuild.jpg" alt="OpenBuild Preview" width="100%" style="border-radius: 12px; margin-bottom: 20px;">
+</div>
+
+<div align="center">
   <img src="https://img.shields.io/badge/Vue.js-3.4+-4FC08D?style=for-the-badge&logo=vue.js&logoColor=white" alt="Vue.js">
   <img src="https://img.shields.io/badge/TypeScript-5.0+-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript">
   <img src="https://img.shields.io/badge/Vite-5.0+-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite">
@@ -15,7 +19,8 @@
 </div>
 
 <p align="center">
-  <strong>A powerful, browser-based visual website builder that generates clean, production-ready HTML/CSS/JavaScript code.</strong>
+  <strong>I was bored and built this because I don't understand why people use Squarespace.</strong><br>
+  <em>OpenBuild actually lets you see the code and modify it however you like.</em>
 </p>
 
 <p align="center">
@@ -31,7 +36,7 @@
 
 ## 🎬 Demo
 
-🌐 **[Try OpenBuild Live →](https://openbuild-gw4rjo6kr-maximgagiev-myg-mediacos-projects.vercel.app)**
+🌐 **[Try OpenBuild Live →](https://openbuild-five.vercel.app)**
 
 
 ## ✨ Features
