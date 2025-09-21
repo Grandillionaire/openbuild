@@ -1,0 +1,57 @@
+/* Z-index layering system for consistent stacking order */
+:root {
+  /* Base layers */
+  --z-base: 1;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-fixed: 300;
+  --z-modal-backdrop: 1000;
+  --z-modal: 1001;
+  --z-popover: 1100;
+  --z-tooltip: 1200;
+  --z-notification: 1300;
+  --z-maximum: 9999;
+}
+
+/* Apply consistent z-index values */
+.app-header {
+  z-index: var(--z-sticky);
+}
+
+.mobile-nav {
+  z-index: var(--z-sticky);
+}
+
+.sidebar {
+  z-index: var(--z-dropdown);
+}
+
+.mobile-overlay {
+  z-index: var(--z-dropdown);
+}
+
+/* Modal z-index hierarchy */
+.template-library-modal,
+.theme-modal,
+.global-code-modal,
+.asset-manager-modal {
+  z-index: var(--z-modal);
+}
+
+.code-viewer-modal {
+  z-index: calc(var(--z-modal) + 10);
+}
+
+/* Component controls should be above content but below modals */
+.component-controls {
+  z-index: var(--z-base) !important;
+}
+
+.component-label {
+  z-index: var(--z-base) !important;
+}
+
+/* Ensure navigation stays on top in its layer */
+.navigation {
+  z-index: var(--z-fixed);
+}
