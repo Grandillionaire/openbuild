@@ -66,9 +66,7 @@ npm run dev
 npm run build
 ```
 
-### Production
 
-Visit the live demo: [Coming Soon]
 
 ## 🛠️ Tech Stack
 
