@@ -1,4 +1,3 @@
-import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 import { codeGenerator } from './codeGenerator';
 import type { Component } from '@/types/component';
@@ -40,6 +39,9 @@ export class ExportManager {
         }
       );
       
+      // Dynamic import to reduce bundle size
+      const JSZip = (await import('jszip')).default;
+      
       // Create ZIP
       const zip = new JSZip();
       
@@ -74,7 +76,14 @@ export class ExportManager {
       const exportTime = performance.now() - startTime;
       
     } catch (error) {
-      throw new Error('Failed to export project');
+      // Preserve original error information for debugging
+      console.error('Export failed:', error);
+      
+      if (error instanceof Error) {
+        throw new Error(`Failed to export project: ${error.message}`, { cause: error });
+      } else {
+        throw new Error(`Failed to export project: ${String(error)}`);
+      }
     }
   }
   

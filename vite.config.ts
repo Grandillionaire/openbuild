@@ -34,10 +34,7 @@ export default defineConfig({
             'vue-codemirror'
           ],
           'export': [
-            'jszip',
-            'file-saver',
-            'prettier',
-            'handlebars'
+            'file-saver'
           ],
           'ui': [
             'lucide-vue-next',

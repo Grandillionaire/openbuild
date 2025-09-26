@@ -1,16 +1,37 @@
-import Handlebars from 'handlebars';
-import prettier from 'prettier';
-import htmlPlugin from 'prettier/plugins/html';
-import cssPlugin from 'prettier/plugins/postcss';
 import { componentDefinitions } from '@/config/components';
 import type { Component, Animation } from '@/types/component';
 
 export class CodeGenerator {
-  private htmlTemplate!: HandlebarsTemplateDelegate;
+  private htmlTemplate: any;
+  private Handlebars: any;
+  private prettier: any;
+  private htmlPlugin: any;
+  private cssPlugin: any;
+  private isInitialized = false;
   
   constructor() {
+    // Lazy initialization
+  }
+  
+  private async ensureInitialized() {
+    if (this.isInitialized) return;
+    
+    // Dynamic imports to reduce initial bundle size
+    const [handlebarsModule, prettierModule, htmlPluginModule, cssPluginModule] = await Promise.all([
+      import('handlebars'),
+      import('prettier'),
+      import('prettier/plugins/html'),
+      import('prettier/plugins/postcss')
+    ]);
+    
+    this.Handlebars = handlebarsModule.default;
+    this.prettier = prettierModule.default;
+    this.htmlPlugin = htmlPluginModule.default;
+    this.cssPlugin = cssPluginModule.default;
+    
     this.registerTemplates();
     this.registerHelpers();
+    this.isInitialized = true;
   }
   
   private registerTemplates() {
@@ -38,11 +59,11 @@ export class CodeGenerator {
 </body>
 </html>`;
     
-    this.htmlTemplate = Handlebars.compile(htmlTemplateSource);
+    this.htmlTemplate = this.Handlebars.compile(htmlTemplateSource);
   }
   
   private registerHelpers() {
-    Handlebars.registerHelper('json', (context) => {
+    this.Handlebars.registerHelper('json', (context) => {
       return JSON.stringify(context, null, 2);
     });
   }
@@ -60,6 +81,7 @@ export class CodeGenerator {
     css: string;
     fullPage: string;
   }> {
+    await this.ensureInitialized();
     // Generate HTML for all components
     const html = this.generateHTML(components);
     
@@ -569,7 +591,7 @@ button {
   
   private async formatHTML(html: string): Promise<string> {
     try {
-      return await prettier.format(html, {
+      return await this.prettier.format(html, {
         parser: 'html',
         plugins: [htmlPlugin],
         printWidth: 100,
@@ -584,7 +606,7 @@ button {
   
   private async formatCSS(css: string): Promise<string> {
     try {
-      return await prettier.format(css, {
+      return await this.prettier.format(css, {
         parser: 'css',
         plugins: [cssPlugin],
         printWidth: 100,

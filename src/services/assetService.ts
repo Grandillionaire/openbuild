@@ -16,7 +16,7 @@ class AssetDatabase extends Dexie {
 
 export class AssetService {
   private db: AssetDatabase;
-  private cache = new Map<string, ExternalAsset[]>();
+  private cache = new Map<string, { data: ExternalAsset[]; timestamp: number }>();
   private cacheExpiry = 5 * 60 * 1000; // 5 minutes
 
   // API Keys - In production, these should be environment variables

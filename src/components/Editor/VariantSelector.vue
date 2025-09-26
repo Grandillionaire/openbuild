@@ -111,7 +111,13 @@ function isActiveVariant(variant: ComponentVariant) {
   
   // Check if key properties match
   const keyProps = ['backgroundColor', 'background', 'color', 'border'];
-  return keyProps.some(prop => componentStyles[prop] === variantStyles[prop]);
+  
+  // Check if all non-undefined variant properties match the component
+  const variantKeyProps = keyProps.filter(prop => variantStyles[prop] !== undefined);
+  
+  if (variantKeyProps.length === 0) return false;
+  
+  return variantKeyProps.every(prop => componentStyles[prop] === variantStyles[prop]);
 }
 
 function applyVariant(variant: ComponentVariant) {

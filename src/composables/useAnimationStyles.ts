@@ -1,4 +1,4 @@
-import { ref, watch } from 'vue';
+import { ref, watch, onUnmounted } from 'vue';
 import type { Component, Animation } from '@/types/component';
 import { useEditorStore } from '@/stores/editor';
 
@@ -142,12 +142,35 @@ export function useAnimationStyles() {
     styleElement.value.textContent = css;
   }
 
+  // Debounce function to prevent rapid updates
+  let updateTimeout: NodeJS.Timeout | null = null;
+  
+  const debouncedUpdateAnimationStyles = () => {
+    if (updateTimeout) {
+      clearTimeout(updateTimeout);
+    }
+    updateTimeout = setTimeout(() => {
+      updateAnimationStyles();
+    }, 100); // 100ms debounce
+  };
+
   // Watch for changes in components and update animation styles
-  watch(
+  const stopWatcher = watch(
     () => store.components,
-    () => updateAnimationStyles(),
+    debouncedUpdateAnimationStyles,
     { deep: true, immediate: true }
   );
+
+  // Cleanup on unmount
+  onUnmounted(() => {
+    stopWatcher();
+    if (updateTimeout) {
+      clearTimeout(updateTimeout);
+    }
+    if (styleElement.value && styleElement.value.parentNode) {
+      styleElement.value.parentNode.removeChild(styleElement.value);
+    }
+  });
 
   return {
     updateAnimationStyles,

@@ -64,54 +64,23 @@ export function safeClone<T>(obj: T): T {
     return obj;
   }
   
-  try {
-    // First try the fast path with safe stringify
-    return JSON.parse(safeStringify(obj));
-  } catch (error) {
-    // If that fails, do a manual deep clone
-    return deepCloneWithCircularCheck(obj);
-  }
-}
-
-/**
- * Manual deep clone with circular reference checking
- */
-function deepCloneWithCircularCheck<T>(obj: T, seen = new WeakMap()): T {
-  if (obj === null || typeof obj !== 'object') {
-    return obj;
-  }
-
-  // Check for circular reference
-  if (seen.has(obj as any)) {
-    return seen.get(obj as any);
-  }
-
-  // Handle arrays
-  if (Array.isArray(obj)) {
-    const cloned: any[] = [];
-    seen.set(obj as any, cloned);
-    
-    obj.forEach((item, index) => {
-      cloned[index] = deepCloneWithCircularCheck(item, seen);
-    });
-    
-    return cloned as any;
-  }
-
-  // Handle dates
+  // Handle special object types that JSON.stringify doesn't preserve
   if (obj instanceof Date) {
     return new Date(obj.getTime()) as any;
   }
-
-  // Handle regular objects
-  const cloned: any = {};
-  seen.set(obj as any, cloned);
-
-  for (const key in obj) {
-    if (obj.hasOwnProperty(key)) {
-      cloned[key] = deepCloneWithCircularCheck(obj[key], seen);
-    }
+  
+  if (obj instanceof RegExp) {
+    return new RegExp(obj.source, obj.flags) as any;
   }
-
-  return cloned;
+  
+  if (obj instanceof Map || obj instanceof Set) {
+    // For Map and Set, convert to array and back
+    if (obj instanceof Map) {
+      return new Map(Array.from(obj.entries())) as any;
+    }
+    return new Set(Array.from(obj)) as any;
+  }
+  
+  // Use the safe stringify method for everything else
+  return JSON.parse(safeStringify(obj));
 }
