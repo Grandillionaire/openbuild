@@ -1,5 +1,6 @@
 import type { ComponentDefinition, ComponentType, Component } from '@/types/component';
 import { componentVariants } from './componentVariants';
+import { formComponentDefinitions } from './formComponents';
 
 // Helper function to add variants and theme support
 function addVariantsToDefinition(definition: ComponentDefinition): ComponentDefinition {
@@ -11,7 +12,7 @@ function addVariantsToDefinition(definition: ComponentDefinition): ComponentDefi
   };
 }
 
-export const componentDefinitions: Record<ComponentType, ComponentDefinition> = {
+const baseComponentDefinitions: Record<ComponentType, ComponentDefinition> = {
   // Layout Components
   container: {
     type: 'container',
@@ -597,6 +598,12 @@ export const componentDefinitions: Record<ComponentType, ComponentDefinition> = 
       `;
     }
   }
+};
+
+// Merge base components with form components
+export const componentDefinitions: Record<string, ComponentDefinition> = {
+  ...baseComponentDefinitions,
+  ...formComponentDefinitions
 };
 
 // Apply variants to all components

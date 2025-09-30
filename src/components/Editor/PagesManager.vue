@@ -334,9 +334,15 @@ const currentNavItems = computed({
 
 // Methods
 function selectPage(page: any) {
+  // Save current page's components before switching
+  if (pagesStore.currentPage) {
+    pagesStore.updatePageComponents(pagesStore.currentPage.id, editorStore.components);
+  }
+
+  // Switch to new page
   pagesStore.setCurrentPage(page.id);
 
-  // Update editor components with page components
+  // Load new page's components
   editorStore.components = page.components || [];
 
   showToast(`Switched to ${page.name}`, 'success');

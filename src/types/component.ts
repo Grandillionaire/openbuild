@@ -28,6 +28,10 @@ export interface ComponentProps {
   };
   animations?: Animation[];
   customCode?: CustomCode;
+  style?: CSSProperties;
+  responsiveStyles?: Record<string, CSSProperties>;
+  className?: string;
+  [key: string]: any;
 }
 
 export interface ResponsiveStyles {
@@ -43,10 +47,12 @@ export interface CSSProperties {
   [key: string]: string | number;
 }
 
-export type ComponentType = 
+export type ComponentType =
   | 'container' | 'section' | 'grid' | 'flex' | 'spacer'
   | 'heading' | 'text' | 'button' | 'link' | 'image'
-  | 'hero' | 'features' | 'cta' | 'footer' | 'navigation';
+  | 'hero' | 'features' | 'cta' | 'footer' | 'navigation'
+  | 'form' | 'input' | 'textarea' | 'select' | 'checkbox'
+  | 'radio' | 'label' | 'formGroup' | 'submitButton';
 
 export interface ComponentVariant {
   id: string;

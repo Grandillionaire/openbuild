@@ -127,7 +127,14 @@
 
     <!-- Pages Manager Modal -->
     <teleport to="body">
-      <PagesManager v-if="showPagesManager" @close="showPagesManager = false" />
+      <div v-if="showPagesManager" class="modal-overlay" @click="showPagesManager = false">
+        <div class="modal-content-large pages-manager-modal" @click.stop>
+          <PagesManager />
+          <button @click="showPagesManager = false" class="modal-close-btn">
+            <X :size="20" />
+          </button>
+        </div>
+      </div>
     </teleport>
 
     <!-- SEO Panel Modal -->
@@ -438,6 +445,10 @@ async function togglePreview() {
   max-height: 80vh;
   overflow-y: auto;
   position: relative;
+}
+
+.pages-manager-modal {
+  max-width: 900px;
 }
 
 .modal-close-btn {
