@@ -580,7 +580,8 @@ function generateSchemaMarkup() {
     url: `${baseUrl.value}/${urlSlug.value}`
   };
 
-  return `<script type="application/ld+json">${JSON.stringify(schema, null, 2)}</script>\n`;
+  // Use escaped script tags to avoid Vue template parsing issues
+  return '\x3Cscript type="application/ld+json"\x3E' + JSON.stringify(schema, null, 2) + '\x3C/script\x3E\n';
 }
 
 function selectOGImage() {
@@ -588,15 +589,17 @@ function selectOGImage() {
 }
 
 function generateSitemap() {
-  const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>${baseUrl.value}/${urlSlug.value}</loc>
-    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-  </url>
-</urlset>`;
+  // Use character codes to avoid Vue template parsing issues
+  const xmlHeader = '\x3C?xml version="1.0" encoding="UTF-8"?\x3E';
+  const sitemap = xmlHeader + '\n' +
+'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
+'  <url>\n' +
+`    <loc>${baseUrl.value}/${urlSlug.value}</loc>\n` +
+`    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>\n` +
+'    <changefreq>weekly</changefreq>\n' +
+'    <priority>1.0</priority>\n' +
+'  </url>\n' +
+'</urlset>';
 
   // Create download
   const blob = new Blob([sitemap], { type: 'application/xml' });
