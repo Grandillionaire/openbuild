@@ -125,19 +125,8 @@
                       <div class="thumbnail-gradient"></div>
                     </div>
 
-                    <!-- Overlay Actions -->
-                    <div class="template-overlay">
-                      <div class="overlay-content">
-                        <button class="action-btn preview" @click.stop="previewTemplate(template)">
-                          <Eye :size="20" />
-                          <span>Quick Preview</span>
-                        </button>
-                        <button class="action-btn details" @click.stop="showDetails(template)">
-                          <Info :size="20" />
-                          <span>View Details</span>
-                        </button>
-                      </div>
-                    </div>
+                    <!-- Simple hover effect -->
+                    <div class="template-hover-overlay"></div>
 
                     <!-- Badges -->
                     <div class="badge-container">
@@ -291,7 +280,6 @@ import {
   Package,
   Download,
   Check,
-  Info,
   TrendingUp,
   RefreshCw,
   Wand2,
@@ -412,16 +400,6 @@ function selectTemplate(template: Template) {
   selectedTemplate.value = template;
 }
 
-function previewTemplate(template: Template) {
-  // Could open a preview modal
-  showToast(`Preview: ${template.name}`, 'info');
-}
-
-function showDetails(template: Template) {
-  // Could show detailed view
-  showToast(`Details: ${template.name}`, 'info');
-}
-
 function resetFilters() {
   searchQuery.value = '';
   selectedCategory.value = 'all';
@@ -472,7 +450,6 @@ onMounted(() => {
 :root {
   --modal-bg: rgba(15, 23, 42, 0.8);
   --content-bg: #ffffff;
-  --header-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   --border-subtle: #e2e8f0;
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
@@ -589,11 +566,12 @@ onMounted(() => {
   animation: slideInUp 0.4s ease;
 }
 
-/* Premium Header */
+/* Clean Dark Header */
 .template-header {
-  background: var(--header-bg);
+  background: #1e293b;
   padding: 1.75rem 2rem;
   color: white;
+  border-bottom: 2px solid #667eea;
 }
 
 .header-content {
@@ -614,9 +592,9 @@ onMounted(() => {
   justify-content: center;
   width: 48px;
   height: 48px;
-  background: rgba(255, 255, 255, 0.2);
+  background: #667eea;
   border-radius: 12px;
-  backdrop-filter: blur(10px);
+  color: white;
 }
 
 .template-header h2 {
@@ -624,11 +602,12 @@ onMounted(() => {
   font-weight: 700;
   margin: 0;
   letter-spacing: -0.025em;
+  color: #ffffff;
 }
 
 .header-subtitle {
   font-size: 0.875rem;
-  opacity: 0.95;
+  color: #cbd5e1;
   margin-top: 0.25rem;
 }
 
@@ -638,7 +617,7 @@ onMounted(() => {
   justify-content: center;
   width: 40px;
   height: 40px;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.1);
   border: none;
   border-radius: 12px;
   color: white;
@@ -647,7 +626,7 @@ onMounted(() => {
 }
 
 .close-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.2);
   transform: scale(1.05);
 }
 
@@ -935,52 +914,17 @@ onMounted(() => {
   background: linear-gradient(to bottom, transparent 60%, rgba(0, 0, 0, 0.1) 100%);
 }
 
-/* Template Overlay */
-.template-overlay {
+/* Simple Hover Overlay */
+.template-hover-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(117, 75, 162, 0.95) 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.3) 100%);
   opacity: 0;
   transition: opacity 0.3s;
 }
 
-.template-card:hover .template-overlay {
+.template-card:hover .template-hover-overlay {
   opacity: 1;
-}
-
-.overlay-content {
-  display: flex;
-  gap: 1rem;
-}
-
-.action-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.25rem;
-  background: white;
-  border: none;
-  border-radius: 10px;
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.action-btn:hover {
-  transform: scale(1.05);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-}
-
-.action-btn.preview {
-  color: var(--primary);
-}
-
-.action-btn.details {
-  color: var(--text-primary);
 }
 
 /* Badges */
