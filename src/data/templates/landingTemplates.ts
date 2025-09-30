@@ -380,6 +380,1591 @@ export const saasLandingTemplate: Template = {
     },
     {
       id: generateId(),
+      type: 'section',
+      displayName: 'Testimonials Section',
+      props: {},
+      styles: {
+        base: {
+          padding: '6rem 2rem',
+          backgroundColor: '#ffffff',
+          position: 'relative'
+        }
+      },
+      children: [
+        {
+          id: generateId(),
+          type: 'container',
+          displayName: 'Testimonials Container',
+          props: {},
+          styles: {
+            base: {
+              maxWidth: '1200px',
+              margin: '0 auto'
+            }
+          },
+          children: [
+            {
+              id: generateId(),
+              type: 'text',
+              displayName: 'Section Label',
+              props: {
+                content: 'TESTIMONIALS'
+              },
+              styles: {
+                base: {
+                  fontSize: '0.875rem',
+                  fontWeight: '600',
+                  textAlign: 'center',
+                  color: '#8B5CF6',
+                  letterSpacing: '0.1em',
+                  marginBottom: '1rem'
+                }
+              }
+            },
+            {
+              id: generateId(),
+              type: 'heading',
+              displayName: 'Section Title',
+              props: {
+                content: 'Loved by Teams Worldwide',
+                attributes: { level: 'h2' }
+              },
+              styles: {
+                base: {
+                  fontSize: '3rem',
+                  fontWeight: '800',
+                  textAlign: 'center',
+                  marginBottom: '1.5rem',
+                  color: '#111827'
+                }
+              }
+            },
+            {
+              id: generateId(),
+              type: 'grid',
+              displayName: 'Testimonials Grid',
+              props: {},
+              styles: {
+                base: {
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
+                  gap: '2rem',
+                  marginTop: '3rem'
+                }
+              },
+              children: [
+                {
+                  id: generateId(),
+                  type: 'container',
+                  displayName: 'Testimonial Card',
+                  props: {},
+                  styles: {
+                    base: {
+                      backgroundColor: '#F9FAFB',
+                      padding: '2rem',
+                      borderRadius: '16px',
+                      position: 'relative'
+                    }
+                  },
+                  children: [
+                    {
+                      id: generateId(),
+                      type: 'text',
+                      displayName: 'Quote',
+                      props: {
+                        content: '"CloudFlow transformed how we handle our operations. The automation features alone saved us 20 hours per week."'
+                      },
+                      styles: {
+                        base: {
+                          fontSize: '1.125rem',
+                          color: '#374151',
+                          lineHeight: '1.8',
+                          marginBottom: '1.5rem',
+                          fontStyle: 'italic'
+                        }
+                      }
+                    },
+                    {
+                      id: generateId(),
+                      type: 'flex',
+                      displayName: 'Author Info',
+                      props: {},
+                      styles: {
+                        base: {
+                          alignItems: 'center',
+                          gap: '1rem'
+                        }
+                      },
+                      children: [
+                        {
+                          id: generateId(),
+                          type: 'container',
+                          displayName: 'Avatar',
+                          props: {},
+                          styles: {
+                            base: {
+                              width: '48px',
+                              height: '48px',
+                              borderRadius: '50%',
+                              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                            }
+                          }
+                        },
+                        {
+                          id: generateId(),
+                          type: 'container',
+                          displayName: 'Author Details',
+                          props: {},
+                          styles: {
+                            base: {
+                              flex: '1'
+                            }
+                          },
+                          children: [
+                            {
+                              id: generateId(),
+                              type: 'text',
+                              displayName: 'Name',
+                              props: {
+                                content: 'Sarah Johnson'
+                              },
+                              styles: {
+                                base: {
+                                  fontWeight: '600',
+                                  color: '#111827',
+                                  marginBottom: '0.25rem'
+                                }
+                              }
+                            },
+                            {
+                              id: generateId(),
+                              type: 'text',
+                              displayName: 'Role',
+                              props: {
+                                content: 'CEO at TechCorp'
+                              },
+                              styles: {
+                                base: {
+                                  fontSize: '0.875rem',
+                                  color: '#6B7280'
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  id: generateId(),
+                  type: 'container',
+                  displayName: 'Testimonial Card',
+                  props: {},
+                  styles: {
+                    base: {
+                      backgroundColor: '#F9FAFB',
+                      padding: '2rem',
+                      borderRadius: '16px'
+                    }
+                  },
+                  children: [
+                    {
+                      id: generateId(),
+                      type: 'text',
+                      displayName: 'Quote',
+                      props: {
+                        content: '"Best investment we made this year. The ROI was evident within the first month of implementation."'
+                      },
+                      styles: {
+                        base: {
+                          fontSize: '1.125rem',
+                          color: '#374151',
+                          lineHeight: '1.8',
+                          marginBottom: '1.5rem',
+                          fontStyle: 'italic'
+                        }
+                      }
+                    },
+                    {
+                      id: generateId(),
+                      type: 'flex',
+                      displayName: 'Author Info',
+                      props: {},
+                      styles: {
+                        base: {
+                          alignItems: 'center',
+                          gap: '1rem'
+                        }
+                      },
+                      children: [
+                        {
+                          id: generateId(),
+                          type: 'container',
+                          displayName: 'Avatar',
+                          props: {},
+                          styles: {
+                            base: {
+                              width: '48px',
+                              height: '48px',
+                              borderRadius: '50%',
+                              background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'
+                            }
+                          }
+                        },
+                        {
+                          id: generateId(),
+                          type: 'container',
+                          displayName: 'Author Details',
+                          props: {},
+                          styles: {
+                            base: {
+                              flex: '1'
+                            }
+                          },
+                          children: [
+                            {
+                              id: generateId(),
+                              type: 'text',
+                              displayName: 'Name',
+                              props: {
+                                content: 'Michael Chen'
+                              },
+                              styles: {
+                                base: {
+                                  fontWeight: '600',
+                                  color: '#111827',
+                                  marginBottom: '0.25rem'
+                                }
+                              }
+                            },
+                            {
+                              id: generateId(),
+                              type: 'text',
+                              displayName: 'Role',
+                              props: {
+                                content: 'CTO at StartupXYZ'
+                              },
+                              styles: {
+                                base: {
+                                  fontSize: '0.875rem',
+                                  color: '#6B7280'
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  id: generateId(),
+                  type: 'container',
+                  displayName: 'Testimonial Card',
+                  props: {},
+                  styles: {
+                    base: {
+                      backgroundColor: '#F9FAFB',
+                      padding: '2rem',
+                      borderRadius: '16px'
+                    }
+                  },
+                  children: [
+                    {
+                      id: generateId(),
+                      type: 'text',
+                      displayName: 'Quote',
+                      props: {
+                        content: '"The customer support is exceptional. They helped us customize everything to our exact needs."'
+                      },
+                      styles: {
+                        base: {
+                          fontSize: '1.125rem',
+                          color: '#374151',
+                          lineHeight: '1.8',
+                          marginBottom: '1.5rem',
+                          fontStyle: 'italic'
+                        }
+                      }
+                    },
+                    {
+                      id: generateId(),
+                      type: 'flex',
+                      displayName: 'Author Info',
+                      props: {},
+                      styles: {
+                        base: {
+                          alignItems: 'center',
+                          gap: '1rem'
+                        }
+                      },
+                      children: [
+                        {
+                          id: generateId(),
+                          type: 'container',
+                          displayName: 'Avatar',
+                          props: {},
+                          styles: {
+                            base: {
+                              width: '48px',
+                              height: '48px',
+                              borderRadius: '50%',
+                              background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)'
+                            }
+                          }
+                        },
+                        {
+                          id: generateId(),
+                          type: 'container',
+                          displayName: 'Author Details',
+                          props: {},
+                          styles: {
+                            base: {
+                              flex: '1'
+                            }
+                          },
+                          children: [
+                            {
+                              id: generateId(),
+                              type: 'text',
+                              displayName: 'Name',
+                              props: {
+                                content: 'Emily Rodriguez'
+                              },
+                              styles: {
+                                base: {
+                                  fontWeight: '600',
+                                  color: '#111827',
+                                  marginBottom: '0.25rem'
+                                }
+                              }
+                            },
+                            {
+                              id: generateId(),
+                              type: 'text',
+                              displayName: 'Role',
+                              props: {
+                                content: 'Product Manager at InnovateCo'
+                              },
+                              styles: {
+                                base: {
+                                  fontSize: '0.875rem',
+                                  color: '#6B7280'
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      id: generateId(),
+      type: 'section',
+      displayName: 'Pricing Section',
+      props: {},
+      styles: {
+        base: {
+          padding: '6rem 2rem',
+          backgroundColor: '#F9FAFB'
+        }
+      },
+      children: [
+        {
+          id: generateId(),
+          type: 'container',
+          displayName: 'Pricing Container',
+          props: {},
+          styles: {
+            base: {
+              maxWidth: '1200px',
+              margin: '0 auto'
+            }
+          },
+          children: [
+            {
+              id: generateId(),
+              type: 'text',
+              displayName: 'Section Label',
+              props: {
+                content: 'PRICING'
+              },
+              styles: {
+                base: {
+                  fontSize: '0.875rem',
+                  fontWeight: '600',
+                  textAlign: 'center',
+                  color: '#8B5CF6',
+                  letterSpacing: '0.1em',
+                  marginBottom: '1rem'
+                }
+              }
+            },
+            {
+              id: generateId(),
+              type: 'heading',
+              displayName: 'Section Title',
+              props: {
+                content: 'Simple, Transparent Pricing',
+                attributes: { level: 'h2' }
+              },
+              styles: {
+                base: {
+                  fontSize: '3rem',
+                  fontWeight: '800',
+                  textAlign: 'center',
+                  marginBottom: '1.5rem',
+                  color: '#111827'
+                }
+              }
+            },
+            {
+              id: generateId(),
+              type: 'text',
+              displayName: 'Section Description',
+              props: {
+                content: 'Choose the perfect plan for your business needs'
+              },
+              styles: {
+                base: {
+                  fontSize: '1.25rem',
+                  textAlign: 'center',
+                  color: '#6B7280',
+                  marginBottom: '4rem'
+                }
+              }
+            },
+            {
+              id: generateId(),
+              type: 'grid',
+              displayName: 'Pricing Grid',
+              props: {},
+              styles: {
+                base: {
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+                  gap: '2rem'
+                }
+              },
+              children: [
+                {
+                  id: generateId(),
+                  type: 'container',
+                  displayName: 'Pricing Card - Starter',
+                  props: {},
+                  styles: {
+                    base: {
+                      backgroundColor: 'white',
+                      padding: '2.5rem',
+                      borderRadius: '16px',
+                      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)',
+                      border: '1px solid #E5E7EB',
+                      position: 'relative'
+                    }
+                  },
+                  children: [
+                    {
+                      id: generateId(),
+                      type: 'text',
+                      displayName: 'Plan Name',
+                      props: {
+                        content: 'Starter'
+                      },
+                      styles: {
+                        base: {
+                          fontSize: '1.5rem',
+                          fontWeight: '700',
+                          color: '#111827',
+                          marginBottom: '0.5rem'
+                        }
+                      }
+                    },
+                    {
+                      id: generateId(),
+                      type: 'text',
+                      displayName: 'Plan Description',
+                      props: {
+                        content: 'Perfect for small teams'
+                      },
+                      styles: {
+                        base: {
+                          color: '#6B7280',
+                          marginBottom: '2rem'
+                        }
+                      }
+                    },
+                    {
+                      id: generateId(),
+                      type: 'flex',
+                      displayName: 'Price Container',
+                      props: {},
+                      styles: {
+                        base: {
+                          alignItems: 'baseline',
+                          marginBottom: '2rem'
+                        }
+                      },
+                      children: [
+                        {
+                          id: generateId(),
+                          type: 'text',
+                          displayName: 'Price',
+                          props: {
+                            content: '$29'
+                          },
+                          styles: {
+                            base: {
+                              fontSize: '3rem',
+                              fontWeight: '800',
+                              color: '#111827'
+                            }
+                          }
+                        },
+                        {
+                          id: generateId(),
+                          type: 'text',
+                          displayName: 'Period',
+                          props: {
+                            content: '/month'
+                          },
+                          styles: {
+                            base: {
+                              fontSize: '1.125rem',
+                              color: '#6B7280',
+                              marginLeft: '0.5rem'
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      id: generateId(),
+                      type: 'container',
+                      displayName: 'Features List',
+                      props: {},
+                      styles: {
+                        base: {
+                          marginBottom: '2rem'
+                        }
+                      },
+                      children: [
+                        {
+                          id: generateId(),
+                          type: 'flex',
+                          displayName: 'Feature Item',
+                          props: {},
+                          styles: {
+                            base: {
+                              alignItems: 'center',
+                              marginBottom: '1rem'
+                            }
+                          },
+                          children: [
+                            {
+                              id: generateId(),
+                              type: 'text',
+                              displayName: 'Check Icon',
+                              props: { content: '✓' },
+                              styles: {
+                                base: {
+                                  color: '#10B981',
+                                  marginRight: '0.75rem',
+                                  fontWeight: '700'
+                                }
+                              }
+                            },
+                            {
+                              id: generateId(),
+                              type: 'text',
+                              displayName: 'Feature Text',
+                              props: { content: 'Up to 5 team members' },
+                              styles: {
+                                base: {
+                                  color: '#374151'
+                                }
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          id: generateId(),
+                          type: 'flex',
+                          displayName: 'Feature Item',
+                          props: {},
+                          styles: {
+                            base: {
+                              alignItems: 'center',
+                              marginBottom: '1rem'
+                            }
+                          },
+                          children: [
+                            {
+                              id: generateId(),
+                              type: 'text',
+                              displayName: 'Check Icon',
+                              props: { content: '✓' },
+                              styles: {
+                                base: {
+                                  color: '#10B981',
+                                  marginRight: '0.75rem',
+                                  fontWeight: '700'
+                                }
+                              }
+                            },
+                            {
+                              id: generateId(),
+                              type: 'text',
+                              displayName: 'Feature Text',
+                              props: { content: '10GB storage' },
+                              styles: {
+                                base: {
+                                  color: '#374151'
+                                }
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          id: generateId(),
+                          type: 'flex',
+                          displayName: 'Feature Item',
+                          props: {},
+                          styles: {
+                            base: {
+                              alignItems: 'center',
+                              marginBottom: '1rem'
+                            }
+                          },
+                          children: [
+                            {
+                              id: generateId(),
+                              type: 'text',
+                              displayName: 'Check Icon',
+                              props: { content: '✓' },
+                              styles: {
+                                base: {
+                                  color: '#10B981',
+                                  marginRight: '0.75rem',
+                                  fontWeight: '700'
+                                }
+                              }
+                            },
+                            {
+                              id: generateId(),
+                              type: 'text',
+                              displayName: 'Feature Text',
+                              props: { content: 'Basic analytics' },
+                              styles: {
+                                base: {
+                                  color: '#374151'
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      id: generateId(),
+                      type: 'button',
+                      displayName: 'CTA Button',
+                      props: {
+                        content: 'Start Free Trial'
+                      },
+                      styles: {
+                        base: {
+                          width: '100%',
+                          padding: '0.875rem',
+                          backgroundColor: '#F3F4F6',
+                          color: '#111827',
+                          border: 'none',
+                          borderRadius: '8px',
+                          fontSize: '1rem',
+                          fontWeight: '600',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s'
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  id: generateId(),
+                  type: 'container',
+                  displayName: 'Pricing Card - Professional',
+                  props: {},
+                  styles: {
+                    base: {
+                      backgroundColor: 'white',
+                      padding: '2.5rem',
+                      borderRadius: '16px',
+                      boxShadow: '0 10px 25px rgba(139, 92, 246, 0.15)',
+                      border: '2px solid #8B5CF6',
+                      position: 'relative',
+                      transform: 'scale(1.05)'
+                    }
+                  },
+                  children: [
+                    {
+                      id: generateId(),
+                      type: 'container',
+                      displayName: 'Popular Badge',
+                      props: {},
+                      styles: {
+                        base: {
+                          position: 'absolute',
+                          top: '-12px',
+                          left: '50%',
+                          transform: 'translateX(-50%)',
+                          backgroundColor: '#8B5CF6',
+                          color: 'white',
+                          padding: '0.25rem 1rem',
+                          borderRadius: '20px',
+                          fontSize: '0.875rem',
+                          fontWeight: '600'
+                        }
+                      },
+                      children: [
+                        {
+                          id: generateId(),
+                          type: 'text',
+                          displayName: 'Badge Text',
+                          props: { content: 'MOST POPULAR' },
+                          styles: { base: {} }
+                        }
+                      ]
+                    },
+                    {
+                      id: generateId(),
+                      type: 'text',
+                      displayName: 'Plan Name',
+                      props: {
+                        content: 'Professional'
+                      },
+                      styles: {
+                        base: {
+                          fontSize: '1.5rem',
+                          fontWeight: '700',
+                          color: '#111827',
+                          marginBottom: '0.5rem'
+                        }
+                      }
+                    },
+                    {
+                      id: generateId(),
+                      type: 'text',
+                      displayName: 'Plan Description',
+                      props: {
+                        content: 'Best for growing teams'
+                      },
+                      styles: {
+                        base: {
+                          color: '#6B7280',
+                          marginBottom: '2rem'
+                        }
+                      }
+                    },
+                    {
+                      id: generateId(),
+                      type: 'flex',
+                      displayName: 'Price Container',
+                      props: {},
+                      styles: {
+                        base: {
+                          alignItems: 'baseline',
+                          marginBottom: '2rem'
+                        }
+                      },
+                      children: [
+                        {
+                          id: generateId(),
+                          type: 'text',
+                          displayName: 'Price',
+                          props: {
+                            content: '$79'
+                          },
+                          styles: {
+                            base: {
+                              fontSize: '3rem',
+                              fontWeight: '800',
+                              color: '#8B5CF6'
+                            }
+                          }
+                        },
+                        {
+                          id: generateId(),
+                          type: 'text',
+                          displayName: 'Period',
+                          props: {
+                            content: '/month'
+                          },
+                          styles: {
+                            base: {
+                              fontSize: '1.125rem',
+                              color: '#6B7280',
+                              marginLeft: '0.5rem'
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      id: generateId(),
+                      type: 'container',
+                      displayName: 'Features List',
+                      props: {},
+                      styles: {
+                        base: {
+                          marginBottom: '2rem'
+                        }
+                      },
+                      children: [
+                        {
+                          id: generateId(),
+                          type: 'flex',
+                          displayName: 'Feature Item',
+                          props: {},
+                          styles: {
+                            base: {
+                              alignItems: 'center',
+                              marginBottom: '1rem'
+                            }
+                          },
+                          children: [
+                            {
+                              id: generateId(),
+                              type: 'text',
+                              displayName: 'Check Icon',
+                              props: { content: '✓' },
+                              styles: {
+                                base: {
+                                  color: '#10B981',
+                                  marginRight: '0.75rem',
+                                  fontWeight: '700'
+                                }
+                              }
+                            },
+                            {
+                              id: generateId(),
+                              type: 'text',
+                              displayName: 'Feature Text',
+                              props: { content: 'Unlimited team members' },
+                              styles: {
+                                base: {
+                                  color: '#374151'
+                                }
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          id: generateId(),
+                          type: 'flex',
+                          displayName: 'Feature Item',
+                          props: {},
+                          styles: {
+                            base: {
+                              alignItems: 'center',
+                              marginBottom: '1rem'
+                            }
+                          },
+                          children: [
+                            {
+                              id: generateId(),
+                              type: 'text',
+                              displayName: 'Check Icon',
+                              props: { content: '✓' },
+                              styles: {
+                                base: {
+                                  color: '#10B981',
+                                  marginRight: '0.75rem',
+                                  fontWeight: '700'
+                                }
+                              }
+                            },
+                            {
+                              id: generateId(),
+                              type: 'text',
+                              displayName: 'Feature Text',
+                              props: { content: '100GB storage' },
+                              styles: {
+                                base: {
+                                  color: '#374151'
+                                }
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          id: generateId(),
+                          type: 'flex',
+                          displayName: 'Feature Item',
+                          props: {},
+                          styles: {
+                            base: {
+                              alignItems: 'center',
+                              marginBottom: '1rem'
+                            }
+                          },
+                          children: [
+                            {
+                              id: generateId(),
+                              type: 'text',
+                              displayName: 'Check Icon',
+                              props: { content: '✓' },
+                              styles: {
+                                base: {
+                                  color: '#10B981',
+                                  marginRight: '0.75rem',
+                                  fontWeight: '700'
+                                }
+                              }
+                            },
+                            {
+                              id: generateId(),
+                              type: 'text',
+                              displayName: 'Feature Text',
+                              props: { content: 'Advanced analytics & API' },
+                              styles: {
+                                base: {
+                                  color: '#374151'
+                                }
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          id: generateId(),
+                          type: 'flex',
+                          displayName: 'Feature Item',
+                          props: {},
+                          styles: {
+                            base: {
+                              alignItems: 'center',
+                              marginBottom: '1rem'
+                            }
+                          },
+                          children: [
+                            {
+                              id: generateId(),
+                              type: 'text',
+                              displayName: 'Check Icon',
+                              props: { content: '✓' },
+                              styles: {
+                                base: {
+                                  color: '#10B981',
+                                  marginRight: '0.75rem',
+                                  fontWeight: '700'
+                                }
+                              }
+                            },
+                            {
+                              id: generateId(),
+                              type: 'text',
+                              displayName: 'Feature Text',
+                              props: { content: 'Priority support' },
+                              styles: {
+                                base: {
+                                  color: '#374151'
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      id: generateId(),
+                      type: 'button',
+                      displayName: 'CTA Button',
+                      props: {
+                        content: 'Start Free Trial'
+                      },
+                      styles: {
+                        base: {
+                          width: '100%',
+                          padding: '0.875rem',
+                          background: 'linear-gradient(135deg, #8B5CF6 0%, #3B82F6 100%)',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '8px',
+                          fontSize: '1rem',
+                          fontWeight: '600',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s'
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  id: generateId(),
+                  type: 'container',
+                  displayName: 'Pricing Card - Enterprise',
+                  props: {},
+                  styles: {
+                    base: {
+                      backgroundColor: 'white',
+                      padding: '2.5rem',
+                      borderRadius: '16px',
+                      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)',
+                      border: '1px solid #E5E7EB',
+                      position: 'relative'
+                    }
+                  },
+                  children: [
+                    {
+                      id: generateId(),
+                      type: 'text',
+                      displayName: 'Plan Name',
+                      props: {
+                        content: 'Enterprise'
+                      },
+                      styles: {
+                        base: {
+                          fontSize: '1.5rem',
+                          fontWeight: '700',
+                          color: '#111827',
+                          marginBottom: '0.5rem'
+                        }
+                      }
+                    },
+                    {
+                      id: generateId(),
+                      type: 'text',
+                      displayName: 'Plan Description',
+                      props: {
+                        content: 'For large organizations'
+                      },
+                      styles: {
+                        base: {
+                          color: '#6B7280',
+                          marginBottom: '2rem'
+                        }
+                      }
+                    },
+                    {
+                      id: generateId(),
+                      type: 'text',
+                      displayName: 'Custom Pricing',
+                      props: {
+                        content: 'Custom Pricing'
+                      },
+                      styles: {
+                        base: {
+                          fontSize: '2rem',
+                          fontWeight: '800',
+                          color: '#111827',
+                          marginBottom: '2rem'
+                        }
+                      }
+                    },
+                    {
+                      id: generateId(),
+                      type: 'container',
+                      displayName: 'Features List',
+                      props: {},
+                      styles: {
+                        base: {
+                          marginBottom: '2rem'
+                        }
+                      },
+                      children: [
+                        {
+                          id: generateId(),
+                          type: 'flex',
+                          displayName: 'Feature Item',
+                          props: {},
+                          styles: {
+                            base: {
+                              alignItems: 'center',
+                              marginBottom: '1rem'
+                            }
+                          },
+                          children: [
+                            {
+                              id: generateId(),
+                              type: 'text',
+                              displayName: 'Check Icon',
+                              props: { content: '✓' },
+                              styles: {
+                                base: {
+                                  color: '#10B981',
+                                  marginRight: '0.75rem',
+                                  fontWeight: '700'
+                                }
+                              }
+                            },
+                            {
+                              id: generateId(),
+                              type: 'text',
+                              displayName: 'Feature Text',
+                              props: { content: 'Everything in Professional' },
+                              styles: {
+                                base: {
+                                  color: '#374151'
+                                }
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          id: generateId(),
+                          type: 'flex',
+                          displayName: 'Feature Item',
+                          props: {},
+                          styles: {
+                            base: {
+                              alignItems: 'center',
+                              marginBottom: '1rem'
+                            }
+                          },
+                          children: [
+                            {
+                              id: generateId(),
+                              type: 'text',
+                              displayName: 'Check Icon',
+                              props: { content: '✓' },
+                              styles: {
+                                base: {
+                                  color: '#10B981',
+                                  marginRight: '0.75rem',
+                                  fontWeight: '700'
+                                }
+                              }
+                            },
+                            {
+                              id: generateId(),
+                              type: 'text',
+                              displayName: 'Feature Text',
+                              props: { content: 'Unlimited storage' },
+                              styles: {
+                                base: {
+                                  color: '#374151'
+                                }
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          id: generateId(),
+                          type: 'flex',
+                          displayName: 'Feature Item',
+                          props: {},
+                          styles: {
+                            base: {
+                              alignItems: 'center',
+                              marginBottom: '1rem'
+                            }
+                          },
+                          children: [
+                            {
+                              id: generateId(),
+                              type: 'text',
+                              displayName: 'Check Icon',
+                              props: { content: '✓' },
+                              styles: {
+                                base: {
+                                  color: '#10B981',
+                                  marginRight: '0.75rem',
+                                  fontWeight: '700'
+                                }
+                              }
+                            },
+                            {
+                              id: generateId(),
+                              type: 'text',
+                              displayName: 'Feature Text',
+                              props: { content: 'SSO & Advanced Security' },
+                              styles: {
+                                base: {
+                                  color: '#374151'
+                                }
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          id: generateId(),
+                          type: 'flex',
+                          displayName: 'Feature Item',
+                          props: {},
+                          styles: {
+                            base: {
+                              alignItems: 'center',
+                              marginBottom: '1rem'
+                            }
+                          },
+                          children: [
+                            {
+                              id: generateId(),
+                              type: 'text',
+                              displayName: 'Check Icon',
+                              props: { content: '✓' },
+                              styles: {
+                                base: {
+                                  color: '#10B981',
+                                  marginRight: '0.75rem',
+                                  fontWeight: '700'
+                                }
+                              }
+                            },
+                            {
+                              id: generateId(),
+                              type: 'text',
+                              displayName: 'Feature Text',
+                              props: { content: 'Dedicated account manager' },
+                              styles: {
+                                base: {
+                                  color: '#374151'
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      id: generateId(),
+                      type: 'button',
+                      displayName: 'CTA Button',
+                      props: {
+                        content: 'Contact Sales'
+                      },
+                      styles: {
+                        base: {
+                          width: '100%',
+                          padding: '0.875rem',
+                          backgroundColor: '#111827',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '8px',
+                          fontSize: '1rem',
+                          fontWeight: '600',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s'
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      id: generateId(),
+      type: 'section',
+      displayName: 'FAQ Section',
+      props: {},
+      styles: {
+        base: {
+          padding: '6rem 2rem',
+          backgroundColor: '#ffffff'
+        }
+      },
+      children: [
+        {
+          id: generateId(),
+          type: 'container',
+          displayName: 'FAQ Container',
+          props: {},
+          styles: {
+            base: {
+              maxWidth: '800px',
+              margin: '0 auto'
+            }
+          },
+          children: [
+            {
+              id: generateId(),
+              type: 'text',
+              displayName: 'Section Label',
+              props: {
+                content: 'FAQ'
+              },
+              styles: {
+                base: {
+                  fontSize: '0.875rem',
+                  fontWeight: '600',
+                  textAlign: 'center',
+                  color: '#8B5CF6',
+                  letterSpacing: '0.1em',
+                  marginBottom: '1rem'
+                }
+              }
+            },
+            {
+              id: generateId(),
+              type: 'heading',
+              displayName: 'Section Title',
+              props: {
+                content: 'Frequently Asked Questions',
+                attributes: { level: 'h2' }
+              },
+              styles: {
+                base: {
+                  fontSize: '3rem',
+                  fontWeight: '800',
+                  textAlign: 'center',
+                  marginBottom: '3rem',
+                  color: '#111827'
+                }
+              }
+            },
+            {
+              id: generateId(),
+              type: 'container',
+              displayName: 'FAQ List',
+              props: {},
+              styles: {
+                base: {
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '1rem'
+                }
+              },
+              children: [
+                {
+                  id: generateId(),
+                  type: 'container',
+                  displayName: 'FAQ Item',
+                  props: {},
+                  styles: {
+                    base: {
+                      backgroundColor: '#F9FAFB',
+                      borderRadius: '12px',
+                      padding: '1.5rem',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s'
+                    }
+                  },
+                  children: [
+                    {
+                      id: generateId(),
+                      type: 'flex',
+                      displayName: 'Question Container',
+                      props: {},
+                      styles: {
+                        base: {
+                          justifyContent: 'space-between',
+                          alignItems: 'center'
+                        }
+                      },
+                      children: [
+                        {
+                          id: generateId(),
+                          type: 'text',
+                          displayName: 'Question',
+                          props: {
+                            content: 'How does the free trial work?'
+                          },
+                          styles: {
+                            base: {
+                              fontSize: '1.125rem',
+                              fontWeight: '600',
+                              color: '#111827'
+                            }
+                          }
+                        },
+                        {
+                          id: generateId(),
+                          type: 'text',
+                          displayName: 'Toggle Icon',
+                          props: { content: '+' },
+                          styles: {
+                            base: {
+                              fontSize: '1.5rem',
+                              color: '#6B7280'
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      id: generateId(),
+                      type: 'text',
+                      displayName: 'Answer',
+                      props: {
+                        content: 'Start your 14-day free trial with full access to all Professional features. No credit card required. Cancel anytime.'
+                      },
+                      styles: {
+                        base: {
+                          marginTop: '1rem',
+                          color: '#6B7280',
+                          lineHeight: '1.6',
+                          display: 'none'
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  id: generateId(),
+                  type: 'container',
+                  displayName: 'FAQ Item',
+                  props: {},
+                  styles: {
+                    base: {
+                      backgroundColor: '#F9FAFB',
+                      borderRadius: '12px',
+                      padding: '1.5rem',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s'
+                    }
+                  },
+                  children: [
+                    {
+                      id: generateId(),
+                      type: 'flex',
+                      displayName: 'Question Container',
+                      props: {},
+                      styles: {
+                        base: {
+                          justifyContent: 'space-between',
+                          alignItems: 'center'
+                        }
+                      },
+                      children: [
+                        {
+                          id: generateId(),
+                          type: 'text',
+                          displayName: 'Question',
+                          props: {
+                            content: 'Can I change plans later?'
+                          },
+                          styles: {
+                            base: {
+                              fontSize: '1.125rem',
+                              fontWeight: '600',
+                              color: '#111827'
+                            }
+                          }
+                        },
+                        {
+                          id: generateId(),
+                          type: 'text',
+                          displayName: 'Toggle Icon',
+                          props: { content: '+' },
+                          styles: {
+                            base: {
+                              fontSize: '1.5rem',
+                              color: '#6B7280'
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      id: generateId(),
+                      type: 'text',
+                      displayName: 'Answer',
+                      props: {
+                        content: 'Yes, you can upgrade or downgrade your plan at any time. Changes take effect on your next billing cycle.'
+                      },
+                      styles: {
+                        base: {
+                          marginTop: '1rem',
+                          color: '#6B7280',
+                          lineHeight: '1.6',
+                          display: 'none'
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  id: generateId(),
+                  type: 'container',
+                  displayName: 'FAQ Item',
+                  props: {},
+                  styles: {
+                    base: {
+                      backgroundColor: '#F9FAFB',
+                      borderRadius: '12px',
+                      padding: '1.5rem',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s'
+                    }
+                  },
+                  children: [
+                    {
+                      id: generateId(),
+                      type: 'flex',
+                      displayName: 'Question Container',
+                      props: {},
+                      styles: {
+                        base: {
+                          justifyContent: 'space-between',
+                          alignItems: 'center'
+                        }
+                      },
+                      children: [
+                        {
+                          id: generateId(),
+                          type: 'text',
+                          displayName: 'Question',
+                          props: {
+                            content: 'What payment methods do you accept?'
+                          },
+                          styles: {
+                            base: {
+                              fontSize: '1.125rem',
+                              fontWeight: '600',
+                              color: '#111827'
+                            }
+                          }
+                        },
+                        {
+                          id: generateId(),
+                          type: 'text',
+                          displayName: 'Toggle Icon',
+                          props: { content: '+' },
+                          styles: {
+                            base: {
+                              fontSize: '1.5rem',
+                              color: '#6B7280'
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      id: generateId(),
+                      type: 'text',
+                      displayName: 'Answer',
+                      props: {
+                        content: 'We accept all major credit cards (Visa, MasterCard, American Express), PayPal, and wire transfers for Enterprise plans.'
+                      },
+                      styles: {
+                        base: {
+                          marginTop: '1rem',
+                          color: '#6B7280',
+                          lineHeight: '1.6',
+                          display: 'none'
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      id: generateId(),
       type: 'cta',
       displayName: 'CTA Section',
       props: {

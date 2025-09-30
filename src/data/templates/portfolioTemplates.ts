@@ -377,6 +377,926 @@ export const designerPortfolioTemplate: Template = {
         }
       ]
     },
+    // Skills Section
+    {
+      id: generateId(),
+      type: 'section',
+      displayName: 'Skills Section',
+      props: {},
+      styles: {
+        base: {
+          padding: '6rem 2rem',
+          backgroundColor: '#ffffff'
+        }
+      },
+      children: [
+        {
+          id: generateId(),
+          type: 'container',
+          displayName: 'Skills Container',
+          props: {},
+          styles: {
+            base: {
+              maxWidth: '1200px',
+              margin: '0 auto'
+            }
+          },
+          children: [
+            {
+              id: generateId(),
+              type: 'heading',
+              displayName: 'Section Title',
+              props: {
+                content: 'Skills & Expertise',
+                attributes: { level: 'h2' }
+              },
+              styles: {
+                base: {
+                  fontSize: '2.5rem',
+                  fontWeight: '300',
+                  textAlign: 'center',
+                  marginBottom: '3rem',
+                  color: '#1f2937'
+                }
+              }
+            },
+            {
+              id: generateId(),
+              type: 'grid',
+              displayName: 'Skills Grid',
+              props: {},
+              styles: {
+                base: {
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+                  gap: '2rem'
+                }
+              },
+              children: [
+                {
+                  id: generateId(),
+                  type: 'container',
+                  displayName: 'Skill Item',
+                  props: {},
+                  styles: {
+                    base: {
+                      padding: '1.5rem'
+                    }
+                  },
+                  children: [
+                    {
+                      id: generateId(),
+                      type: 'flex',
+                      displayName: 'Skill Header',
+                      props: {},
+                      styles: {
+                        base: {
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          marginBottom: '0.75rem'
+                        }
+                      },
+                      children: [
+                        {
+                          id: generateId(),
+                          type: 'text',
+                          displayName: 'Skill Name',
+                          props: { content: 'UI/UX Design' },
+                          styles: {
+                            base: {
+                              fontSize: '1.125rem',
+                              fontWeight: '500',
+                              color: '#374151'
+                            }
+                          }
+                        },
+                        {
+                          id: generateId(),
+                          type: 'text',
+                          displayName: 'Skill Level',
+                          props: { content: '95%' },
+                          styles: {
+                            base: {
+                              fontSize: '0.875rem',
+                              fontWeight: '500',
+                              color: '#8B5CF6'
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      id: generateId(),
+                      type: 'container',
+                      displayName: 'Progress Bar Background',
+                      props: {},
+                      styles: {
+                        base: {
+                          width: '100%',
+                          height: '4px',
+                          backgroundColor: '#E5E7EB',
+                          borderRadius: '2px',
+                          overflow: 'hidden'
+                        }
+                      },
+                      children: [
+                        {
+                          id: generateId(),
+                          type: 'container',
+                          displayName: 'Progress Bar Fill',
+                          props: {},
+                          styles: {
+                            base: {
+                              width: '95%',
+                              height: '100%',
+                              backgroundColor: '#8B5CF6',
+                              borderRadius: '2px',
+                              transition: 'width 1s ease-out'
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  id: generateId(),
+                  type: 'container',
+                  displayName: 'Skill Item',
+                  props: {},
+                  styles: {
+                    base: {
+                      padding: '1.5rem'
+                    }
+                  },
+                  children: [
+                    {
+                      id: generateId(),
+                      type: 'flex',
+                      displayName: 'Skill Header',
+                      props: {},
+                      styles: {
+                        base: {
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          marginBottom: '0.75rem'
+                        }
+                      },
+                      children: [
+                        {
+                          id: generateId(),
+                          type: 'text',
+                          displayName: 'Skill Name',
+                          props: { content: 'Brand Strategy' },
+                          styles: {
+                            base: {
+                              fontSize: '1.125rem',
+                              fontWeight: '500',
+                              color: '#374151'
+                            }
+                          }
+                        },
+                        {
+                          id: generateId(),
+                          type: 'text',
+                          displayName: 'Skill Level',
+                          props: { content: '90%' },
+                          styles: {
+                            base: {
+                              fontSize: '0.875rem',
+                              fontWeight: '500',
+                              color: '#8B5CF6'
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      id: generateId(),
+                      type: 'container',
+                      displayName: 'Progress Bar Background',
+                      props: {},
+                      styles: {
+                        base: {
+                          width: '100%',
+                          height: '4px',
+                          backgroundColor: '#E5E7EB',
+                          borderRadius: '2px',
+                          overflow: 'hidden'
+                        }
+                      },
+                      children: [
+                        {
+                          id: generateId(),
+                          type: 'container',
+                          displayName: 'Progress Bar Fill',
+                          props: {},
+                          styles: {
+                            base: {
+                              width: '90%',
+                              height: '100%',
+                              backgroundColor: '#8B5CF6',
+                              borderRadius: '2px',
+                              transition: 'width 1s ease-out'
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  id: generateId(),
+                  type: 'container',
+                  displayName: 'Skill Item',
+                  props: {},
+                  styles: {
+                    base: {
+                      padding: '1.5rem'
+                    }
+                  },
+                  children: [
+                    {
+                      id: generateId(),
+                      type: 'flex',
+                      displayName: 'Skill Header',
+                      props: {},
+                      styles: {
+                        base: {
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          marginBottom: '0.75rem'
+                        }
+                      },
+                      children: [
+                        {
+                          id: generateId(),
+                          type: 'text',
+                          displayName: 'Skill Name',
+                          props: { content: 'Motion Design' },
+                          styles: {
+                            base: {
+                              fontSize: '1.125rem',
+                              fontWeight: '500',
+                              color: '#374151'
+                            }
+                          }
+                        },
+                        {
+                          id: generateId(),
+                          type: 'text',
+                          displayName: 'Skill Level',
+                          props: { content: '85%' },
+                          styles: {
+                            base: {
+                              fontSize: '0.875rem',
+                              fontWeight: '500',
+                              color: '#8B5CF6'
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      id: generateId(),
+                      type: 'container',
+                      displayName: 'Progress Bar Background',
+                      props: {},
+                      styles: {
+                        base: {
+                          width: '100%',
+                          height: '4px',
+                          backgroundColor: '#E5E7EB',
+                          borderRadius: '2px',
+                          overflow: 'hidden'
+                        }
+                      },
+                      children: [
+                        {
+                          id: generateId(),
+                          type: 'container',
+                          displayName: 'Progress Bar Fill',
+                          props: {},
+                          styles: {
+                            base: {
+                              width: '85%',
+                              height: '100%',
+                              backgroundColor: '#8B5CF6',
+                              borderRadius: '2px',
+                              transition: 'width 1s ease-out'
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  id: generateId(),
+                  type: 'container',
+                  displayName: 'Skill Item',
+                  props: {},
+                  styles: {
+                    base: {
+                      padding: '1.5rem'
+                    }
+                  },
+                  children: [
+                    {
+                      id: generateId(),
+                      type: 'flex',
+                      displayName: 'Skill Header',
+                      props: {},
+                      styles: {
+                        base: {
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          marginBottom: '0.75rem'
+                        }
+                      },
+                      children: [
+                        {
+                          id: generateId(),
+                          type: 'text',
+                          displayName: 'Skill Name',
+                          props: { content: 'Figma & Sketch' },
+                          styles: {
+                            base: {
+                              fontSize: '1.125rem',
+                              fontWeight: '500',
+                              color: '#374151'
+                            }
+                          }
+                        },
+                        {
+                          id: generateId(),
+                          type: 'text',
+                          displayName: 'Skill Level',
+                          props: { content: '100%' },
+                          styles: {
+                            base: {
+                              fontSize: '0.875rem',
+                              fontWeight: '500',
+                              color: '#8B5CF6'
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      id: generateId(),
+                      type: 'container',
+                      displayName: 'Progress Bar Background',
+                      props: {},
+                      styles: {
+                        base: {
+                          width: '100%',
+                          height: '4px',
+                          backgroundColor: '#E5E7EB',
+                          borderRadius: '2px',
+                          overflow: 'hidden'
+                        }
+                      },
+                      children: [
+                        {
+                          id: generateId(),
+                          type: 'container',
+                          displayName: 'Progress Bar Fill',
+                          props: {},
+                          styles: {
+                            base: {
+                              width: '100%',
+                              height: '100%',
+                              backgroundColor: '#8B5CF6',
+                              borderRadius: '2px',
+                              transition: 'width 1s ease-out'
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  id: generateId(),
+                  type: 'container',
+                  displayName: 'Skill Item',
+                  props: {},
+                  styles: {
+                    base: {
+                      padding: '1.5rem'
+                    }
+                  },
+                  children: [
+                    {
+                      id: generateId(),
+                      type: 'flex',
+                      displayName: 'Skill Header',
+                      props: {},
+                      styles: {
+                        base: {
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          marginBottom: '0.75rem'
+                        }
+                      },
+                      children: [
+                        {
+                          id: generateId(),
+                          type: 'text',
+                          displayName: 'Skill Name',
+                          props: { content: 'Illustration' },
+                          styles: {
+                            base: {
+                              fontSize: '1.125rem',
+                              fontWeight: '500',
+                              color: '#374151'
+                            }
+                          }
+                        },
+                        {
+                          id: generateId(),
+                          type: 'text',
+                          displayName: 'Skill Level',
+                          props: { content: '88%' },
+                          styles: {
+                            base: {
+                              fontSize: '0.875rem',
+                              fontWeight: '500',
+                              color: '#8B5CF6'
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      id: generateId(),
+                      type: 'container',
+                      displayName: 'Progress Bar Background',
+                      props: {},
+                      styles: {
+                        base: {
+                          width: '100%',
+                          height: '4px',
+                          backgroundColor: '#E5E7EB',
+                          borderRadius: '2px',
+                          overflow: 'hidden'
+                        }
+                      },
+                      children: [
+                        {
+                          id: generateId(),
+                          type: 'container',
+                          displayName: 'Progress Bar Fill',
+                          props: {},
+                          styles: {
+                            base: {
+                              width: '88%',
+                              height: '100%',
+                              backgroundColor: '#8B5CF6',
+                              borderRadius: '2px',
+                              transition: 'width 1s ease-out'
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  id: generateId(),
+                  type: 'container',
+                  displayName: 'Skill Item',
+                  props: {},
+                  styles: {
+                    base: {
+                      padding: '1.5rem'
+                    }
+                  },
+                  children: [
+                    {
+                      id: generateId(),
+                      type: 'flex',
+                      displayName: 'Skill Header',
+                      props: {},
+                      styles: {
+                        base: {
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          marginBottom: '0.75rem'
+                        }
+                      },
+                      children: [
+                        {
+                          id: generateId(),
+                          type: 'text',
+                          displayName: 'Skill Name',
+                          props: { content: 'Typography' },
+                          styles: {
+                            base: {
+                              fontSize: '1.125rem',
+                              fontWeight: '500',
+                              color: '#374151'
+                            }
+                          }
+                        },
+                        {
+                          id: generateId(),
+                          type: 'text',
+                          displayName: 'Skill Level',
+                          props: { content: '92%' },
+                          styles: {
+                            base: {
+                              fontSize: '0.875rem',
+                              fontWeight: '500',
+                              color: '#8B5CF6'
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      id: generateId(),
+                      type: 'container',
+                      displayName: 'Progress Bar Background',
+                      props: {},
+                      styles: {
+                        base: {
+                          width: '100%',
+                          height: '4px',
+                          backgroundColor: '#E5E7EB',
+                          borderRadius: '2px',
+                          overflow: 'hidden'
+                        }
+                      },
+                      children: [
+                        {
+                          id: generateId(),
+                          type: 'container',
+                          displayName: 'Progress Bar Fill',
+                          props: {},
+                          styles: {
+                            base: {
+                              width: '92%',
+                              height: '100%',
+                              backgroundColor: '#8B5CF6',
+                              borderRadius: '2px',
+                              transition: 'width 1s ease-out'
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    // Client Testimonials
+    {
+      id: generateId(),
+      type: 'section',
+      displayName: 'Testimonials Section',
+      props: {},
+      styles: {
+        base: {
+          padding: '6rem 2rem',
+          backgroundColor: '#f9fafb'
+        }
+      },
+      children: [
+        {
+          id: generateId(),
+          type: 'container',
+          displayName: 'Testimonials Container',
+          props: {},
+          styles: {
+            base: {
+              maxWidth: '1000px',
+              margin: '0 auto'
+            }
+          },
+          children: [
+            {
+              id: generateId(),
+              type: 'heading',
+              displayName: 'Section Title',
+              props: {
+                content: 'Client Testimonials',
+                attributes: { level: 'h2' }
+              },
+              styles: {
+                base: {
+                  fontSize: '2.5rem',
+                  fontWeight: '300',
+                  textAlign: 'center',
+                  marginBottom: '3rem',
+                  color: '#1f2937'
+                }
+              }
+            },
+            {
+              id: generateId(),
+              type: 'grid',
+              displayName: 'Testimonials Grid',
+              props: {},
+              styles: {
+                base: {
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
+                  gap: '2rem'
+                }
+              },
+              children: [
+                {
+                  id: generateId(),
+                  type: 'container',
+                  displayName: 'Testimonial Card',
+                  props: {},
+                  styles: {
+                    base: {
+                      backgroundColor: 'white',
+                      padding: '2rem',
+                      borderRadius: '8px',
+                      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)'
+                    }
+                  },
+                  children: [
+                    {
+                      id: generateId(),
+                      type: 'text',
+                      displayName: 'Testimonial Text',
+                      props: {
+                        content: '"Jane transformed our brand identity with her exceptional creative vision. Her attention to detail and ability to understand our needs was outstanding."'
+                      },
+                      styles: {
+                        base: {
+                          fontSize: '1rem',
+                          color: '#374151',
+                          lineHeight: '1.8',
+                          marginBottom: '1.5rem',
+                          fontStyle: 'italic'
+                        }
+                      }
+                    },
+                    {
+                      id: generateId(),
+                      type: 'flex',
+                      displayName: 'Client Info',
+                      props: {},
+                      styles: {
+                        base: {
+                          alignItems: 'center',
+                          gap: '1rem'
+                        }
+                      },
+                      children: [
+                        {
+                          id: generateId(),
+                          type: 'container',
+                          displayName: 'Avatar',
+                          props: {},
+                          styles: {
+                            base: {
+                              width: '48px',
+                              height: '48px',
+                              borderRadius: '50%',
+                              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                            }
+                          }
+                        },
+                        {
+                          id: generateId(),
+                          type: 'container',
+                          displayName: 'Client Details',
+                          props: {},
+                          styles: {
+                            base: {}
+                          },
+                          children: [
+                            {
+                              id: generateId(),
+                              type: 'text',
+                              displayName: 'Name',
+                              props: { content: 'Alex Thompson' },
+                              styles: {
+                                base: {
+                                  fontSize: '1rem',
+                                  fontWeight: '600',
+                                  color: '#111827',
+                                  marginBottom: '0.25rem'
+                                }
+                              }
+                            },
+                            {
+                              id: generateId(),
+                              type: 'text',
+                              displayName: 'Role',
+                              props: { content: 'CEO, TechStart Inc.' },
+                              styles: {
+                                base: {
+                                  fontSize: '0.875rem',
+                                  color: '#6B7280'
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  id: generateId(),
+                  type: 'container',
+                  displayName: 'Testimonial Card',
+                  props: {},
+                  styles: {
+                    base: {
+                      backgroundColor: 'white',
+                      padding: '2rem',
+                      borderRadius: '8px',
+                      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)'
+                    }
+                  },
+                  children: [
+                    {
+                      id: generateId(),
+                      type: 'text',
+                      displayName: 'Testimonial Text',
+                      props: {
+                        content: '"Working with Jane was a game-changer for our startup. Her designs helped us secure funding and establish a strong market presence."'
+                      },
+                      styles: {
+                        base: {
+                          fontSize: '1rem',
+                          color: '#374151',
+                          lineHeight: '1.8',
+                          marginBottom: '1.5rem',
+                          fontStyle: 'italic'
+                        }
+                      }
+                    },
+                    {
+                      id: generateId(),
+                      type: 'flex',
+                      displayName: 'Client Info',
+                      props: {},
+                      styles: {
+                        base: {
+                          alignItems: 'center',
+                          gap: '1rem'
+                        }
+                      },
+                      children: [
+                        {
+                          id: generateId(),
+                          type: 'container',
+                          displayName: 'Avatar',
+                          props: {},
+                          styles: {
+                            base: {
+                              width: '48px',
+                              height: '48px',
+                              borderRadius: '50%',
+                              background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'
+                            }
+                          }
+                        },
+                        {
+                          id: generateId(),
+                          type: 'container',
+                          displayName: 'Client Details',
+                          props: {},
+                          styles: {
+                            base: {}
+                          },
+                          children: [
+                            {
+                              id: generateId(),
+                              type: 'text',
+                              displayName: 'Name',
+                              props: { content: 'Sarah Mitchell' },
+                              styles: {
+                                base: {
+                                  fontSize: '1rem',
+                                  fontWeight: '600',
+                                  color: '#111827',
+                                  marginBottom: '0.25rem'
+                                }
+                              }
+                            },
+                            {
+                              id: generateId(),
+                              type: 'text',
+                              displayName: 'Role',
+                              props: { content: 'Founder, Creative Labs' },
+                              styles: {
+                                base: {
+                                  fontSize: '0.875rem',
+                                  color: '#6B7280'
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    // Contact CTA
+    {
+      id: generateId(),
+      type: 'section',
+      displayName: 'Contact CTA',
+      props: {},
+      styles: {
+        base: {
+          padding: '6rem 2rem',
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          textAlign: 'center'
+        }
+      },
+      children: [
+        {
+          id: generateId(),
+          type: 'container',
+          displayName: 'CTA Container',
+          props: {},
+          styles: {
+            base: {
+              maxWidth: '800px',
+              margin: '0 auto'
+            }
+          },
+          children: [
+            {
+              id: generateId(),
+              type: 'heading',
+              displayName: 'CTA Title',
+              props: {
+                content: "Let's Create Something Beautiful",
+                attributes: { level: 'h2' }
+              },
+              styles: {
+                base: {
+                  fontSize: '3rem',
+                  fontWeight: '300',
+                  color: 'white',
+                  marginBottom: '1rem'
+                }
+              }
+            },
+            {
+              id: generateId(),
+              type: 'text',
+              displayName: 'CTA Description',
+              props: {
+                content: "Have a project in mind? I'd love to hear about it and explore how we can work together."
+              },
+              styles: {
+                base: {
+                  fontSize: '1.25rem',
+                  color: 'rgba(255, 255, 255, 0.9)',
+                  marginBottom: '2rem'
+                }
+              }
+            },
+            {
+              id: generateId(),
+              type: 'button',
+              displayName: 'CTA Button',
+              props: {
+                content: 'Start a Project'
+              },
+              styles: {
+                base: {
+                  padding: '1rem 2.5rem',
+                  backgroundColor: 'white',
+                  color: '#667eea',
+                  border: 'none',
+                  borderRadius: '50px',
+                  fontSize: '1.125rem',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s',
+                  boxShadow: '0 10px 30px rgba(0, 0, 0, 0.2)'
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
     // Footer
     {
       id: generateId(),

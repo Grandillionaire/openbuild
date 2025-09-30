@@ -30,6 +30,10 @@ import {
   professionalAgencyTemplate
 } from './templates/modernTemplates';
 
+import {
+  ecommerceTemplate
+} from './templates/ecommerceTemplate';
+
 // Landing Page Templates
 const modernLandingTemplate: Template = {
   id: 'tpl_modern_landing',
@@ -2964,19 +2968,22 @@ export const templates: Template[] = [
   // Modern Templates (Featured)
   modernStartupTemplate,
   professionalAgencyTemplate,
-  
+
   // Landing Pages
   saasLandingTemplate,
   productLaunchTemplate,
   agencyLandingTemplate,
-  
+
   // Portfolio
   designerPortfolioTemplate,
   developerPortfolioTemplate,
   photographerPortfolioTemplate,
-  
+
   // Blog
   techBlogTemplate,
   personalBlogTemplate,
-  magazineBlogTemplate
+  magazineBlogTemplate,
+
+  // E-commerce
+  ecommerceTemplate
 ];
