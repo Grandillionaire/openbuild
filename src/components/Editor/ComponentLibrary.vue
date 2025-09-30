@@ -1,5 +1,18 @@
 <template>
   <div class="component-library">
+    <!-- Section Templates -->
+    <SectionLibrary />
+
+    <!-- Divider -->
+    <div class="library-divider"></div>
+
+    <!-- Form Builder -->
+    <FormBuilder />
+
+    <!-- Divider -->
+    <div class="library-divider"></div>
+
+    <!-- Components -->
     <div class="library-header">
       <h3>Components</h3>
       <button @click="toggleView" class="view-toggle">
@@ -88,6 +101,8 @@ import {
   Megaphone
 } from 'lucide-vue-next';
 import { componentDefinitions } from '@/config/components';
+import SectionLibrary from './SectionLibrary.vue';
+import FormBuilder from './FormBuilder.vue';
 
 const store = useEditorStore();
 
@@ -214,6 +229,12 @@ function endDrag() {
   height: 100%;
   display: flex;
   flex-direction: column;
+}
+
+.library-divider {
+  height: 1px;
+  background: #e5e7eb;
+  margin: 0;
 }
 
 .library-header {

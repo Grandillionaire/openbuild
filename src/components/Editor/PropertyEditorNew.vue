@@ -34,11 +34,20 @@
     </div>
     
     <div v-else class="editor-content">
+      <!-- Quick Style Switcher -->
+      <QuickStyleSwitcher />
+
+      <!-- Responsive Editor -->
+      <ResponsiveEditor />
+
+      <!-- Image Editor (for image components) -->
+      <ImageEditor />
+
       <!-- Search/Filter -->
       <div class="search-box">
         <Search :size="16" />
-        <input 
-          v-model="searchQuery" 
+        <input
+          v-model="searchQuery"
           placeholder="Search properties..."
           @input="filterProperties"
         />
@@ -284,6 +293,9 @@ import { nanoid } from 'nanoid';
 import VariantSelector from './VariantSelector.vue';
 import AnimationEditor from './AnimationEditorNew.vue';
 import CustomCodeEditor from './CustomCodeEditor.vue';
+import QuickStyleSwitcher from './QuickStyleSwitcher.vue';
+import ResponsiveEditor from './ResponsiveEditor.vue';
+import ImageEditor from './ImageEditor.vue';
 
 // Sub-components for different property groups
 import ResponsiveToggle from './properties/ResponsiveToggle.vue';

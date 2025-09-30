@@ -137,6 +137,22 @@ function selectComponent(id: string) {
 
 function handleDrop(e: DragEvent) {
   e.preventDefault();
+
+  // Check if it's a section drop
+  const sectionData = e.dataTransfer?.getData('sectionData');
+  if (sectionData) {
+    try {
+      const components = JSON.parse(sectionData);
+      components.forEach((component: any) => {
+        store.addComponent(component);
+      });
+      return;
+    } catch (err) {
+      console.error('Failed to parse section data:', err);
+    }
+  }
+
+  // Regular component drop
   const type = e.dataTransfer?.getData('componentType');
   if (type) {
     store.addComponent(type as any);

@@ -44,12 +44,15 @@
       />
       
       <!-- Template Library -->
-      <TemplateLibrary 
-        :isOpen="showTemplateLibrary" 
-        @close="showTemplateLibrary = false" 
+      <TemplateLibrary
+        :isOpen="showTemplateLibrary"
+        @close="showTemplateLibrary = false"
       />
+
+      <!-- Quick Actions Bar -->
+      <QuickActionsBar />
     </ErrorBoundary>
-    
+
   </div>
 </template>
 
@@ -83,6 +86,7 @@ import CodeViewer from '@/components/Editor/CodeViewer.vue';
 import ErrorBoundary from '@/components/UI/ErrorBoundary.vue';
 import AssetManager from '@/components/Assets/AssetManager.vue';
 import TemplateLibrary from '@/components/Templates/TemplateLibrary.vue';
+import QuickActionsBar from '@/components/UI/QuickActionsBar.vue';
 import { useKeyboardShortcuts } from '@/composables/useKeyboardShortcuts';
 import { usePerformance } from '@/composables/usePerformance';
 import { storageService } from '@/services/storageService';

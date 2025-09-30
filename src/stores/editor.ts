@@ -27,6 +27,14 @@ export const useEditorStore = defineStore('editor', () => {
   const zoom = ref(1);
   const showCode = ref(false);
   const showGrid = ref(true);
+
+  // Responsive editing mode
+  const responsiveMode = ref<'desktop' | 'tablet' | 'mobile'>('desktop');
+  const deviceVisibility = ref<Record<string, {
+    desktop: boolean;
+    tablet: boolean;
+    mobile: boolean;
+  }>>({});
   
   // Asset management
   const showAssetManager = ref(false);
@@ -306,6 +314,54 @@ export const useEditorStore = defineStore('editor', () => {
       component.props.animations = component.props.animations.filter(a => a.id !== animationId);
     }
   }
+
+  // Responsive mode functions
+  function setResponsiveMode(mode: 'desktop' | 'tablet' | 'mobile') {
+    responsiveMode.value = mode;
+    viewport.value = mode;
+  }
+
+  function toggleDeviceVisibility(componentId: string, device: 'desktop' | 'tablet' | 'mobile') {
+    if (!deviceVisibility.value[componentId]) {
+      deviceVisibility.value[componentId] = {
+        desktop: true,
+        tablet: true,
+        mobile: true
+      };
+    }
+    deviceVisibility.value[componentId][device] = !deviceVisibility.value[componentId][device];
+
+    // Update component with visibility classes
+    const component = findComponentById(components.value, componentId);
+    if (component) {
+      if (!component.props.className) {
+        component.props.className = '';
+      }
+
+      // Remove old visibility classes
+      component.props.className = component.props.className
+        .replace(/\bhide-on-(desktop|tablet|mobile)\b/g, '')
+        .trim();
+
+      // Add new visibility classes
+      const hideClasses = [];
+      if (!deviceVisibility.value[componentId].desktop) hideClasses.push('hide-on-desktop');
+      if (!deviceVisibility.value[componentId].tablet) hideClasses.push('hide-on-tablet');
+      if (!deviceVisibility.value[componentId].mobile) hideClasses.push('hide-on-mobile');
+
+      if (hideClasses.length > 0) {
+        component.props.className = `${component.props.className} ${hideClasses.join(' ')}`.trim();
+      }
+    }
+  }
+
+  function getDeviceVisibility(componentId: string) {
+    return deviceVisibility.value[componentId] || {
+      desktop: true,
+      tablet: true,
+      mobile: true
+    };
+  }
   
   return {
     // State
@@ -323,12 +379,14 @@ export const useEditorStore = defineStore('editor', () => {
     showAssetManager,
     assets,
     globalCustomCode,
-    
+    responsiveMode,
+    deviceVisibility,
+
     // Computed
     selectedComponent,
     canUndo,
     canRedo,
-    
+
     // Actions
     addComponent,
     updateComponent,
@@ -346,6 +404,9 @@ export const useEditorStore = defineStore('editor', () => {
     updateMultipleStyles,
     addAnimation,
     updateAnimation,
-    removeAnimation
+    removeAnimation,
+    setResponsiveMode,
+    toggleDeviceVisibility,
+    getDeviceVisibility
   };
 });

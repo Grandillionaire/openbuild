@@ -34,7 +34,7 @@
         
         <div class="separator"></div>
         
-        <button 
+        <button
           @click="showTemplateLibrary = true"
           title="Browse Templates"
           class="template-btn"
@@ -42,7 +42,19 @@
           <BookOpen :size="18" />
           <span class="btn-label">Templates</span>
         </button>
-        <button 
+        <button
+          @click="showPagesManager = true"
+          title="Pages & Navigation"
+        >
+          <FileText :size="18" />
+        </button>
+        <button
+          @click="showSEOPanel = true"
+          title="SEO Settings"
+        >
+          <Search :size="18" />
+        </button>
+        <button
           @click="showThemeModal = true"
           title="Design Theme"
         >
@@ -112,7 +124,24 @@
     
     <!-- Global Code Editor -->
     <GlobalCodeEditor :isOpen="showGlobalCode" @close="showGlobalCode = false" />
-    
+
+    <!-- Pages Manager Modal -->
+    <teleport to="body">
+      <PagesManager v-if="showPagesManager" @close="showPagesManager = false" />
+    </teleport>
+
+    <!-- SEO Panel Modal -->
+    <teleport to="body">
+      <div v-if="showSEOPanel" class="modal-overlay" @click="showSEOPanel = false">
+        <div class="modal-content-large" @click.stop>
+          <SEOPanel />
+          <button @click="showSEOPanel = false" class="modal-close-btn">
+            <X :size="20" />
+          </button>
+        </div>
+      </div>
+    </teleport>
+
     <!-- Toast Notifications -->
     <ToastContainer />
   </header>
@@ -121,10 +150,10 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { useEditorStore } from '@/stores/editor';
-import { 
-  Package, 
-  Undo, 
-  Redo, 
+import {
+  Package,
+  Undo,
+  Redo,
   Grid3x3,
   Eye,
   Code2,
@@ -135,7 +164,10 @@ import {
   Palette,
   FileCode,
   BookOpen,
-  Menu
+  Menu,
+  FileText,
+  Search,
+  X
 } from 'lucide-vue-next';
 import ExportModal from './ExportModal.vue';
 import DeployModal from './DeployModal.vue';
@@ -143,6 +175,8 @@ import ToastContainer from '../UI/ToastContainer.vue';
 import TemplateLibrary from '../Templates/TemplateLibrary.vue';
 import ThemeModal from './ThemeModal.vue';
 import GlobalCodeEditor from '../Editor/GlobalCodeEditor.vue';
+import PagesManager from '../Editor/PagesManager.vue';
+import SEOPanel from '../Editor/SEOPanel.vue';
 import { useToast } from '@/composables/useToast';
 import { storageService } from '@/services/storageService';
 
@@ -156,6 +190,8 @@ const showTemplateLibrary = ref(false);
 const showThemeModal = ref(false);
 const showGlobalCode = ref(false);
 const showMobileMenu = ref(false);
+const showPagesManager = ref(false);
+const showSEOPanel = ref(false);
 
 function updateProjectName() {
   store.projectName = projectName.value || 'Untitled Project';
@@ -381,6 +417,50 @@ async function togglePreview() {
   border: none;
   border-radius: 4px;
   cursor: pointer;
+}
+
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.modal-content-large {
+  background: white;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 800px;
+  max-height: 80vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s;
+  z-index: 10;
+}
+
+.modal-close-btn:hover {
+  background: #f3f4f6;
+  color: #374151;
 }
 
 /* Responsive styles */
