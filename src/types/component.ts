@@ -48,7 +48,7 @@ export interface CSSProperties {
 }
 
 export type ComponentType =
-  | 'container' | 'section' | 'grid' | 'flex' | 'spacer'
+  | 'container' | 'section' | 'div' | 'grid' | 'flex' | 'spacer'
   | 'heading' | 'text' | 'button' | 'link' | 'image'
   | 'hero' | 'features' | 'cta' | 'footer' | 'navigation'
   | 'form' | 'input' | 'textarea' | 'select' | 'checkbox'

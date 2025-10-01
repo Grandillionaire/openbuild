@@ -34,8 +34,8 @@ const baseComponentDefinitions: Record<ComponentType, ComponentDefinition> = {
       }
     },
     generateHTML: (component) => {
-      const children = component.children?.map(c => 
-        componentDefinitions[c.type].generateHTML(c)
+      const children = component.children?.map(c =>
+        componentDefinitions[c.type] ? componentDefinitions[c.type].generateHTML(c) : ''
       ).join('\n') || '';
       return `<div class="c-${component.id}" id="${component.id}">\n${children}\n</div>`;
     },
@@ -62,8 +62,8 @@ const baseComponentDefinitions: Record<ComponentType, ComponentDefinition> = {
       }
     },
     generateHTML: (component) => {
-      const children = component.children?.map(c => 
-        componentDefinitions[c.type].generateHTML(c)
+      const children = component.children?.map(c =>
+        componentDefinitions[c.type] ? componentDefinitions[c.type].generateHTML(c) : ''
       ).join('\n') || '';
       return `<section class="c-${component.id}" id="${component.id}">\n${children}\n</section>`;
     },
@@ -71,7 +71,30 @@ const baseComponentDefinitions: Record<ComponentType, ComponentDefinition> = {
       return generateResponsiveCSS(`.c-${component.id}`, component.styles);
     }
   },
-  
+
+  div: {
+    type: 'div' as any,
+    displayName: 'Div',
+    category: 'layout',
+    icon: 'square',
+    acceptsChildren: true,
+    defaultProps: {},
+    defaultStyles: {
+      base: {
+        display: 'block'
+      }
+    },
+    generateHTML: (component) => {
+      const children = component.children?.map(c =>
+        componentDefinitions[c.type] ? componentDefinitions[c.type].generateHTML(c) : ''
+      ).join('\n') || '';
+      return `<div class="c-${component.id}" id="${component.id}">\n${children}\n</div>`;
+    },
+    generateCSS: (component) => {
+      return generateResponsiveCSS(`.c-${component.id}`, component.styles);
+    }
+  },
+
   grid: {
     type: 'grid',
     displayName: 'Grid',
@@ -96,8 +119,8 @@ const baseComponentDefinitions: Record<ComponentType, ComponentDefinition> = {
       }
     },
     generateHTML: (component) => {
-      const children = component.children?.map(c => 
-        componentDefinitions[c.type].generateHTML(c)
+      const children = component.children?.map(c =>
+        componentDefinitions[c.type] ? componentDefinitions[c.type].generateHTML(c) : ''
       ).join('\n') || '';
       return `<div class="c-${component.id} grid" id="${component.id}">\n${children}\n</div>`;
     },
@@ -126,8 +149,8 @@ const baseComponentDefinitions: Record<ComponentType, ComponentDefinition> = {
       }
     },
     generateHTML: (component) => {
-      const children = component.children?.map(c => 
-        componentDefinitions[c.type].generateHTML(c)
+      const children = component.children?.map(c =>
+        componentDefinitions[c.type] ? componentDefinitions[c.type].generateHTML(c) : ''
       ).join('\n') || '';
       return `<div class="c-${component.id} flex" id="${component.id}">\n${children}\n</div>`;
     },
