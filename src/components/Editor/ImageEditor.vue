@@ -288,12 +288,19 @@ const cropRatios = [
 function updateImageSource() {
   if (!store.selectedComponent) return;
 
+  // Update both src and attributes.src for compatibility
   store.updateComponent(store.selectedComponent.id, {
     props: {
       ...store.selectedComponent.props,
-      src: imageUrl.value
+      src: imageUrl.value,
+      attributes: {
+        ...store.selectedComponent.props.attributes,
+        src: imageUrl.value
+      }
     }
   });
+
+  showToast('Image updated successfully', 'success');
 }
 
 function handleImageDrop(event: DragEvent) {

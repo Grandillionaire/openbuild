@@ -407,6 +407,16 @@ export const useEditorStore = defineStore('editor', () => {
           comp.props.content = comp.props.text;
           // Keep text for backward compatibility
         }
+
+        // Normalize image src - ensure it's in both places for compatibility
+        if (comp.type === 'image' && comp.props.src) {
+          if (!comp.props.attributes) {
+            comp.props.attributes = {};
+          }
+          if (!comp.props.attributes.src) {
+            comp.props.attributes.src = comp.props.src;
+          }
+        }
       }
 
       // Ensure styles structure exists
@@ -467,6 +477,16 @@ export const useEditorStore = defineStore('editor', () => {
         if (comp.props.text && !comp.props.content) {
           comp.props.content = comp.props.text;
           // Keep text for backward compatibility
+        }
+
+        // Normalize image src - ensure it's in both places for compatibility
+        if (comp.type === 'image' && comp.props.src) {
+          if (!comp.props.attributes) {
+            comp.props.attributes = {};
+          }
+          if (!comp.props.attributes.src) {
+            comp.props.attributes.src = comp.props.src;
+          }
         }
       }
 

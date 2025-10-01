@@ -128,10 +128,11 @@
       </template>
       
       <template v-else-if="component.type === 'image'">
-        <img 
-          :src="component.props.attributes?.src || 'https://via.placeholder.com/600x400'" 
-          :alt="component.props.attributes?.alt || 'Image'"
+        <img
+          :src="component.props.src || component.props.attributes?.src || component.props.url || 'https://via.placeholder.com/600x400'"
+          :alt="component.props.alt || component.props.attributes?.alt || 'Image'"
           class="image-content"
+          :style="imageStyles"
         />
       </template>
       
@@ -277,6 +278,29 @@ const flexStyles = computed(() => ({
   justifyContent: String(props.component.styles.base?.justifyContent || 'flex-start'),
   gap: String(props.component.styles.base?.gap || '16px')
 }));
+
+const imageStyles = computed(() => {
+  // Get filters from props if they exist
+  const filters = props.component.props.filters || {};
+  const filterString = Object.entries(filters)
+    .map(([key, value]) => {
+      if (key === 'brightness' || key === 'contrast' || key === 'saturate') {
+        return `${key}(${value}%)`;
+      } else if (key === 'blur') {
+        return `${key}(${value}px)`;
+      }
+      return '';
+    })
+    .filter(Boolean)
+    .join(' ');
+
+  return {
+    width: props.component.props.width || '100%',
+    height: props.component.props.height || 'auto',
+    objectFit: props.component.props.objectFit || 'cover',
+    filter: filterString || undefined
+  };
+});
 
 const buttonStyles = computed(() => ({
   ...props.component.styles.base,

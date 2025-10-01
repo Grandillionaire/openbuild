@@ -331,9 +331,11 @@ const baseComponentDefinitions: Record<ComponentType, ComponentDefinition> = {
       }
     },
     generateHTML: (component) => {
-      const src = component.props.attributes?.src || 'https://via.placeholder.com/600x400';
-      const alt = component.props.attributes?.alt || 'Image';
-      return `<img src="${src}" alt="${alt}" class="c-${component.id}" id="${component.id}" />`;
+      const src = component.props.src || component.props.attributes?.src || 'https://via.placeholder.com/600x400';
+      const alt = component.props.alt || component.props.attributes?.alt || 'Image';
+      const objectFit = component.props.objectFit || 'cover';
+      const loading = component.props.loading || 'lazy';
+      return `<img src="${src}" alt="${alt}" style="object-fit: ${objectFit};" loading="${loading}" class="c-${component.id}" id="${component.id}" />`;
     },
     generateCSS: (component) => {
       return generateResponsiveCSS(`.c-${component.id}`, component.styles);
