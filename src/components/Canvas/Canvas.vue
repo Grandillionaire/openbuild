@@ -43,16 +43,46 @@
         <div
           v-if="components.length === 0"
           class="empty-state"
+          @dragover="handleDragOver"
+          @drop="handleDrop"
         >
-          <Package :size="48" />
-          <h3>Start Building Your Website</h3>
-          <p>Choose a template or drag components from the sidebar</p>
-          <button @click="$emit('show-templates')" class="template-cta">
-            <BookOpen :size="20" />
-            Browse Templates
-          </button>
-          <span class="separator-text">or</span>
-          <p class="hint">Drag components from the left sidebar to start from scratch</p>
+          <div class="empty-state-content">
+            <div class="icon-wrapper">
+              <Package :size="48" />
+            </div>
+            <h3>Let's Build Something Amazing! 🚀</h3>
+            <p class="subtitle">Choose how you want to start:</p>
+
+            <div class="start-options">
+              <button @click="$emit('show-templates')" class="option-card template-option">
+                <div class="option-icon">
+                  <BookOpen :size="24" />
+                </div>
+                <div class="option-content">
+                  <h4>Use a Template</h4>
+                  <p>Start with a professional design</p>
+                </div>
+                <span class="recommended">Recommended</span>
+              </button>
+
+              <button @click="showComponentHint" class="option-card scratch-option">
+                <div class="option-icon">
+                  <Plus :size="24" />
+                </div>
+                <div class="option-content">
+                  <h4>Start from Scratch</h4>
+                  <p>Drag components from the left</p>
+                </div>
+              </button>
+            </div>
+
+            <div class="drag-hint" :class="{ active: isDraggingOver }">
+              <div class="drag-area">
+                <Upload :size="32" />
+                <p>Or drag your first component here!</p>
+              </div>
+            </div>
+          </div>
         </div>
         
         <div class="canvas-content" v-if="components.length > 0">
@@ -78,15 +108,17 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useEditorStore } from '@/stores/editor';
-import { 
-  Smartphone, 
-  Tablet, 
-  Monitor, 
-  ZoomIn, 
-  ZoomOut, 
+import {
+  Smartphone,
+  Tablet,
+  Monitor,
+  ZoomIn,
+  ZoomOut,
   Maximize2,
   Package,
-  BookOpen
+  BookOpen,
+  Plus,
+  Upload
 } from 'lucide-vue-next';
 import ComponentRenderer from './ComponentRenderer.vue';
 
@@ -130,12 +162,30 @@ const viewportStyles = computed(() => {
   };
 });
 
+// State
+const isDraggingOver = ref(false);
+
 // Methods
 function selectComponent(id: string) {
   store.selectedId = id;
 }
 
+function handleDragOver(e: DragEvent) {
+  e.preventDefault();
+  isDraggingOver.value = true;
+}
+
+function showComponentHint() {
+  // Highlight the component library
+  const sidebar = document.querySelector('.sidebar-left');
+  sidebar?.classList.add('highlight-pulse');
+  setTimeout(() => {
+    sidebar?.classList.remove('highlight-pulse');
+  }, 3000);
+}
+
 function handleDrop(e: DragEvent) {
+  isDraggingOver.value = false;
   e.preventDefault();
 
   // Check if it's a section drop
@@ -291,39 +341,154 @@ onUnmounted(() => {
 
 .empty-state {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 400px;
-  color: #9CA3AF;
+  min-height: 600px;
+  padding: 40px;
+}
+
+.empty-state-content {
+  max-width: 600px;
+  text-align: center;
+}
+
+.icon-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 20px;
+  color: white;
+  margin-bottom: 24px;
 }
 
 .empty-state h3 {
-  margin-top: 16px;
-  font-size: 20px;
-  font-weight: 600;
-  color: #4B5563;
+  font-size: 28px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 8px 0;
 }
 
-.empty-state p {
-  margin-top: 8px;
-  font-size: 14px;
-}
-
-.template-cta {
-  margin-top: 24px;
-  padding: 12px 24px;
-  background: #3B82F6;
-  color: white;
-  border: none;
-  border-radius: 8px;
+.subtitle {
   font-size: 16px;
-  font-weight: 500;
+  color: #6b7280;
+  margin: 0 0 32px 0;
+}
+
+.start-options {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.option-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px;
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
   cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.option-card:hover {
+  border-color: #8b5cf6;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.15);
+}
+
+.template-option {
+  border-color: #8b5cf6;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(139, 92, 246, 0.1) 100%);
+}
+
+.option-icon {
+  width: 48px;
+  height: 48px;
+  background: #f3f4f6;
+  border-radius: 12px;
   display: flex;
   align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  color: #6b7280;
+}
+
+.template-option .option-icon {
+  background: #ede9fe;
+  color: #8b5cf6;
+}
+
+.option-content h4 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 4px 0;
+}
+
+.option-content p {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+}
+
+.recommended {
+  position: absolute;
+  top: -10px;
+  right: 16px;
+  background: #8b5cf6;
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 6px;
+  text-transform: uppercase;
+}
+
+.drag-hint {
+  padding: 24px;
+  background: #f9fafb;
+  border-radius: 12px;
+  border: 2px dashed #e5e7eb;
+  transition: all 0.3s;
+}
+
+.drag-hint.active {
+  background: #ede9fe;
+  border-color: #8b5cf6;
+}
+
+.drag-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   gap: 8px;
-  transition: all 0.2s;
+  color: #9ca3af;
+}
+
+.drag-hint.active .drag-area {
+  color: #8b5cf6;
+}
+
+/* Highlight pulse animation */
+:global(.highlight-pulse) {
+  animation: highlightPulse 1s ease 3;
+}
+
+@keyframes highlightPulse {
+  0%, 100% {
+    box-shadow: none;
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.4);
+  }
 }
 
 .template-cta:hover {

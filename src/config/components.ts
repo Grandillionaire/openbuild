@@ -16,7 +16,7 @@ const baseComponentDefinitions: Record<ComponentType, ComponentDefinition> = {
   // Layout Components
   container: {
     type: 'container',
-    displayName: 'Container',
+    displayName: 'Content Box',
     category: 'layout',
     icon: 'package',
     acceptsChildren: true,
@@ -46,7 +46,7 @@ const baseComponentDefinitions: Record<ComponentType, ComponentDefinition> = {
   
   section: {
     type: 'section',
-    displayName: 'Section',
+    displayName: 'Page Section',
     category: 'layout',
     icon: 'layers',
     acceptsChildren: true,
@@ -74,7 +74,7 @@ const baseComponentDefinitions: Record<ComponentType, ComponentDefinition> = {
 
   div: {
     type: 'div' as any,
-    displayName: 'Div',
+    displayName: 'Box',
     category: 'layout',
     icon: 'square',
     acceptsChildren: true,
@@ -97,7 +97,7 @@ const baseComponentDefinitions: Record<ComponentType, ComponentDefinition> = {
 
   grid: {
     type: 'grid',
-    displayName: 'Grid',
+    displayName: 'Column Layout',
     category: 'layout',
     icon: 'grid',
     acceptsChildren: true,
