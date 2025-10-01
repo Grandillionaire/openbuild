@@ -118,15 +118,17 @@
                   }"
                   @click="selectTemplate(template)"
                 >
-                  <!-- Enhanced Thumbnail -->
+                  <!-- Enhanced Thumbnail with Live Preview -->
                   <div class="template-thumbnail">
-                    <div class="thumbnail-wrapper">
-                      <img :src="getTemplateImage(template)" :alt="template.name" />
-                      <div class="thumbnail-gradient"></div>
-                    </div>
+                    <TemplatePreview :template="template" />
 
-                    <!-- Simple hover effect -->
-                    <div class="template-hover-overlay"></div>
+                    <!-- Hover overlay with preview button -->
+                    <div class="template-hover-overlay">
+                      <button class="preview-btn" @click.stop="previewTemplate(template)">
+                        <Eye :size="20" />
+                        <span>Preview</span>
+                      </button>
+                    </div>
 
                     <!-- Badges -->
                     <div class="badge-container">
@@ -285,6 +287,7 @@ import {
   Wand2,
   ArrowRight
 } from 'lucide-vue-next';
+import TemplatePreview from './TemplatePreview.vue';
 
 interface Props {
   isOpen: boolean;
@@ -398,6 +401,11 @@ function clearSearch() {
 
 function selectTemplate(template: Template) {
   selectedTemplate.value = template;
+}
+
+function previewTemplate(template: Template) {
+  // TODO: Implement full preview modal
+  showToast(`Preview: ${template.name}`, 'info');
 }
 
 function resetFilters() {
@@ -888,42 +896,56 @@ onMounted(() => {
   height: 240px;
   overflow: hidden;
   background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+  border-radius: 12px 12px 0 0;
 }
 
-.thumbnail-wrapper {
-  width: 100%;
-  height: 100%;
-  position: relative;
-}
-
-.template-thumbnail img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.3s;
-}
-
-.template-card:hover .template-thumbnail img {
-  transform: scale(1.05);
-}
-
-.thumbnail-gradient {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to bottom, transparent 60%, rgba(0, 0, 0, 0.1) 100%);
-}
-
-/* Simple Hover Overlay */
+/* Hover Overlay with Preview Button */
 .template-hover-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.3) 100%);
+  background: rgba(0, 0, 0, 0.7);
   opacity: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
   transition: opacity 0.3s;
 }
 
 .template-card:hover .template-hover-overlay {
   opacity: 1;
+}
+
+.preview-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: white;
+  color: var(--text-primary);
+  border: none;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  transform: translateY(10px);
+  opacity: 0;
+  animation: slideUp 0.3s forwards;
+  animation-delay: 0.1s;
+}
+
+@keyframes slideUp {
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.preview-btn:hover {
+  background: var(--primary);
+  color: white;
+  transform: scale(1.05);
 }
 
 /* Badges - Clean solid colors */
