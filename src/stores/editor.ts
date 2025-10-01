@@ -401,9 +401,21 @@ export const useEditorStore = defineStore('editor', () => {
         }
       }
 
+      // Normalize props - convert 'text' to 'content' for consistency
+      if (comp.props) {
+        if (comp.props.text && !comp.props.content) {
+          comp.props.content = comp.props.text;
+          // Keep text for backward compatibility
+        }
+      }
+
       // Ensure styles structure exists
       if (!comp.styles) {
         comp.styles = comp.props?.style ? { base: comp.props.style } : { base: {} };
+        // Remove style from props after moving to styles
+        if (comp.props?.style) {
+          delete comp.props.style;
+        }
       }
 
       // Process all children recursively
@@ -450,9 +462,21 @@ export const useEditorStore = defineStore('editor', () => {
         }
       }
 
+      // Normalize props - convert 'text' to 'content' for consistency
+      if (comp.props) {
+        if (comp.props.text && !comp.props.content) {
+          comp.props.content = comp.props.text;
+          // Keep text for backward compatibility
+        }
+      }
+
       // Ensure styles structure exists
       if (!comp.styles) {
         comp.styles = comp.props?.style ? { base: comp.props.style } : { base: {} };
+        // Remove style from props after moving to styles
+        if (comp.props?.style) {
+          delete comp.props.style;
+        }
       }
 
       // Process all children recursively

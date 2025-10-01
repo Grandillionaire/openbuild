@@ -52,7 +52,7 @@
       :style="[computedStyles, { animation: animationStyleString }]"
     >
       <!-- Layout Components -->
-      <template v-if="component.type === 'container' || component.type === 'section'">
+      <template v-if="component.type === 'container' || component.type === 'section' || component.type === 'div'">
         <div class="component-inner">
           <ComponentRenderer
             v-for="child in component.children"
@@ -107,17 +107,17 @@
       <!-- Content Components -->
       <template v-else-if="component.type === 'heading'">
         <component :is="headingTag" class="heading-content">
-          {{ component.props.content }}
+          {{ component.props.content || component.props.text || 'Heading' }}
         </component>
       </template>
-      
+
       <template v-else-if="component.type === 'text'">
-        <p class="text-content">{{ component.props.content }}</p>
+        <p class="text-content">{{ component.props.content || component.props.text || 'Text' }}</p>
       </template>
-      
+
       <template v-else-if="component.type === 'button'">
         <button class="button-content" :style="buttonStyles">
-          {{ component.props.content }}
+          {{ component.props.content || component.props.text || 'Button' }}
         </button>
       </template>
       
@@ -233,9 +233,10 @@ const hasChildren = computed(() =>
   props.component.children && props.component.children.length > 0
 );
 
-const headingTag = computed(() => 
-  props.component.props.attributes?.level || 'h2'
-);
+const headingTag = computed(() => {
+  const level = props.component.props.attributes?.level || props.component.props.level;
+  return level ? `h${level}` : 'h2';
+});
 
 const computedStyles = computed(() => {
   const styles = { ...props.component.styles.base };
