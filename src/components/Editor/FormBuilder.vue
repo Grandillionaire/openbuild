@@ -300,11 +300,13 @@ const showValidation = computed(() => {
 function addFormElement(element: any) {
   // Check if a form is selected or create one
   let formComponent = store.selectedComponent;
+  let isNewForm = false;
 
   if (!formComponent || formComponent.type !== 'form') {
-    // Create a new form
-    formComponent = createFormComponent();
-    formComponent = store.addComponentDirect(formComponent);
+    // Create a new form and add it to canvas
+    const newForm = createFormComponent();
+    formComponent = store.addComponentDirect(newForm);
+    isNewForm = true;
   }
 
   // Create the form element
@@ -339,14 +341,23 @@ function addFormElement(element: any) {
       return;
   }
 
-  // Add element to form
-  if (formComponent.children) {
-    formComponent.children.push(newElement);
-  } else {
-    formComponent.children = [newElement];
+  // For new forms, we need to get the actual component from store
+  if (isNewForm) {
+    formComponent = store.findComponentById(store.components, formComponent.id);
+    if (!formComponent) {
+      console.error('Failed to find newly created form component');
+      return;
+    }
   }
 
-  store.updateComponent(formComponent.id, formComponent);
+  // Add element to form
+  if (!formComponent.children) {
+    formComponent.children = [];
+  }
+  formComponent.children.push(newElement);
+
+  // Update the component in store
+  store.updateComponent(formComponent.id, { children: formComponent.children });
   showToast(`Added ${element.label} to form`, 'success');
 }
 

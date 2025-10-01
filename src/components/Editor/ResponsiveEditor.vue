@@ -252,10 +252,22 @@ function updateResponsiveSpacing(type: 'padding' | 'margin') {
   const values = type === 'padding' ? responsivePadding.value : responsiveMargin.value;
   const cssValue = `${values.top}px ${values.right}px ${values.bottom}px ${values.left}px`;
 
-  // Create responsive class name based on current mode
-  const className = `${store.responsiveMode}-${type}`;
-
-  updateResponsiveStyle(type, cssValue, className);
+  // Apply directly to component styles based on responsive mode
+  const breakpointKey = getBreakpointKey(store.responsiveMode);
+  if (breakpointKey) {
+    store.updateComponent(store.selectedComponent.id, {
+      styles: {
+        ...store.selectedComponent.styles,
+        [breakpointKey]: {
+          ...store.selectedComponent.styles[breakpointKey],
+          [type]: cssValue
+        }
+      }
+    });
+  } else {
+    // For desktop/base, update base styles
+    store.updateComponentStyle(store.selectedComponent.id, type, cssValue);
+  }
 }
 
 function updateResponsiveTypography() {
@@ -298,11 +310,28 @@ function updateResponsiveStyle(property: string, value: any, className: string) 
 
   store.selectedComponent.props.responsiveStyles[store.responsiveMode][property] = value;
 
-  // Apply styles based on current viewport
-  if (store.responsiveMode === store.viewport) {
-    const currentStyles = store.selectedComponent.props.style || {};
-    store.updateComponentStyle(store.selectedComponent.id, property, value);
+  // Apply styles to the component's responsive styles structure
+  const breakpointKey = getBreakpointKey(store.responsiveMode);
+  if (breakpointKey) {
+    store.updateComponent(store.selectedComponent.id, {
+      styles: {
+        ...store.selectedComponent.styles,
+        [breakpointKey]: {
+          ...store.selectedComponent.styles[breakpointKey],
+          [property]: value
+        }
+      }
+    });
   }
+}
+
+function getBreakpointKey(mode: string): string | null {
+  const breakpointMap: Record<string, string> = {
+    'mobile': 'sm',
+    'tablet': 'md',
+    'desktop': 'lg'
+  };
+  return breakpointMap[mode] || null;
 }
 
 function isBreakpointActive(breakpoint: any) {

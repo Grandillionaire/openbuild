@@ -368,13 +368,27 @@ function lockComponent() {
 }
 
 function openStylePanel() {
-  // Emit event to open style panel
-  showToast('Opening style panel', 'info');
+  // Scroll to and highlight the style section in PropertyEditor
+  const styleSection = document.querySelector('.section-styles');
+  if (styleSection) {
+    styleSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // Add highlight effect
+    styleSection.classList.add('highlight-section');
+    setTimeout(() => styleSection.classList.remove('highlight-section'), 2000);
+  }
+  showToast('Style panel opened', 'success');
 }
 
 function openAnimationPanel() {
-  // Emit event to open animation panel
-  showToast('Opening animation panel', 'info');
+  // Scroll to and highlight the animation section in PropertyEditor
+  const animationSection = document.querySelector('.section-animations');
+  if (animationSection) {
+    animationSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // Add highlight effect
+    animationSection.classList.add('highlight-section');
+    setTimeout(() => animationSection.classList.remove('highlight-section'), 2000);
+  }
+  showToast('Animation panel opened', 'success');
 }
 
 function convertToTemplate() {
