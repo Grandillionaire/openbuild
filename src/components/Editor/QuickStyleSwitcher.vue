@@ -112,6 +112,8 @@ const store = useEditorStore();
 // State
 const showAdvanced = ref(false);
 const currentPreset = ref('modern');
+const currentColorScheme = ref('ocean');
+const currentFontPairing = ref('modern-sans');
 const currentSpacing = ref('normal');
 
 // Style Presets
@@ -318,16 +320,14 @@ function applyPreset(preset: any) {
 
   currentPreset.value = preset.id;
 
-  const currentStyles = store.selectedComponent.props.style || {};
-  const newStyles = {
-    ...currentStyles,
-    ...preset.styles
-  };
+  // Apply preset styles to styles.base
+  store.updateMultipleStyles(store.selectedComponent.id, preset.styles);
 
+  // Store preset selection
   store.updateComponent(store.selectedComponent.id, {
     props: {
       ...store.selectedComponent.props,
-      style: newStyles
+      stylePreset: preset.id
     }
   });
 }
@@ -335,7 +335,7 @@ function applyPreset(preset: any) {
 function applyColorScheme(scheme: any) {
   if (!store.selectedComponent) return;
 
-  const currentStyles = store.selectedComponent.props.style || {};
+  currentColorScheme.value = scheme.id;
 
   // Apply colors based on component type
   let colorStyles: any = {};
@@ -350,26 +350,41 @@ function applyColorScheme(scheme: any) {
     colorStyles = {
       color: scheme.primary
     };
-  } else if (store.selectedComponent.type === 'container' || store.selectedComponent.type === 'section') {
+  } else if (store.selectedComponent.type === 'container' || store.selectedComponent.type === 'section' || store.selectedComponent.type === 'div') {
+    // Create a light background tint - convert hex to rgba
+    const hexToRgba = (hex: string, alpha: number) => {
+      const r = parseInt(hex.slice(1, 3), 16);
+      const g = parseInt(hex.slice(3, 5), 16);
+      const b = parseInt(hex.slice(5, 7), 16);
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    };
+
     colorStyles = {
-      backgroundColor: scheme.colors[3] + '20', // Light tint
+      backgroundColor: hexToRgba(scheme.primary, 0.05),
       borderColor: scheme.primary
+    };
+  } else if (store.selectedComponent.type === 'hero' || store.selectedComponent.type === 'cta') {
+    // Apply gradient for hero/cta sections
+    const gradient = `linear-gradient(135deg, ${scheme.primary} 0%, ${scheme.colors[1]} 100%)`;
+    colorStyles = {
+      background: gradient,
+      color: 'white'
     };
   } else {
     colorStyles = {
-      backgroundColor: scheme.primary
+      backgroundColor: scheme.primary,
+      color: 'white'
     };
   }
 
-  const newStyles = {
-    ...currentStyles,
-    ...colorStyles
-  };
+  // Apply to styles.base, not props.style
+  store.updateMultipleStyles(store.selectedComponent.id, colorStyles);
 
+  // Also store scheme selection as component metadata
   store.updateComponent(store.selectedComponent.id, {
     props: {
       ...store.selectedComponent.props,
-      style: newStyles
+      colorScheme: scheme.id
     }
   });
 }
@@ -383,22 +398,21 @@ function applyFontPairing(event: Event) {
   const pairing = fontPairings.find(p => p.id === pairingId);
   if (!pairing) return;
 
-  const currentStyles = store.selectedComponent.props.style || {};
+  currentFontPairing.value = pairingId;
 
   // Apply font based on component type
   const fontFamily = store.selectedComponent.type === 'heading'
     ? pairing.heading
     : pairing.body;
 
-  const newStyles = {
-    ...currentStyles,
-    fontFamily
-  };
+  // Apply to styles.base
+  store.updateComponentStyle(store.selectedComponent.id, 'fontFamily', fontFamily);
 
+  // Store font pairing selection
   store.updateComponent(store.selectedComponent.id, {
     props: {
       ...store.selectedComponent.props,
-      style: newStyles
+      fontPairing: pairingId
     }
   });
 }
@@ -408,18 +422,20 @@ function applySpacing(spacing: any) {
 
   currentSpacing.value = spacing.id;
 
-  const currentStyles = store.selectedComponent.props.style || {};
-  const newStyles = {
-    ...currentStyles,
+  // Apply spacing to styles.base
+  const spacingStyles = {
     padding: spacing.padding,
     margin: spacing.margin,
     gap: spacing.gap
   };
 
+  store.updateMultipleStyles(store.selectedComponent.id, spacingStyles);
+
+  // Store spacing selection
   store.updateComponent(store.selectedComponent.id, {
     props: {
       ...store.selectedComponent.props,
-      style: newStyles
+      spacingPreset: spacing.id
     }
   });
 }
