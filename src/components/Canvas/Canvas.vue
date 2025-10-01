@@ -143,9 +143,8 @@ function handleDrop(e: DragEvent) {
   if (sectionData) {
     try {
       const components = JSON.parse(sectionData);
-      components.forEach((component: any) => {
-        store.addComponent(component);
-      });
+      // Use the addSectionComponents method for pre-built sections
+      store.addSectionComponents(components);
       return;
     } catch (err) {
       console.error('Failed to parse section data:', err);

@@ -87,8 +87,21 @@ export const useEditorStore = defineStore('editor', () => {
   // Actions
   function addComponent(type: ComponentType, parentId?: string, index?: number) {
     saveHistory();
-    
+
     const definition = componentDefinitions[type];
+
+    // Add defensive checks
+    if (!definition) {
+      console.error(`Component definition not found for type: ${type}`);
+      return;
+    }
+
+    // Ensure displayName exists
+    if (!definition.displayName) {
+      console.warn(`Missing displayName for component type: ${type}, using type as fallback`);
+      definition.displayName = type;
+    }
+
     const newComponent: Component = {
       id: nanoid(8),
       type,
@@ -362,6 +375,101 @@ export const useEditorStore = defineStore('editor', () => {
       mobile: true
     };
   }
+
+  // Add section components (pre-built templates)
+  function addSectionComponents(sectionComponents: Component[]) {
+    saveHistory();
+
+    // Deep clone the components to avoid reference issues
+    const clonedComponents = JSON.parse(JSON.stringify(sectionComponents));
+
+    // Function to ensure ALL components in tree have required properties
+    function processComponent(comp: any): void {
+      // Generate new ID
+      comp.id = nanoid(8);
+
+      // Ensure displayName exists for EVERY component
+      if (!comp.displayName) {
+        const definition = componentDefinitions[comp.type];
+        if (definition && definition.displayName) {
+          comp.displayName = definition.displayName;
+        } else {
+          // Fallback to type name with proper formatting
+          comp.displayName = comp.type ?
+            comp.type.charAt(0).toUpperCase() + comp.type.slice(1) :
+            'Component';
+        }
+      }
+
+      // Ensure styles structure exists
+      if (!comp.styles) {
+        comp.styles = comp.props?.style ? { base: comp.props.style } : { base: {} };
+      }
+
+      // Process all children recursively
+      if (comp.children && Array.isArray(comp.children)) {
+        comp.children.forEach(processComponent);
+      }
+    }
+
+    // Process each component and its entire tree
+    clonedComponents.forEach((component: any) => {
+      processComponent(component);
+      // Add to canvas
+      components.value.push(component);
+    });
+
+    // Select the first component if any were added
+    if (clonedComponents.length > 0) {
+      selectedId.value = clonedComponents[0].id;
+    }
+  }
+
+  // Add a pre-built component object directly
+  function addComponentDirect(component: Component): Component {
+    saveHistory();
+
+    // Deep clone to avoid reference issues
+    const clonedComponent = JSON.parse(JSON.stringify(component));
+
+    // Function to ensure ALL components in tree have required properties
+    function processComponent(comp: any): void {
+      // Generate new ID
+      comp.id = nanoid(8);
+
+      // Ensure displayName exists for EVERY component
+      if (!comp.displayName) {
+        const definition = componentDefinitions[comp.type];
+        if (definition && definition.displayName) {
+          comp.displayName = definition.displayName;
+        } else {
+          // Fallback to type name with proper formatting
+          comp.displayName = comp.type ?
+            comp.type.charAt(0).toUpperCase() + comp.type.slice(1) :
+            'Component';
+        }
+      }
+
+      // Ensure styles structure exists
+      if (!comp.styles) {
+        comp.styles = comp.props?.style ? { base: comp.props.style } : { base: {} };
+      }
+
+      // Process all children recursively
+      if (comp.children && Array.isArray(comp.children)) {
+        comp.children.forEach(processComponent);
+      }
+    }
+
+    // Process the component and its entire tree
+    processComponent(clonedComponent);
+
+    // Add to canvas
+    components.value.push(clonedComponent);
+    selectedId.value = clonedComponent.id;
+
+    return clonedComponent;
+  }
   
   return {
     // State
@@ -407,6 +515,8 @@ export const useEditorStore = defineStore('editor', () => {
     removeAnimation,
     setResponsiveMode,
     toggleDeviceVisibility,
-    getDeviceVisibility
+    getDeviceVisibility,
+    addSectionComponents,
+    addComponentDirect
   };
 });

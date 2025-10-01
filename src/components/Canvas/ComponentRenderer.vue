@@ -43,7 +43,7 @@
     
     <!-- Component Label -->
     <div v-if="selected || hovered" class="component-label">
-      {{ component.displayName }}
+      {{ component.displayName || component.type || 'Component' }}
     </div>
     
     <!-- Render Component Content -->

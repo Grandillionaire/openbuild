@@ -60,7 +60,7 @@
                 <component :is="getIcon(component.icon)" :size="20" />
               </div>
               <div class="component-info">
-                <div class="component-name">{{ component.displayName }}</div>
+                <div class="component-name">{{ component.displayName || component.type || 'Component' }}</div>
                 <div v-if="viewMode === 'list'" class="component-desc">
                   {{ component.description }}
                 </div>
@@ -165,7 +165,7 @@ const filteredCategories = computed(() => {
   return categories.map(category => ({
     ...category,
     components: category.components.filter(comp =>
-      comp.displayName.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+      (comp.displayName || comp.type || '').toLowerCase().includes(searchQuery.value.toLowerCase()) ||
       comp.description?.toLowerCase().includes(searchQuery.value.toLowerCase())
     )
   })).filter(category => category.components.length > 0);

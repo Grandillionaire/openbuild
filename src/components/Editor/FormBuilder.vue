@@ -304,7 +304,7 @@ function addFormElement(element: any) {
   if (!formComponent || formComponent.type !== 'form') {
     // Create a new form
     formComponent = createFormComponent();
-    store.addComponent(formComponent);
+    formComponent = store.addComponentDirect(formComponent);
   }
 
   // Create the form element
@@ -561,7 +561,7 @@ function applyFormTemplate(template: any) {
   });
 
   // Add form to canvas
-  store.addComponent(form);
+  store.addComponentDirect(form);
   showToast(`Applied ${template.name} template`, 'success');
 }
 

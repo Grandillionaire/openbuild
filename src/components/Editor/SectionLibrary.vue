@@ -206,9 +206,8 @@ function addSectionToCanvas(section: SectionTemplate) {
     // Add the default variation
     const defaultVariation = section.variations[0];
     if (defaultVariation) {
-      defaultVariation.components.forEach(component => {
-        store.addComponent(component);
-      });
+      // Use the addSectionComponents method from store
+      store.addSectionComponents(defaultVariation.components);
       showToast(`Added ${section.name} to canvas`, 'success');
     }
   }
@@ -225,9 +224,8 @@ function closeVariationsModal() {
 }
 
 function selectVariation(variation: SectionVariation) {
-  variation.components.forEach(component => {
-    store.addComponent(component);
-  });
+  // Use the addSectionComponents method from store
+  store.addSectionComponents(variation.components);
   showToast(`Added ${variation.name} to canvas`, 'success');
   closeVariationsModal();
 }

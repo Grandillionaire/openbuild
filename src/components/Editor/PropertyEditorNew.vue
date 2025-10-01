@@ -71,8 +71,8 @@
           <div class="info-grid">
             <div class="info-item">
               <label>Name</label>
-              <input 
-                :value="selectedComponent.displayName"
+              <input
+                :value="selectedComponent.displayName || selectedComponent.type || ''"
                 @input="updateDisplayName($event.target.value)"
                 placeholder="Component name"
               />
@@ -409,7 +409,7 @@ function duplicateComponent() {
   const duplicate = {
     ...selectedComponent.value,
     id: nanoid(),
-    displayName: `${selectedComponent.value.displayName} (Copy)`
+    displayName: `${selectedComponent.value.displayName || selectedComponent.value.type} (Copy)`
   };
   
   // Add to parent or canvas
