@@ -427,21 +427,24 @@ function applySpacing(spacing: any) {
 function applyAnimation(animation: any) {
   if (!store.selectedComponent) return;
 
-  const currentStyles = store.selectedComponent.props.style || {};
-  const newStyles = {
-    ...currentStyles,
-    animation: animation.animation
-  };
+  // Apply animation to component styles, not props
+  if (animation.id === 'none') {
+    // Remove animation
+    store.updateComponentStyle(store.selectedComponent.id, 'animation', 'none');
+  } else {
+    // Apply animation
+    store.updateComponentStyle(store.selectedComponent.id, 'animation', animation.animation);
 
-  store.updateComponent(store.selectedComponent.id, {
-    props: {
-      ...store.selectedComponent.props,
-      style: newStyles
-    }
-  });
+    // Also add as a CSS class for better compatibility
+    const className = `animate-${animation.id}`;
+    store.updateComponent(store.selectedComponent.id, {
+      props: {
+        ...store.selectedComponent.props,
+        className: className
+      }
+    });
 
-  // Add keyframes if needed
-  if (animation.id !== 'none') {
+    // Add keyframes if needed
     addAnimationKeyframes(animation.id);
   }
 }

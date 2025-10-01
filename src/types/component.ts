@@ -49,7 +49,7 @@ export interface CSSProperties {
 
 export type ComponentType =
   | 'container' | 'section' | 'div' | 'grid' | 'flex' | 'spacer'
-  | 'heading' | 'text' | 'button' | 'link' | 'image'
+  | 'heading' | 'text' | 'button' | 'link' | 'image' | 'icon'
   | 'hero' | 'features' | 'cta' | 'footer' | 'navigation'
   | 'form' | 'input' | 'textarea' | 'select' | 'checkbox'
   | 'radio' | 'label' | 'formGroup' | 'submitButton';
