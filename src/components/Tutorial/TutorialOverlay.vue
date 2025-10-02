@@ -256,26 +256,48 @@ const updateSpotlight = async () => {
   if (!props.currentStep?.targetElement) {
     spotlightBounds.value = null
     showPulse.value = false
+    // Position tooltip in center when no target
+    await nextTick()
+    calculateTooltipPosition()
     return
   }
 
-  await nextTick()
-  const element = document.querySelector(props.currentStep.targetElement)
-  if (element) {
-    spotlightBounds.value = element.getBoundingClientRect()
-    showPulse.value = true
+  // Try multiple times to find element (in case it's still loading)
+  let attempts = 0
+  const maxAttempts = 10
 
-    // Hide pulse after animation
-    setTimeout(() => {
-      showPulse.value = false
-    }, 2000)
+  while (attempts < maxAttempts) {
+    await nextTick()
+    const element = document.querySelector(props.currentStep.targetElement)
 
-    // Scroll element into view if needed
-    element.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' })
-  } else {
-    spotlightBounds.value = null
-    showPulse.value = false
+    if (element) {
+      spotlightBounds.value = element.getBoundingClientRect()
+      showPulse.value = true
+
+      // Hide pulse after animation
+      setTimeout(() => {
+        showPulse.value = false
+      }, 2000)
+
+      // Scroll element into view if needed
+      element.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' })
+
+      // Calculate position after element is found
+      await nextTick()
+      calculateTooltipPosition()
+      return
+    }
+
+    attempts++
+    await new Promise(resolve => setTimeout(resolve, 100))
   }
+
+  // If element not found after attempts, show tooltip in center
+  console.warn(`Tutorial: Could not find element ${props.currentStep.targetElement}`)
+  spotlightBounds.value = null
+  showPulse.value = false
+  await nextTick()
+  calculateTooltipPosition()
 }
 
 // Get action hint text
@@ -360,7 +382,7 @@ onUnmounted(() => {
   left: 0;
   width: 100vw;
   height: 100vh;
-  z-index: 9998;
+  z-index: 100000;
   pointer-events: none;
 }
 
@@ -383,7 +405,7 @@ onUnmounted(() => {
   padding: 0;
   max-width: 400px;
   min-width: 320px;
-  z-index: 9999;
+  z-index: 100001;
   pointer-events: auto;
   border: 1px solid rgba(0, 0, 0, 0.05);
 }
@@ -566,7 +588,7 @@ onUnmounted(() => {
   border-radius: 50%;
   background: rgba(59, 130, 246, 0.5);
   pointer-events: none;
-  z-index: 9997;
+  z-index: 99999;
 }
 
 .pulse-indicator::before {

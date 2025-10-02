@@ -348,8 +348,13 @@ function startTutorial(tutorialId: string) {
   const progress = getTutorialProgress(tutorialId)
   const startFrom = progress?.currentStepIndex || 0
 
-  tutorialStore.startTutorial(tutorialId, startFrom)
+  // Close the launcher immediately
   isExpanded.value = false
+
+  // Start tutorial after a brief delay to allow modal to close
+  setTimeout(() => {
+    tutorialStore.startTutorial(tutorialId, startFrom)
+  }, 300)
 }
 
 function handleTutorialClick(tutorial: Tutorial) {

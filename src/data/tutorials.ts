@@ -59,7 +59,7 @@ export const tutorials: Tutorial[] = [
         id: 'component-library',
         title: 'Component Library',
         description: 'This is your component library. All the building blocks for your website are here. You can drag any component onto the canvas to add it to your page.',
-        targetElement: '.component-library',
+        targetElement: '.sidebar-left',
         placement: 'right',
         spotlight: true,
         spotlightPadding: 16
@@ -68,7 +68,7 @@ export const tutorials: Tutorial[] = [
         id: 'canvas-area',
         title: 'Canvas',
         description: 'This is your canvas - where you build your website. Drag components here and arrange them to create your perfect layout.',
-        targetElement: '.canvas-container',
+        targetElement: '.main-content',
         placement: 'left',
         spotlight: true,
         spotlightPadding: 20
@@ -77,7 +77,7 @@ export const tutorials: Tutorial[] = [
         id: 'property-editor',
         title: 'Property Editor',
         description: 'When you select a component, its properties appear here. You can customize everything from colors and fonts to spacing and animations.',
-        targetElement: '.property-editor',
+        targetElement: '.sidebar-right',
         placement: 'left',
         spotlight: true,
         spotlightPadding: 16
