@@ -4,7 +4,7 @@
 
     <div class="guide-content">
       <div class="guide-header">
-        <h2>👋 Welcome to OpenBuild!</h2>
+        <h2>Welcome to OpenBuild!</h2>
         <button @click="dismissGuide" class="close-btn">
           <X :size="20" />
         </button>
@@ -37,9 +37,13 @@
       </div>
 
       <div class="guide-actions">
-        <button @click="startWithTemplate" class="btn-primary">
+        <button @click="startTutorial" class="btn-primary">
+          <GraduationCap :size="18" />
+          Start Interactive Tutorial
+        </button>
+        <button @click="startWithTemplate" class="btn-secondary">
           <Layout :size="18" />
-          Start with Template
+          Browse Templates
         </button>
         <button @click="startFromScratch" class="btn-secondary">
           <Plus :size="18" />
@@ -52,6 +56,10 @@
           <input type="checkbox" v-model="dontShowAgain" />
           <span>Don't show this again</span>
         </label>
+        <div class="guide-tip">
+          <LightbulbIcon :size="14" />
+          <span>Tip: Access tutorials anytime from the floating button in the bottom-right</span>
+        </div>
       </div>
     </div>
 
@@ -83,10 +91,10 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { X, Layout, Plus } from 'lucide-vue-next';
+import { X, Layout, Plus, GraduationCap, LightbulbIcon } from 'lucide-vue-next';
 import { useTemplateStore } from '@/stores/templates';
 
-const emit = defineEmits(['close', 'start-template', 'start-scratch']);
+const emit = defineEmits(['close', 'start-template', 'start-scratch', 'start-tutorial']);
 
 const showGuide = ref(true);
 const currentStep = ref(1);
@@ -129,6 +137,11 @@ function startFromScratch() {
       componentLib?.classList.remove('highlight-pulse');
     }, 3000);
   }, 100);
+}
+
+function startTutorial() {
+  dismissGuide();
+  emit('start-tutorial', 'interface-overview');
 }
 </script>
 
@@ -264,13 +277,13 @@ function startFromScratch() {
 
 .guide-actions {
   display: flex;
+  flex-direction: column;
   gap: 12px;
   margin-bottom: 24px;
 }
 
 .btn-primary,
 .btn-secondary {
-  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -282,17 +295,17 @@ function startFromScratch() {
   cursor: pointer;
   transition: all 0.2s;
   border: none;
+  width: 100%;
 }
 
 .btn-primary {
-  background: #8b5cf6;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
 }
 
 .btn-primary:hover {
-  background: #7c3aed;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
 }
 
 .btn-secondary {
@@ -309,6 +322,9 @@ function startFromScratch() {
 .guide-footer {
   padding-top: 16px;
   border-top: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .dont-show-again {
@@ -322,6 +338,21 @@ function startFromScratch() {
 
 .dont-show-again input {
   cursor: pointer;
+}
+
+.guide-tip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #f0f4ff;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #4c5fd5;
+}
+
+.guide-tip svg {
+  flex-shrink: 0;
 }
 
 /* Floating Tooltips */

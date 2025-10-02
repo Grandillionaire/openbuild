@@ -37,10 +37,18 @@
         <button
           @click="showTemplateLibrary = true"
           title="Browse Templates"
-          class="template-btn"
+          class="template-btn header-btn-templates"
         >
           <BookOpen :size="18" />
           <span class="btn-label">Templates</span>
+        </button>
+        <button
+          @click="toggleTutorials"
+          title="Interactive Tutorials"
+          class="header-btn-tutorials"
+        >
+          <GraduationCap :size="18" />
+          <span class="btn-label">Tutorials</span>
         </button>
         <button
           @click="showPagesManager = true"
@@ -157,6 +165,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { useEditorStore } from '@/stores/editor';
+import { useTutorialStore } from '@/stores/tutorial';
 import {
   Package,
   Undo,
@@ -174,7 +183,8 @@ import {
   Menu,
   FileText,
   Search,
-  X
+  X,
+  GraduationCap
 } from 'lucide-vue-next';
 import ExportModal from './ExportModal.vue';
 import DeployModal from './DeployModal.vue';
@@ -188,6 +198,7 @@ import { useToast } from '@/composables/useToast';
 import { storageService } from '@/services/storageService';
 
 const store = useEditorStore();
+const tutorialStore = useTutorialStore();
 const { showToast } = useToast();
 
 const projectName = ref(store.projectName);
@@ -217,6 +228,10 @@ async function saveProject() {
   } catch (error) {
     showToast('Failed to save project', 'error');
   }
+}
+
+function toggleTutorials() {
+  tutorialStore.toggleLauncher();
 }
 
 async function togglePreview() {

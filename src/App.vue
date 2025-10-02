@@ -51,6 +51,31 @@
 
       <!-- Quick Actions Bar -->
       <QuickActionsBar />
+
+      <!-- Tutorial System -->
+      <TutorialOverlay
+        :isVisible="tutorialStore.isActive && !tutorialStore.minimized"
+        :currentStep="tutorialStore.currentStep"
+        :currentStepIndex="tutorialStore.currentStepIndex"
+        :totalSteps="tutorialStore.totalSteps"
+        :canProceed="tutorialStore.canProceed"
+        @next="tutorialStore.nextStep"
+        @previous="tutorialStore.previousStep"
+        @skip="tutorialStore.skipTutorial"
+        @close="tutorialStore.stopTutorial"
+        @complete="tutorialStore.completeTutorial"
+        @goToStep="tutorialStore.goToStep"
+      />
+
+      <!-- Tutorial Launcher -->
+      <TutorialLauncher />
+
+      <!-- Welcome Guide (only for first-time users) -->
+      <WelcomeGuide
+        v-if="showWelcomeGuide"
+        @close="handleWelcomeClose"
+        @start-tutorial="handleStartTutorial"
+      />
     </ErrorBoundary>
 
   </div>
@@ -78,6 +103,7 @@
 import { onMounted, computed, ref } from 'vue';
 import { useEditorStore } from '@/stores/editor';
 import { useThemeStore } from '@/stores/theme';
+import { useTutorialStore } from '@/stores/tutorial';
 import AppHeader from '@/components/Layout/AppHeader.vue';
 import ComponentLibrary from '@/components/Editor/ComponentLibrary.vue';
 import Canvas from '@/components/Canvas/Canvas.vue';
@@ -87,6 +113,9 @@ import ErrorBoundary from '@/components/UI/ErrorBoundary.vue';
 import AssetManager from '@/components/Assets/AssetManager.vue';
 import TemplateLibrary from '@/components/Templates/TemplateLibrary.vue';
 import QuickActionsBar from '@/components/UI/QuickActionsBar.vue';
+import TutorialOverlay from '@/components/Tutorial/TutorialOverlay.vue';
+import TutorialLauncher from '@/components/Tutorial/TutorialLauncher.vue';
+import WelcomeGuide from '@/components/UI/WelcomeGuide.vue';
 import { useKeyboardShortcuts } from '@/composables/useKeyboardShortcuts';
 import { usePerformance } from '@/composables/usePerformance';
 import { storageService } from '@/services/storageService';
@@ -94,11 +123,15 @@ import { useAnimationStyles } from '@/composables/useAnimationStyles';
 
 const store = useEditorStore();
 const themeStore = useThemeStore();
+const tutorialStore = useTutorialStore();
 const { fps, memoryUsage, startMonitoring } = usePerformance();
 const isDev = computed(() => import.meta.env.DEV);
 
 // Template Library state
 const showTemplateLibrary = ref(false);
+
+// Welcome guide state
+const showWelcomeGuide = ref(false);
 
 // Initialize keyboard shortcuts
 useKeyboardShortcuts();
@@ -121,21 +154,38 @@ function handleAssetSelect(asset: any) {
       props: { ...store.selectedComponent.props, attributes }
     });
   }
-  
+
   // Store asset for future use
   store.addAsset(asset);
+}
+
+/**
+ * Handle welcome guide close
+ */
+function handleWelcomeClose() {
+  showWelcomeGuide.value = false;
+  localStorage.setItem('welcomeGuideShown', 'true');
+}
+
+/**
+ * Handle starting a tutorial from the welcome guide
+ */
+function handleStartTutorial(tutorialId: string) {
+  showWelcomeGuide.value = false;
+  localStorage.setItem('welcomeGuideShown', 'true');
+  tutorialStore.startTutorial(tutorialId);
 }
 
 
 onMounted(async () => {
   // Apply default theme
   themeStore.applyThemeToDocument();
-  
+
   // Start performance monitoring
   if (isDev.value) {
     startMonitoring();
   }
-  
+
   // Load last project if exists
   const lastProjectId = localStorage.getItem('lastProjectId');
   if (lastProjectId) {
@@ -146,7 +196,23 @@ onMounted(async () => {
       store.components = project.components;
     }
   }
-  
+
+  // Check if we should show welcome guide for first-time users
+  const welcomeShown = localStorage.getItem('welcomeGuideShown');
+  const hasCompletedTutorial = tutorialStore.completedTutorials.size > 0;
+
+  if (!welcomeShown && !hasCompletedTutorial && store.components.length === 0) {
+    // Show welcome guide for new users with no project
+    setTimeout(() => {
+      showWelcomeGuide.value = true;
+    }, 1000);
+  } else if (tutorialStore.isFirstTime && !tutorialStore.preferences.neverShowAgain) {
+    // Show tutorial launcher for returning users who haven't completed any tutorials
+    setTimeout(() => {
+      tutorialStore.showLauncher = true;
+    }, 2000);
+  }
+
   // Setup beforeunload handler
   window.addEventListener('beforeunload', (e) => {
     if (store.components.length > 0) {
