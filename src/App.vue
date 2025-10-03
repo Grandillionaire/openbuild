@@ -76,6 +76,9 @@
         @close="handleWelcomeClose"
         @start-tutorial="handleStartTutorial"
       />
+
+      <!-- Command Palette (⌘K) -->
+      <CommandPalette ref="commandPaletteRef" />
     </ErrorBoundary>
 
   </div>
@@ -116,6 +119,7 @@ import QuickActionsBar from '@/components/UI/QuickActionsBar.vue';
 import TutorialOverlay from '@/components/Tutorial/TutorialOverlay.vue';
 import TutorialLauncher from '@/components/Tutorial/TutorialLauncher.vue';
 import WelcomeGuide from '@/components/UI/WelcomeGuide.vue';
+import CommandPalette from '@/components/UI/CommandPalette.vue';
 import { useKeyboardShortcuts } from '@/composables/useKeyboardShortcuts';
 import { usePerformance } from '@/composables/usePerformance';
 import { storageService } from '@/services/storageService';
@@ -126,6 +130,7 @@ const themeStore = useThemeStore();
 const tutorialStore = useTutorialStore();
 const { fps, memoryUsage, startMonitoring } = usePerformance();
 const isDev = computed(() => import.meta.env.DEV);
+const commandPaletteRef = ref<InstanceType<typeof CommandPalette>>();
 
 // Template Library state
 const showTemplateLibrary = ref(false);

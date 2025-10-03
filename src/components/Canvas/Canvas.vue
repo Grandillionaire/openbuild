@@ -29,17 +29,54 @@
     </div>
     
     <!-- Canvas -->
-    <div 
+    <div
       ref="canvasRef"
       class="canvas-container"
       @drop="handleDrop"
-      @dragover.prevent
+      @dragover="handleDragOver"
       @dragenter.prevent
+      @dragleave="handleDragLeave"
+      @mousemove="handleMouseMove"
     >
-      <div 
+      <div
         class="canvas-viewport"
         :style="viewportStyles"
       >
+        <!-- Snap Guides Overlay -->
+        <div v-if="store.showSnapGuides && showGuides" class="snap-guides">
+          <div
+            v-for="(line, index) in snapGuides.vertical"
+            :key="'v-' + index"
+            class="snap-guide vertical"
+            :style="{ left: line + 'px' }"
+          ></div>
+          <div
+            v-for="(line, index) in snapGuides.horizontal"
+            :key="'h-' + index"
+            class="snap-guide horizontal"
+            :style="{ top: line + 'px' }"
+          ></div>
+        </div>
+
+        <!-- Drop Preview Ghost -->
+        <div
+          v-if="dropPreview.targetId"
+          class="drop-preview"
+          :style="dropPreviewStyles"
+        >
+          <div class="preview-content">
+            <Plus :size="20" />
+            <span>Drop {{ draggedComponentName }} here</span>
+          </div>
+        </div>
+
+        <!-- Marquee Selection Box -->
+        <div
+          v-if="isMarqueeSelecting"
+          class="marquee-selection"
+          :style="marqueeStyles"
+        ></div>
+
         <div
           v-if="components.length === 0"
           class="empty-state"
@@ -85,7 +122,7 @@
           </div>
         </div>
         
-        <div class="canvas-content" v-if="components.length > 0">
+        <div class="canvas-content" v-if="components.length > 0" @click="handleCanvasClick">
           <ComponentRenderer
             v-for="component in components"
             :key="component.id"
@@ -134,6 +171,19 @@ const selectedId = computed(() => store.selectedId);
 const hoveredId = computed(() => store.hoveredId);
 const viewport = computed(() => store.viewport);
 const zoom = computed(() => store.zoom);
+const dropPreview = computed(() => store.dropPreview);
+const snapGuides = computed(() => store.snapGuides);
+
+// State
+const isDraggingOver = ref(false);
+const showGuides = ref(false);
+const isMarqueeSelecting = ref(false);
+const marqueeStart = ref({ x: 0, y: 0 });
+const marqueeEnd = ref({ x: 0, y: 0 });
+const draggedComponentName = ref('');
+
+// Store event handler for cleanup
+let mouseDownHandler: ((e: MouseEvent) => void) | null = null;
 
 const viewports = [
   { value: 'mobile', label: 'Mobile', icon: Smartphone },
@@ -162,17 +212,213 @@ const viewportStyles = computed(() => {
   };
 });
 
-// State
-const isDraggingOver = ref(false);
+// Computed styles
+const dropPreviewStyles = computed(() => {
+  if (!dropPreview.value.coords) return {};
+
+  return {
+    left: dropPreview.value.coords.x + 'px',
+    top: dropPreview.value.coords.y + 'px',
+    opacity: 1
+  };
+});
+
+const marqueeStyles = computed(() => {
+  const left = Math.min(marqueeStart.value.x, marqueeEnd.value.x);
+  const top = Math.min(marqueeStart.value.y, marqueeEnd.value.y);
+  const width = Math.abs(marqueeEnd.value.x - marqueeStart.value.x);
+  const height = Math.abs(marqueeEnd.value.y - marqueeStart.value.y);
+
+  return {
+    left: left + 'px',
+    top: top + 'px',
+    width: width + 'px',
+    height: height + 'px'
+  };
+});
 
 // Methods
 function selectComponent(id: string) {
   store.selectedId = id;
+  // Note: Multi-select is handled by handleCanvasClick which captures the event
+}
+
+function handleCanvasClick(event: MouseEvent) {
+  // Find which component was clicked
+  const target = event.target as HTMLElement;
+  const componentEl = target.closest('[data-component-id]');
+
+  if (componentEl) {
+    const componentId = componentEl.getAttribute('data-component-id');
+
+    if (componentId) {
+      if (event.shiftKey || event.metaKey || event.ctrlKey) {
+        store.toggleComponentSelection(componentId, true);
+      } else {
+        store.toggleComponentSelection(componentId, false);
+      }
+    }
+  }
 }
 
 function handleDragOver(e: DragEvent) {
   e.preventDefault();
   isDraggingOver.value = true;
+
+  if (!canvasRef.value) return;
+
+  // Calculate drop position
+  const rect = canvasRef.value.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+
+  // Find target component under cursor
+  const targetElement = document.elementFromPoint(e.clientX, e.clientY);
+  const componentElement = targetElement?.closest('[data-component-id]');
+
+  if (componentElement) {
+    const targetId = componentElement.getAttribute('data-component-id');
+    const targetRect = componentElement.getBoundingClientRect();
+
+    // Determine drop position (before, after, inside)
+    const relativeY = e.clientY - targetRect.top;
+    const threshold = targetRect.height / 3;
+
+    let position: 'before' | 'after' | 'inside';
+    if (relativeY < threshold) {
+      position = 'before';
+    } else if (relativeY > targetRect.height - threshold) {
+      position = 'after';
+    } else {
+      position = 'inside';
+    }
+
+    store.setDropPreview(targetId, position, { x, y });
+  } else {
+    store.setDropPreview(null, null, { x, y });
+  }
+
+  // Calculate snap guides
+  if (store.showSnapGuides) {
+    calculateSnapGuides(x, y);
+  }
+}
+
+function handleDragLeave(e: DragEvent) {
+  // Only clear if we're actually leaving the canvas
+  if (e.target === canvasRef.value) {
+    isDraggingOver.value = false;
+    store.clearDropPreview();
+    showGuides.value = false;
+  }
+}
+
+function calculateSnapGuides(x: number, y: number) {
+  const threshold = 5; // Snap within 5px
+  const guides = {
+    vertical: [] as number[],
+    horizontal: [] as number[]
+  };
+
+  // Get all component elements
+  const componentElements = document.querySelectorAll('[data-component-id]');
+
+  componentElements.forEach(el => {
+    const rect = el.getBoundingClientRect();
+    const canvasRect = canvasRef.value?.getBoundingClientRect();
+
+    if (canvasRect) {
+      const relativeLeft = rect.left - canvasRect.left;
+      const relativeTop = rect.top - canvasRect.top;
+      const relativeRight = relativeLeft + rect.width;
+      const relativeBottom = relativeTop + rect.height;
+      const centerX = relativeLeft + rect.width / 2;
+      const centerY = relativeTop + rect.height / 2;
+
+      // Check vertical alignment
+      if (Math.abs(x - relativeLeft) < threshold) guides.vertical.push(relativeLeft);
+      if (Math.abs(x - relativeRight) < threshold) guides.vertical.push(relativeRight);
+      if (Math.abs(x - centerX) < threshold) guides.vertical.push(centerX);
+
+      // Check horizontal alignment
+      if (Math.abs(y - relativeTop) < threshold) guides.horizontal.push(relativeTop);
+      if (Math.abs(y - relativeBottom) < threshold) guides.horizontal.push(relativeBottom);
+      if (Math.abs(y - centerY) < threshold) guides.horizontal.push(centerY);
+    }
+  });
+
+  // Remove duplicates
+  store.snapGuides.vertical = [...new Set(guides.vertical)];
+  store.snapGuides.horizontal = [...new Set(guides.horizontal)];
+  showGuides.value = guides.vertical.length > 0 || guides.horizontal.length > 0;
+}
+
+function handleMouseMove(e: MouseEvent) {
+  if (isMarqueeSelecting.value) {
+    const rect = canvasRef.value?.getBoundingClientRect();
+    if (rect) {
+      marqueeEnd.value = {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+      };
+      updateMarqueeSelection();
+    }
+  }
+}
+
+function startMarqueeSelection(e: MouseEvent) {
+  if (e.target === canvasRef.value || (e.target as HTMLElement).classList.contains('canvas-content')) {
+    const rect = canvasRef.value?.getBoundingClientRect();
+    if (rect) {
+      isMarqueeSelecting.value = true;
+      marqueeStart.value = {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+      };
+      marqueeEnd.value = { ...marqueeStart.value };
+    }
+  }
+}
+
+function updateMarqueeSelection() {
+  const left = Math.min(marqueeStart.value.x, marqueeEnd.value.x);
+  const top = Math.min(marqueeStart.value.y, marqueeEnd.value.y);
+  const right = Math.max(marqueeStart.value.x, marqueeEnd.value.x);
+  const bottom = Math.max(marqueeStart.value.y, marqueeEnd.value.y);
+
+  const selectedIds: string[] = [];
+  const componentElements = document.querySelectorAll('[data-component-id]');
+
+  componentElements.forEach(el => {
+    const rect = el.getBoundingClientRect();
+    const canvasRect = canvasRef.value?.getBoundingClientRect();
+
+    if (canvasRect) {
+      const relativeRect = {
+        left: rect.left - canvasRect.left,
+        top: rect.top - canvasRect.top,
+        right: rect.right - canvasRect.left,
+        bottom: rect.bottom - canvasRect.top
+      };
+
+      // Check if component intersects with marquee
+      if (
+        relativeRect.left < right &&
+        relativeRect.right > left &&
+        relativeRect.top < bottom &&
+        relativeRect.bottom > top
+      ) {
+        const id = el.getAttribute('data-component-id');
+        if (id) selectedIds.push(id);
+      }
+    }
+  });
+
+  store.selectMultipleComponents(selectedIds);
+}
+
+function endMarqueeSelection() {
+  isMarqueeSelecting.value = false;
 }
 
 function showComponentHint() {
@@ -187,6 +433,10 @@ function showComponentHint() {
 function handleDrop(e: DragEvent) {
   isDraggingOver.value = false;
   e.preventDefault();
+
+  // Clear drop preview
+  store.clearDropPreview();
+  showGuides.value = false;
 
   // Check if it's a section drop
   const sectionData = e.dataTransfer?.getData('sectionData');
@@ -204,7 +454,22 @@ function handleDrop(e: DragEvent) {
   // Regular component drop
   const type = e.dataTransfer?.getData('componentType');
   if (type) {
-    store.addComponent(type as any);
+    draggedComponentName.value = type;
+
+    // Use drop preview position if available
+    if (dropPreview.value.targetId && dropPreview.value.position) {
+      const targetComponent = store.components.find(c => c.id === dropPreview.value.targetId);
+
+      if (targetComponent && dropPreview.value.position === 'inside' && targetComponent.children) {
+        // Add as child
+        store.addComponent(type as any, dropPreview.value.targetId);
+      } else {
+        // Add at root level
+        store.addComponent(type as any);
+      }
+    } else {
+      store.addComponent(type as any);
+    }
   }
 }
 
@@ -251,10 +516,28 @@ function handleKeydown(e: KeyboardEvent) {
 
 onMounted(() => {
   window.addEventListener('keydown', handleKeydown);
+
+  // Add mousedown listener for marquee selection
+  if (canvasRef.value) {
+    mouseDownHandler = (e: MouseEvent) => {
+      if (!e.shiftKey && !e.metaKey && !e.ctrlKey) {
+        startMarqueeSelection(e);
+      }
+    };
+    canvasRef.value.addEventListener('mousedown', mouseDownHandler);
+    document.addEventListener('mouseup', endMarqueeSelection);
+  }
 });
 
 onUnmounted(() => {
   window.removeEventListener('keydown', handleKeydown);
+  document.removeEventListener('mouseup', endMarqueeSelection);
+
+  // Clean up canvas mousedown listener
+  if (canvasRef.value && mouseDownHandler) {
+    canvasRef.value.removeEventListener('mousedown', mouseDownHandler);
+    mouseDownHandler = null;
+  }
 });
 
 </script>
@@ -544,5 +827,95 @@ onUnmounted(() => {
 .components-leave-to {
   opacity: 0;
   transform: scale(0.9);
+}
+
+/* Snap Guides */
+.snap-guides {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+.snap-guide {
+  position: absolute;
+  background: #6366F1;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.snap-guide.vertical {
+  width: 1px;
+  height: 100%;
+  box-shadow: 0 0 4px rgba(99, 102, 241, 0.5);
+}
+
+.snap-guide.horizontal {
+  width: 100%;
+  height: 1px;
+  box-shadow: 0 0 4px rgba(99, 102, 241, 0.5);
+}
+
+/* Drop Preview */
+.drop-preview {
+  position: absolute;
+  pointer-events: none;
+  z-index: 999;
+  transform: translate(-50%, -50%);
+}
+
+.preview-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: rgba(99, 102, 241, 0.95);
+  color: white;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+  backdrop-filter: blur(8px);
+  animation: dropPreviewPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes dropPreviewPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+}
+
+/* Marquee Selection */
+.marquee-selection {
+  position: absolute;
+  border: 2px solid #6366F1;
+  background: rgba(99, 102, 241, 0.1);
+  pointer-events: none;
+  z-index: 998;
+  border-radius: 4px;
+  transition: all 0.05s ease-out;
+}
+
+.marquee-selection::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border: 1px dashed #A5B4FC;
+  border-radius: 4px;
+  animation: marqueeRotate 20s linear infinite;
+}
+
+@keyframes marqueeRotate {
+  0% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: 100;
+  }
 }
 </style>

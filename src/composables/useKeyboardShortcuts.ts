@@ -3,46 +3,132 @@ import { useEditorStore } from '@/stores/editor';
 
 export function useKeyboardShortcuts() {
   const store = useEditorStore();
-  
+
   const shortcuts: Record<string, (e?: KeyboardEvent) => void> = {
+    // Undo/Redo
     'ctrl+z': () => store.undo(),
     'cmd+z': () => store.undo(),
     'ctrl+shift+z': () => store.redo(),
     'cmd+shift+z': () => store.redo(),
     'ctrl+y': () => store.redo(),
     'cmd+y': () => store.redo(),
+
+    // Delete
     'delete': () => {
-      if (store.selectedId) {
+      if (store.selectedIds.size > 0) {
+        store.deleteMultipleComponents(Array.from(store.selectedIds));
+      } else if (store.selectedId) {
         store.deleteComponent(store.selectedId);
       }
     },
     'backspace': () => {
-      if (store.selectedId && !isInputFocused()) {
-        store.deleteComponent(store.selectedId);
+      if (!isInputFocused()) {
+        if (store.selectedIds.size > 0) {
+          store.deleteMultipleComponents(Array.from(store.selectedIds));
+        } else if (store.selectedId) {
+          store.deleteComponent(store.selectedId);
+        }
       }
     },
-    'ctrl+d': () => {
+
+    // Duplicate
+    'ctrl+d': (e: KeyboardEvent) => {
+      e?.preventDefault();
       if (store.selectedId) {
         store.duplicateComponent(store.selectedId);
       }
     },
-    'cmd+d': () => {
+    'cmd+d': (e: KeyboardEvent) => {
+      e?.preventDefault();
       if (store.selectedId) {
         store.duplicateComponent(store.selectedId);
       }
     },
+
+    // Style Copy/Paste
+    'ctrl+shift+c': (e: KeyboardEvent) => {
+      e?.preventDefault();
+      if (store.selectedId) {
+        store.copyComponentStyles(store.selectedId);
+        showToastNotification('Styles copied', 'success');
+      }
+    },
+    'cmd+shift+c': (e: KeyboardEvent) => {
+      e?.preventDefault();
+      if (store.selectedId) {
+        store.copyComponentStyles(store.selectedId);
+        showToastNotification('Styles copied', 'success');
+      }
+    },
+    'ctrl+shift+v': (e: KeyboardEvent) => {
+      e?.preventDefault();
+      if (store.selectedIds.size > 0) {
+        store.pasteStylesToSelected();
+        showToastNotification('Styles pasted', 'success');
+      } else if (store.selectedId) {
+        store.pasteComponentStyles(store.selectedId);
+        showToastNotification('Styles pasted', 'success');
+      }
+    },
+    'cmd+shift+v': (e: KeyboardEvent) => {
+      e?.preventDefault();
+      if (store.selectedIds.size > 0) {
+        store.pasteStylesToSelected();
+        showToastNotification('Styles pasted', 'success');
+      } else if (store.selectedId) {
+        store.pasteComponentStyles(store.selectedId);
+        showToastNotification('Styles pasted', 'success');
+      }
+    },
+
+    // Save
     'ctrl+s': (e: KeyboardEvent) => {
-      e.preventDefault();
+      e?.preventDefault();
       saveProject();
     },
     'cmd+s': (e: KeyboardEvent) => {
-      e.preventDefault();
+      e?.preventDefault();
       saveProject();
     },
+
+    // Selection
     'escape': () => {
-      store.selectedId = null;
+      store.clearSelection();
+    },
+    'ctrl+a': (e: KeyboardEvent) => {
+      if (!isInputFocused()) {
+        e?.preventDefault();
+        const allIds = getAllComponentIds(store.components);
+        store.selectMultipleComponents(allIds);
+      }
+    },
+    'cmd+a': (e: KeyboardEvent) => {
+      if (!isInputFocused()) {
+        e?.preventDefault();
+        const allIds = getAllComponentIds(store.components);
+        store.selectMultipleComponents(allIds);
+      }
     }
   };
+
+  function getAllComponentIds(components: any[]): string[] {
+    const ids: string[] = [];
+    function traverse(comps: any[]) {
+      comps.forEach(comp => {
+        ids.push(comp.id);
+        if (comp.children) {
+          traverse(comp.children);
+        }
+      });
+    }
+    traverse(components);
+    return ids;
+  }
+
+  function showToastNotification(message: string, type: string) {
+    // Simple toast notification - can be enhanced
+    console.log(`${type.toUpperCase()}: ${message}`);
+  }
   
   function handleKeydown(event: KeyboardEvent) {
     const key = getKeyCombo(event);

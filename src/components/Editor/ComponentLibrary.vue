@@ -77,9 +77,9 @@
 <script setup lang="ts">
 import { ref, computed, reactive } from 'vue';
 import { useEditorStore } from '@/stores/editor';
-import { 
-  Search, 
-  List, 
+import {
+  Search,
+  List,
   Grid2X2,
   ChevronDown,
   Layout,
@@ -88,16 +88,12 @@ import {
   Type,
   Image,
   Link,
-  MousePointer,
   Grid3X3,
   Columns,
   Square,
   Minus,
   FileText,
   Navigation,
-  Home,
-  Star,
-  Phone,
   Megaphone
 } from 'lucide-vue-next';
 import { componentDefinitions } from '@/config/components';
@@ -110,7 +106,7 @@ const viewMode = ref<'grid' | 'list'>('grid');
 const searchQuery = ref('');
 const draggedComponent = ref<string | null>(null);
 
-const expandedCategories = reactive({
+const expandedCategories = reactive<Record<string, boolean>>({
   layout: true,
   content: true,
   media: true,

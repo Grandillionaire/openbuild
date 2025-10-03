@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { nanoid } from 'nanoid';
-import type { Component, ComponentType } from '@/types/component';
+import type { Component, ComponentType, ResponsiveStyles } from '@/types/component';
 import type { Asset } from '@/types/asset';
 import { componentDefinitions } from '@/config/components';
 import { safeStringify, safeParse, safeClone } from '@/utils/safeSerialize';
@@ -20,6 +20,7 @@ export const useEditorStore = defineStore('editor', () => {
   
   // Editor state
   const selectedId = ref<string | null>(null);
+  const selectedIds = ref<Set<string>>(new Set()); // Multi-select support
   const hoveredId = ref<string | null>(null);
   const isDragging = ref(false);
   const draggedType = ref<ComponentType | null>(null);
@@ -27,6 +28,30 @@ export const useEditorStore = defineStore('editor', () => {
   const zoom = ref(1);
   const showCode = ref(false);
   const showGrid = ref(true);
+  const showSnapGuides = ref(true);
+
+  // Advanced drag-drop state
+  const dropPreview = ref<{
+    targetId: string | null;
+    position: 'before' | 'after' | 'inside' | null;
+    coords: { x: number; y: number } | null;
+  }>({
+    targetId: null,
+    position: null,
+    coords: null
+  });
+
+  // Clipboard for style copy/paste
+  const copiedStyles = ref<ResponsiveStyles | null>(null);
+
+  // Snap guides
+  const snapGuides = ref<{
+    vertical: number[];
+    horizontal: number[];
+  }>({
+    vertical: [],
+    horizontal: []
+  });
 
   // Responsive editing mode
   const responsiveMode = ref<'desktop' | 'tablet' | 'mobile'>('desktop');
@@ -514,6 +539,118 @@ export const useEditorStore = defineStore('editor', () => {
 
     return clonedComponent;
   }
+
+  // Multi-select functions
+  function toggleComponentSelection(id: string, addToSelection: boolean = false) {
+    if (addToSelection) {
+      const newSet = new Set(selectedIds.value);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
+      selectedIds.value = newSet;
+    } else {
+      selectedIds.value = new Set([id]);
+      selectedId.value = id;
+    }
+  }
+
+  function selectMultipleComponents(ids: string[]) {
+    selectedIds.value = new Set(ids);
+    selectedId.value = ids[0] || null;
+  }
+
+  function clearSelection() {
+    selectedIds.value = new Set();
+    selectedId.value = null;
+  }
+
+  // Style copy/paste functions
+  function copyComponentStyles(id: string) {
+    const component = findComponentById(components.value, id);
+    if (component && component.styles) {
+      copiedStyles.value = safeClone(component.styles);
+      return true;
+    }
+    return false;
+  }
+
+  function pasteComponentStyles(id: string) {
+    if (!copiedStyles.value) return false;
+    saveHistory();
+    const component = findComponentById(components.value, id);
+    if (component) {
+      component.styles = safeClone(copiedStyles.value);
+      return true;
+    }
+    return false;
+  }
+
+  function pasteStylesToSelected() {
+    if (!copiedStyles.value) return;
+    saveHistory();
+    selectedIds.value.forEach(id => {
+      const component = findComponentById(components.value, id);
+      if (component) {
+        component.styles = safeClone(copiedStyles.value!);
+      }
+    });
+  }
+
+  // Drop preview functions
+  function setDropPreview(targetId: string | null, position: 'before' | 'after' | 'inside' | null, coords: { x: number; y: number } | null = null) {
+    dropPreview.value = { targetId, position, coords };
+  }
+
+  function clearDropPreview() {
+    dropPreview.value = { targetId: null, position: null, coords: null };
+  }
+
+  // Snap guide functions
+  function updateSnapGuides(componentId: string) {
+    const component = findComponentById(components.value, componentId);
+    if (!component) return;
+
+    const guides = {
+      vertical: [] as number[],
+      horizontal: [] as number[]
+    };
+
+    // Calculate guides from all other components
+    components.value.forEach(comp => {
+      if (comp.id !== componentId) {
+        // Add component edges as potential snap points
+        // This will be enhanced with actual position calculation
+      }
+    });
+
+    snapGuides.value = guides;
+  }
+
+  function clearSnapGuides() {
+    snapGuides.value = { vertical: [], horizontal: [] };
+  }
+
+  // Batch update for multiple components
+  function updateMultipleComponents(ids: string[], updates: Partial<Component>) {
+    saveHistory();
+    ids.forEach(id => {
+      const component = findComponentById(components.value, id);
+      if (component) {
+        Object.assign(component, updates);
+      }
+    });
+  }
+
+  // Delete multiple components
+  function deleteMultipleComponents(ids: string[]) {
+    saveHistory();
+    ids.forEach(id => {
+      deleteComponent(id);
+    });
+    clearSelection();
+  }
   
   return {
     // State
@@ -521,6 +658,7 @@ export const useEditorStore = defineStore('editor', () => {
     projectName,
     components,
     selectedId,
+    selectedIds,
     hoveredId,
     isDragging,
     draggedType,
@@ -528,11 +666,15 @@ export const useEditorStore = defineStore('editor', () => {
     zoom,
     showCode,
     showGrid,
+    showSnapGuides,
     showAssetManager,
     assets,
     globalCustomCode,
     responsiveMode,
     deviceVisibility,
+    dropPreview,
+    copiedStyles,
+    snapGuides,
 
     // Computed
     selectedComponent,
@@ -561,6 +703,19 @@ export const useEditorStore = defineStore('editor', () => {
     toggleDeviceVisibility,
     getDeviceVisibility,
     addSectionComponents,
-    addComponentDirect
+    addComponentDirect,
+    // New functions
+    toggleComponentSelection,
+    selectMultipleComponents,
+    clearSelection,
+    copyComponentStyles,
+    pasteComponentStyles,
+    pasteStylesToSelected,
+    setDropPreview,
+    clearDropPreview,
+    updateSnapGuides,
+    clearSnapGuides,
+    updateMultipleComponents,
+    deleteMultipleComponents
   };
 });
