@@ -1,95 +1,92 @@
 <template>
   <div class="template-preview-container">
-    <!-- Mini Canvas Preview -->
+    <!-- Rendered HTML Preview -->
     <div class="mini-canvas" :style="canvasStyle">
-      <!-- Render simplified components -->
-      <div v-for="(component, index) in previewComponents" :key="index" class="preview-component" :style="getComponentStyle(component)">
+      <!-- Render components with actual content -->
+      <div
+        v-for="(component, index) in previewComponents"
+        :key="index"
+        class="preview-component"
+        :style="getComponentStyle(component)"
+      >
         <!-- Navigation Preview -->
         <template v-if="component.type === 'navigation'">
-          <div class="nav-preview">
-            <div class="nav-logo"></div>
+          <div class="nav-preview" :style="getNavStyle(component)">
+            <div class="nav-logo">{{ getLogoText(component) }}</div>
             <div class="nav-links">
-              <span v-for="n in 4" :key="n" class="nav-link"></span>
+              <span v-for="(link, i) in getNavLinks(component)" :key="i" class="nav-link">
+                {{ link }}
+              </span>
             </div>
           </div>
         </template>
 
         <!-- Hero Preview -->
         <template v-else-if="component.type === 'hero'">
-          <div class="hero-preview">
-            <div class="hero-title"></div>
-            <div class="hero-subtitle"></div>
-            <div class="hero-button"></div>
+          <div class="hero-preview" :style="getHeroStyle(component)">
+            <h1 class="hero-title">{{ getHeroTitle(component) }}</h1>
+            <p class="hero-subtitle">{{ getHeroSubtitle(component) }}</p>
+            <button class="hero-button">{{ getHeroButtonText(component) }}</button>
           </div>
         </template>
 
         <!-- Features Preview -->
         <template v-else-if="component.type === 'features'">
-          <div class="features-preview">
-            <div v-for="n in 3" :key="n" class="feature-item">
-              <div class="feature-icon"></div>
-              <div class="feature-text"></div>
+          <div class="features-preview" :style="getFeaturesStyle(component)">
+            <div v-for="(feature, i) in getFeatures(component)" :key="i" class="feature-item">
+              <div class="feature-icon" :style="{ background: feature.color }">
+                <span class="icon-text">{{ feature.icon }}</span>
+              </div>
+              <h4 class="feature-title">{{ feature.title }}</h4>
+              <p class="feature-desc">{{ feature.description }}</p>
             </div>
           </div>
         </template>
 
         <!-- CTA Preview -->
         <template v-else-if="component.type === 'cta'">
-          <div class="cta-preview">
-            <div class="cta-text"></div>
-            <div class="cta-button"></div>
+          <div class="cta-preview" :style="getCtaStyle(component)">
+            <h3 class="cta-title">{{ getCtaText(component) }}</h3>
+            <button class="cta-button">{{ getCtaButtonText(component) }}</button>
           </div>
         </template>
 
         <!-- Footer Preview -->
         <template v-else-if="component.type === 'footer'">
-          <div class="footer-preview">
-            <div class="footer-content"></div>
+          <div class="footer-preview" :style="getFooterStyle(component)">
+            <div class="footer-content">
+              <p class="footer-text">{{ getFooterText(component) }}</p>
+            </div>
           </div>
         </template>
 
-        <!-- Section Preview -->
-        <template v-else-if="component.type === 'section'">
-          <div class="section-preview" :style="getSectionStyle(component)">
-            <div class="section-content"></div>
+        <!-- Render child components recursively -->
+        <template v-else-if="component.children && component.children.length > 0">
+          <div :style="getContainerStyle(component)">
+            <template v-for="(child, childIndex) in getVisibleChildren(component)" :key="childIndex">
+              <!-- Heading -->
+              <h2 v-if="child.type === 'heading'" class="preview-heading" :style="getTextStyle(child)">
+                {{ getTextContent(child) }}
+              </h2>
+              <!-- Text -->
+              <p v-else-if="child.type === 'text'" class="preview-text" :style="getTextStyle(child)">
+                {{ getTextContent(child) }}
+              </p>
+              <!-- Button -->
+              <button v-else-if="child.type === 'button'" class="preview-button" :style="getButtonStyle(child)">
+                {{ getButtonText(child) }}
+              </button>
+              <!-- Image -->
+              <div v-else-if="child.type === 'image'" class="preview-image" :style="getImageStyle(child)">
+                <svg viewBox="0 0 24 24" fill="currentColor" class="placeholder-icon">
+                  <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+                </svg>
+              </div>
+            </template>
           </div>
-        </template>
-
-        <!-- Container/Div Preview -->
-        <template v-else-if="component.type === 'container' || component.type === 'div'">
-          <div class="container-preview">
-            <div class="container-content"></div>
-          </div>
-        </template>
-
-        <!-- Text/Heading Preview -->
-        <template v-else-if="component.type === 'heading' || component.type === 'text'">
-          <div class="text-preview" :class="component.type"></div>
-        </template>
-
-        <!-- Button Preview -->
-        <template v-else-if="component.type === 'button'">
-          <div class="button-preview"></div>
-        </template>
-
-        <!-- Image Preview -->
-        <template v-else-if="component.type === 'image'">
-          <div class="image-preview">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-              <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
-            </svg>
-          </div>
-        </template>
-
-        <!-- Generic Component -->
-        <template v-else>
-          <div class="generic-preview"></div>
         </template>
       </div>
     </div>
-
-    <!-- Gradient Overlay for Style -->
-    <div class="preview-overlay" :style="overlayStyle"></div>
   </div>
 </template>
 
@@ -172,12 +169,153 @@ function getComponentStyle(component: any) {
   return baseStyle;
 }
 
-function getSectionStyle(component: any) {
-  const style: any = {};
-  if (component.props?.style?.background) {
-    style.background = component.props.style.background;
+// Helper functions to extract content from components
+function getLogoText(component: any): string {
+  return component.content?.logo || component.props?.brandName || 'Logo';
+}
+
+function getNavLinks(component: any): string[] {
+  const links = component.children?.filter((c: any) => c.type === 'link') || [];
+  return links.length > 0
+    ? links.slice(0, 4).map((l: any) => l.content || l.text || 'Link')
+    : ['Home', 'About', 'Services', 'Contact'];
+}
+
+function getNavStyle(component: any): any {
+  return {
+    background: component.styles?.base?.backgroundColor || '#ffffff',
+    borderBottom: `1px solid ${component.styles?.base?.borderColor || '#e5e7eb'}`
+  };
+}
+
+function getHeroTitle(component: any): string {
+  const heading = component.children?.find((c: any) => c.type === 'heading' || c.type === 'h1');
+  return heading?.content || heading?.text || 'Welcome to Your Site';
+}
+
+function getHeroSubtitle(component: any): string {
+  const text = component.children?.find((c: any) => c.type === 'text' || c.type === 'p');
+  return text?.content || text?.text || 'Build amazing things';
+}
+
+function getHeroButtonText(component: any): string {
+  const button = component.children?.find((c: any) => c.type === 'button');
+  return button?.content || button?.text || 'Get Started';
+}
+
+function getHeroStyle(component: any): any {
+  return {
+    background: colorScheme.value.gradient,
+    color: '#ffffff',
+    minHeight: '80px'
+  };
+}
+
+function getFeatures(component: any): any[] {
+  const features = component.children?.filter((c: any) =>
+    c.type === 'feature' || c.type === 'card'
+  ) || [];
+
+  if (features.length > 0) {
+    return features.slice(0, 3).map((f: any, i: number) => ({
+      icon: f.icon || ['⚡', '🎨', '🚀'][i] || '✨',
+      title: f.title || f.heading || `Feature ${i + 1}`,
+      description: f.description || f.text || 'Amazing feature',
+      color: [colorScheme.value.primary, colorScheme.value.secondary, '#10b981'][i]
+    }));
   }
-  return style;
+
+  return [
+    { icon: '⚡', title: 'Fast', description: 'Lightning speed', color: colorScheme.value.primary },
+    { icon: '🎨', title: 'Beautiful', description: 'Stunning design', color: colorScheme.value.secondary },
+    { icon: '🚀', title: 'Modern', description: 'Latest tech', color: '#10b981' }
+  ];
+}
+
+function getFeaturesStyle(component: any): any {
+  return {
+    background: component.styles?.base?.backgroundColor || '#ffffff',
+    padding: '12px'
+  };
+}
+
+function getCtaText(component: any): string {
+  const heading = component.children?.find((c: any) =>
+    c.type === 'heading' || c.type === 'h2' || c.type === 'h3'
+  );
+  return heading?.content || heading?.text || 'Ready to get started?';
+}
+
+function getCtaButtonText(component: any): string {
+  const button = component.children?.find((c: any) => c.type === 'button');
+  return button?.content || button?.text || 'Get Started';
+}
+
+function getCtaStyle(component: any): any {
+  return {
+    background: component.styles?.base?.backgroundColor || '#f3f4f6',
+    padding: '12px'
+  };
+}
+
+function getFooterText(component: any): string {
+  return component.content || '© 2025 All rights reserved';
+}
+
+function getFooterStyle(component: any): any {
+  return {
+    background: component.styles?.base?.backgroundColor || '#1f2937',
+    padding: '8px'
+  };
+}
+
+function getContainerStyle(component: any): any {
+  return {
+    background: component.styles?.base?.backgroundColor || 'transparent',
+    padding: '8px'
+  };
+}
+
+function getVisibleChildren(component: any): any[] {
+  return (component.children || []).slice(0, 6);
+}
+
+function getTextContent(child: any): string {
+  return child.content || child.text || 'Sample text content';
+}
+
+function getTextStyle(child: any): any {
+  return {
+    color: child.styles?.base?.color || '#6b7280',
+    fontSize: child.type === 'heading' ? '0.875rem' : '0.75rem',
+    fontWeight: child.type === 'heading' ? 600 : 400
+  };
+}
+
+function getButtonText(child: any): string {
+  return child.content || child.text || 'Button';
+}
+
+function getButtonStyle(child: any): any {
+  return {
+    background: child.styles?.base?.backgroundColor || colorScheme.value.primary,
+    color: child.styles?.base?.color || '#ffffff',
+    padding: '0.5rem 1rem',
+    borderRadius: '6px',
+    fontSize: '0.75rem',
+    fontWeight: 600
+  };
+}
+
+function getImageStyle(child: any): any {
+  return {
+    background: '#f3f4f6',
+    minHeight: '40px',
+    borderRadius: '4px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
+  };
 }
 </script>
 
@@ -220,28 +358,32 @@ function getSectionStyle(component: any) {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 6px 8px;
+  padding: 6px 10px;
   background: white;
   border-bottom: 1px solid #e5e7eb;
 }
 
 .nav-logo {
-  width: 40px;
-  height: 8px;
-  background: #6b7280;
-  border-radius: 4px;
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: #1f2937;
+  padding: 2px 6px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .nav-links {
   display: flex;
-  gap: 8px;
+  gap: 6px;
 }
 
 .nav-link {
-  width: 20px;
-  height: 4px;
-  background: #d1d5db;
-  border-radius: 2px;
+  font-size: 0.5rem;
+  color: #6b7280;
+  padding: 2px 4px;
+  white-space: nowrap;
 }
 
 /* Hero */
@@ -250,61 +392,87 @@ function getSectionStyle(component: any) {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 20px;
-  gap: 6px;
-  min-height: 80px;
+  padding: 16px 12px;
+  gap: 4px;
+  min-height: 70px;
 }
 
 .hero-title {
-  width: 120px;
-  height: 8px;
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.95);
+  text-align: center;
+  margin: 0;
+  line-height: 1.2;
 }
 
 .hero-subtitle {
-  width: 160px;
-  height: 4px;
-  background: rgba(255, 255, 255, 0.7);
-  border-radius: 2px;
+  font-size: 0.5rem;
+  color: rgba(255, 255, 255, 0.85);
+  text-align: center;
+  margin: 0;
+  line-height: 1.3;
 }
 
 .hero-button {
-  width: 60px;
-  height: 12px;
-  background: rgba(255, 255, 255, 1);
-  border-radius: 6px;
-  margin-top: 4px;
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.95);
+  color: #5b21b6;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.5rem;
+  font-weight: 600;
+  margin-top: 3px;
+  cursor: default;
 }
 
 /* Features */
 .features-preview {
   display: flex;
-  gap: 8px;
-  padding: 12px;
+  gap: 6px;
+  padding: 10px 8px;
   justify-content: center;
+  background: #ffffff;
 }
 
 .feature-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
   flex: 1;
+  max-width: 60px;
 }
 
 .feature-icon {
-  width: 20px;
-  height: 20px;
-  background: #e5e7eb;
+  width: 18px;
+  height: 18px;
   border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2px;
 }
 
-.feature-text {
-  width: 100%;
-  height: 3px;
-  background: #e5e7eb;
-  border-radius: 2px;
+.icon-text {
+  font-size: 0.625rem;
+}
+
+.feature-title {
+  font-size: 0.5rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.feature-desc {
+  font-size: 0.4rem;
+  color: #6b7280;
+  margin: 0;
+  text-align: center;
+  line-height: 1.2;
 }
 
 /* CTA */
@@ -312,38 +480,49 @@ function getSectionStyle(component: any) {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
-  padding: 12px;
-  background: #f3f4f6;
+  gap: 4px;
+  padding: 10px;
+  background: #f8fafc;
 }
 
-.cta-text {
-  width: 100px;
-  height: 4px;
-  background: #6b7280;
-  border-radius: 2px;
+.cta-title {
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: #1f2937;
+  text-align: center;
+  margin: 0;
+  line-height: 1.3;
 }
 
 .cta-button {
-  width: 50px;
-  height: 10px;
+  padding: 3px 8px;
   background: #3b82f6;
-  border-radius: 5px;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.5rem;
+  font-weight: 600;
+  cursor: default;
 }
 
 /* Footer */
 .footer-preview {
-  padding: 8px;
+  padding: 6px 8px;
   background: #1f2937;
   margin-top: auto;
 }
 
 .footer-content {
-  width: 80px;
-  height: 4px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 2px;
-  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.footer-text {
+  font-size: 0.45rem;
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+  margin: 0;
 }
 
 /* Sections */
@@ -371,41 +550,47 @@ function getSectionStyle(component: any) {
   border-radius: 4px;
 }
 
-/* Text */
-.text-preview {
-  height: 3px;
-  background: #9ca3af;
-  border-radius: 2px;
-  margin: 2px 8px;
+/* Headings and Text in generic containers */
+.preview-heading {
+  font-size: 0.625rem;
+  font-weight: 600;
+  margin: 2px 0;
+  line-height: 1.3;
 }
 
-.text-preview.heading {
-  height: 5px;
-  background: #6b7280;
-  width: 60%;
+.preview-text {
+  font-size: 0.5rem;
+  margin: 2px 0;
+  line-height: 1.4;
+  opacity: 0.8;
 }
 
-/* Button */
-.button-preview {
-  width: 40px;
-  height: 10px;
-  background: #3b82f6;
-  border-radius: 5px;
-  margin: 4px 8px;
+/* Buttons in generic containers */
+.preview-button {
+  padding: 3px 8px;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.5rem;
+  font-weight: 600;
+  cursor: default;
+  margin: 3px 0;
 }
 
 /* Image */
-.image-preview {
+.preview-image {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 12px;
+  padding: 8px;
   background: #f3f4f6;
+  border-radius: 4px;
+  min-height: 30px;
+  margin: 2px 0;
 }
 
-.image-preview svg {
-  width: 24px;
-  height: 24px;
+.placeholder-icon {
+  width: 16px;
+  height: 16px;
   color: #d1d5db;
 }
 
