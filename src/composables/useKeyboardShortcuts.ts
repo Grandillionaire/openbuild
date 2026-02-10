@@ -1,27 +1,30 @@
-import { onMounted, onUnmounted } from 'vue';
+import { onMounted, onUnmounted, ref } from 'vue';
 import { useEditorStore } from '@/stores/editor';
+
+// Global state for keyboard help modal
+export const showKeyboardHelp = ref(false);
 
 export function useKeyboardShortcuts() {
   const store = useEditorStore();
 
-  const shortcuts: Record<string, (e?: KeyboardEvent) => void> = {
+  const shortcuts: Record<string, (e: KeyboardEvent) => void> = {
     // Undo/Redo
-    'ctrl+z': () => store.undo(),
-    'cmd+z': () => store.undo(),
-    'ctrl+shift+z': () => store.redo(),
-    'cmd+shift+z': () => store.redo(),
-    'ctrl+y': () => store.redo(),
-    'cmd+y': () => store.redo(),
+    'ctrl+z': (_e: KeyboardEvent) => store.undo(),
+    'cmd+z': (_e: KeyboardEvent) => store.undo(),
+    'ctrl+shift+z': (_e: KeyboardEvent) => store.redo(),
+    'cmd+shift+z': (_e: KeyboardEvent) => store.redo(),
+    'ctrl+y': (_e: KeyboardEvent) => store.redo(),
+    'cmd+y': (_e: KeyboardEvent) => store.redo(),
 
     // Delete
-    'delete': () => {
+    'delete': (_e: KeyboardEvent) => {
       if (store.selectedIds.size > 0) {
         store.deleteMultipleComponents(Array.from(store.selectedIds));
       } else if (store.selectedId) {
         store.deleteComponent(store.selectedId);
       }
     },
-    'backspace': () => {
+    'backspace': (_e: KeyboardEvent) => {
       if (!isInputFocused()) {
         if (store.selectedIds.size > 0) {
           store.deleteMultipleComponents(Array.from(store.selectedIds));
@@ -92,7 +95,7 @@ export function useKeyboardShortcuts() {
     },
 
     // Selection
-    'escape': () => {
+    'escape': (_e: KeyboardEvent) => {
       store.clearSelection();
     },
     'ctrl+a': (e: KeyboardEvent) => {
@@ -107,6 +110,18 @@ export function useKeyboardShortcuts() {
         e?.preventDefault();
         const allIds = getAllComponentIds(store.components);
         store.selectMultipleComponents(allIds);
+      }
+    },
+
+    // Help
+    '?': (_e: KeyboardEvent) => {
+      if (!isInputFocused()) {
+        showKeyboardHelp.value = !showKeyboardHelp.value;
+      }
+    },
+    'shift+?': (_e: KeyboardEvent) => {
+      if (!isInputFocused()) {
+        showKeyboardHelp.value = !showKeyboardHelp.value;
       }
     }
   };

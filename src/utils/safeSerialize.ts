@@ -12,7 +12,7 @@
 export function safeStringify(obj: any, space?: number): string {
   const seen = new WeakSet();
   
-  return JSON.stringify(obj, (key, value) => {
+  return JSON.stringify(obj, (_key, value) => {
     // Handle null and primitives
     if (value === null || typeof value !== 'object') {
       return value;
@@ -45,7 +45,7 @@ export function safeStringify(obj: any, space?: number): string {
  * @returns Parsed object
  */
 export function safeParse(json: string): any {
-  return JSON.parse(json, (key, value) => {
+  return JSON.parse(json, (_key, value) => {
     // You can add custom revival logic here if needed
     if (value === '[Circular]') {
       return undefined; // or handle as needed

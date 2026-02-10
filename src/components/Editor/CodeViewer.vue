@@ -38,7 +38,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
+import { ref, onMounted, onUnmounted, watch } from 'vue';
 import { Copy, Download, X } from 'lucide-vue-next';
 import { EditorView, basicSetup } from 'codemirror';
 import { html } from '@codemirror/lang-html';
@@ -56,7 +56,7 @@ const activeTab = ref<'html' | 'css' | 'full'>('html');
 const editor = ref<EditorView | null>(null);
 const generatedCode = ref({ html: '', css: '', fullPage: '' });
 
-const tabs = [
+const tabs: { value: 'html' | 'css' | 'full'; label: string }[] = [
   { value: 'html', label: 'HTML' },
   { value: 'css', label: 'CSS' },
   { value: 'full', label: 'Full Page' }

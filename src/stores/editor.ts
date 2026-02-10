@@ -4,7 +4,7 @@ import { nanoid } from 'nanoid';
 import type { Component, ComponentType, ResponsiveStyles } from '@/types/component';
 import type { Asset } from '@/types/asset';
 import { componentDefinitions } from '@/config/components';
-import { safeStringify, safeParse, safeClone } from '@/utils/safeSerialize';
+import { safeClone } from '@/utils/safeSerialize';
 
 interface HistoryState {
   past: Component[][];
@@ -675,6 +675,7 @@ export const useEditorStore = defineStore('editor', () => {
     dropPreview,
     copiedStyles,
     snapGuides,
+    history,
 
     // Computed
     selectedComponent,
@@ -716,6 +717,7 @@ export const useEditorStore = defineStore('editor', () => {
     updateSnapGuides,
     clearSnapGuides,
     updateMultipleComponents,
-    deleteMultipleComponents
+    deleteMultipleComponents,
+    findComponentById
   };
 });

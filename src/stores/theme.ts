@@ -278,19 +278,19 @@ export const useThemeStore = defineStore('theme', () => {
     });
   }
   
-  function getThemeValue(path: string): string | number {
+  function getThemeValue(path: string): string {
     const keys = path.split('.');
-    let value: any = activeTheme.value;
+    let value: unknown = activeTheme.value;
     
     for (const key of keys) {
       if (value && typeof value === 'object' && key in value) {
-        value = value[key];
+        value = (value as Record<string, unknown>)[key];
       } else {
         return '';
       }
     }
     
-    return value;
+    return String(value);
   }
   
   return {

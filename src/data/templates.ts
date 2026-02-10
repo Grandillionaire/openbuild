@@ -35,7 +35,7 @@ import {
 } from './templates/ecommerceTemplate';
 
 // Landing Page Templates
-const modernLandingTemplate: Template = {
+const _modernLandingTemplate: Template = {
   id: 'tpl_modern_landing',
   name: 'Modern Landing Page',
   category: 'landing',
@@ -176,7 +176,7 @@ const modernLandingTemplate: Template = {
   ]
 };
 
-const startupLandingTemplate: Template = {
+const _startupLandingTemplate: Template = {
   id: 'tpl_startup_landing',
   name: 'Startup Landing Page',
   category: 'landing',
@@ -304,7 +304,7 @@ const startupLandingTemplate: Template = {
   ]
 };
 
-const minimalistLandingTemplate: Template = {
+const _minimalistLandingTemplate: Template = {
   id: 'tpl_minimalist_landing',
   name: 'Minimalist Landing Page',
   category: 'landing',
@@ -401,7 +401,7 @@ const minimalistLandingTemplate: Template = {
 };
 
 // Portfolio Templates
-const creativePortfolioTemplate: Template = {
+const _creativePortfolioTemplate: Template = {
   id: 'tpl_creative_portfolio',
   name: 'Creative Portfolio',
   category: 'portfolio',
@@ -656,7 +656,7 @@ const creativePortfolioTemplate: Template = {
   ]
 };
 
-const photographerPortfolioTemplate: Template = {
+const _photographerPortfolioTemplate: Template = {
   id: 'tpl_photographer_portfolio',
   name: 'Photographer Portfolio',
   category: 'portfolio',
@@ -967,7 +967,7 @@ const photographerPortfolioTemplate: Template = {
 };*/
 
 // Blog Templates
-const minimalBlogTemplate: Template = {
+const _minimalBlogTemplate: Template = {
   id: 'tpl_minimal_blog',
   name: 'Minimal Blog',
   category: 'blog',
@@ -1223,7 +1223,7 @@ const minimalBlogTemplate: Template = {
   ]
 };
 
-const magazineBlogTemplate: Template = {
+const _magazineBlogTemplate: Template = {
   id: 'tpl_magazine_blog',
   name: 'Magazine Blog',
   category: 'blog',
@@ -1524,7 +1524,7 @@ const magazineBlogTemplate: Template = {
   ]
 };
 
-const personalBlogTemplate: Template = {
+const _personalBlogTemplate: Template = {
   id: 'tpl_personal_blog',
   name: 'Personal Blog',
   category: 'blog',
@@ -1725,7 +1725,7 @@ const personalBlogTemplate: Template = {
 };
 
 // Business Templates
-const corporateBusinessTemplate: Template = {
+const _corporateBusinessTemplate: Template = {
   id: 'tpl_corporate_business',
   name: 'Corporate Business',
   category: 'business',
@@ -2043,7 +2043,7 @@ const corporateBusinessTemplate: Template = {
   ]
 };
 
-const consultingBusinessTemplate: Template = {
+const _consultingBusinessTemplate: Template = {
   id: 'tpl_consulting_business',
   name: 'Consulting Agency',
   category: 'business',
@@ -2256,7 +2256,7 @@ const consultingBusinessTemplate: Template = {
   ]
 };
 
-const startupBusinessTemplate: Template = {
+const _startupBusinessTemplate: Template = {
   id: 'tpl_startup_business',
   name: 'Tech Startup',
   category: 'business',
@@ -2395,7 +2395,7 @@ const startupBusinessTemplate: Template = {
 };
 
 // E-commerce Templates
-const modernEcommerceTemplate: Template = {
+const _modernEcommerceTemplate: Template = {
   id: 'tpl_modern_ecommerce',
   name: 'Modern Store',
   category: 'ecommerce',
@@ -2629,7 +2629,7 @@ const modernEcommerceTemplate: Template = {
   ]
 };
 
-const fashionEcommerceTemplate: Template = {
+const _fashionEcommerceTemplate: Template = {
   id: 'tpl_fashion_ecommerce',
   name: 'Fashion Store',
   category: 'ecommerce',
@@ -2757,7 +2757,7 @@ const fashionEcommerceTemplate: Template = {
   ]
 };
 
-const minimalEcommerceTemplate: Template = {
+const _minimalEcommerceTemplate: Template = {
   id: 'tpl_minimal_ecommerce',
   name: 'Minimal Shop',
   category: 'ecommerce',

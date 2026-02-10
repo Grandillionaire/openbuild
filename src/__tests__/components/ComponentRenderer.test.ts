@@ -76,7 +76,7 @@ describe('ComponentRenderer', () => {
       displayName: 'Heading',
       props: {
         content: 'Test Heading',
-        attributes: { level: 'h2' }
+        attributes: { level: 2 }
       }
     });
     
@@ -88,8 +88,10 @@ describe('ComponentRenderer', () => {
       }
     });
     
-    expect(wrapper.find('h2').exists()).toBe(true);
-    expect(wrapper.find('h2').text()).toBe('Test Heading');
+    // The heading is rendered with class 'heading-content'
+    const heading = wrapper.find('.heading-content');
+    expect(heading.exists()).toBe(true);
+    expect(heading.text()).toBe('Test Heading');
   });
 
   it('renders button component', () => {

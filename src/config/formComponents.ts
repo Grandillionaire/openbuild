@@ -4,7 +4,7 @@ export const formComponentDefinitions: Record<string, ComponentDefinition> = {
   form: {
     type: 'form' as any,
     displayName: 'Form',
-    category: 'form',
+    category: 'form' as const,
     icon: 'form',
     acceptsChildren: true,
     defaultProps: {
@@ -28,7 +28,7 @@ export const formComponentDefinitions: Record<string, ComponentDefinition> = {
       return `<form class="c-${component.id}" id="${component.id}" method="${method}" action="${action}">`;
     },
     generateCSS: (component) => {
-      const styles = component.props.style || component.defaultStyles?.base || {};
+      const styles = component.props.style || component.styles?.base || {};
       const cssProps = Object.entries(styles)
         .map(([prop, value]) => `  ${prop.replace(/([A-Z])/g, '-$1').toLowerCase()}: ${value};`)
         .join('\n');
@@ -39,7 +39,7 @@ export const formComponentDefinitions: Record<string, ComponentDefinition> = {
   input: {
     type: 'input' as any,
     displayName: 'Input',
-    category: 'form',
+    category: 'form' as const,
     icon: 'input',
     acceptsChildren: false,
     defaultProps: {
@@ -68,7 +68,7 @@ export const formComponentDefinitions: Record<string, ComponentDefinition> = {
       return `<input class="c-${component.id}" id="${component.id}" type="${type}" name="${name}" placeholder="${placeholder}" value="${value}" ${required} />`;
     },
     generateCSS: (component) => {
-      const styles = component.props.style || component.defaultStyles?.base || {};
+      const styles = component.props.style || component.styles?.base || {};
       const cssProps = Object.entries(styles)
         .map(([prop, value]) => `  ${prop.replace(/([A-Z])/g, '-$1').toLowerCase()}: ${value};`)
         .join('\n');
@@ -79,7 +79,7 @@ export const formComponentDefinitions: Record<string, ComponentDefinition> = {
   textarea: {
     type: 'textarea' as any,
     displayName: 'Textarea',
-    category: 'form',
+    category: 'form' as const,
     icon: 'textarea',
     acceptsChildren: false,
     defaultProps: {
@@ -110,7 +110,7 @@ export const formComponentDefinitions: Record<string, ComponentDefinition> = {
       return `<textarea class="c-${component.id}" id="${component.id}" name="${name}" placeholder="${placeholder}" rows="${rows}" ${required}>${value}</textarea>`;
     },
     generateCSS: (component) => {
-      const styles = component.props.style || component.defaultStyles?.base || {};
+      const styles = component.props.style || component.styles?.base || {};
       const cssProps = Object.entries(styles)
         .map(([prop, value]) => `  ${prop.replace(/([A-Z])/g, '-$1').toLowerCase()}: ${value};`)
         .join('\n');
@@ -121,7 +121,7 @@ export const formComponentDefinitions: Record<string, ComponentDefinition> = {
   select: {
     type: 'select' as any,
     displayName: 'Select',
-    category: 'form',
+    category: 'form' as const,
     icon: 'select',
     acceptsChildren: true,
     defaultProps: {
@@ -156,7 +156,7 @@ export const formComponentDefinitions: Record<string, ComponentDefinition> = {
       return `<select class="c-${component.id}" id="${component.id}" name="${name}" ${required}>\n${optionsHTML}\n</select>`;
     },
     generateCSS: (component) => {
-      const styles = component.props.style || component.defaultStyles?.base || {};
+      const styles = component.props.style || component.styles?.base || {};
       const cssProps = Object.entries(styles)
         .map(([prop, value]) => `  ${prop.replace(/([A-Z])/g, '-$1').toLowerCase()}: ${value};`)
         .join('\n');
@@ -167,7 +167,7 @@ export const formComponentDefinitions: Record<string, ComponentDefinition> = {
   checkbox: {
     type: 'checkbox' as any,
     displayName: 'Checkbox',
-    category: 'form',
+    category: 'form' as const,
     icon: 'checkbox',
     acceptsChildren: false,
     defaultProps: {
@@ -194,7 +194,7 @@ export const formComponentDefinitions: Record<string, ComponentDefinition> = {
       </label>`;
     },
     generateCSS: (component) => {
-      const styles = component.props.style || component.defaultStyles?.base || {};
+      const styles = component.props.style || component.styles?.base || {};
       const cssProps = Object.entries(styles)
         .map(([prop, value]) => `  ${prop.replace(/([A-Z])/g, '-$1').toLowerCase()}: ${value};`)
         .join('\n');
@@ -205,7 +205,7 @@ export const formComponentDefinitions: Record<string, ComponentDefinition> = {
   radio: {
     type: 'radio' as any,
     displayName: 'Radio Group',
-    category: 'form',
+    category: 'form' as const,
     icon: 'radio',
     acceptsChildren: false,
     defaultProps: {
@@ -237,7 +237,7 @@ export const formComponentDefinitions: Record<string, ComponentDefinition> = {
       return `<div class="c-${component.id}" id="${component.id}">\n${optionsHTML}\n</div>`;
     },
     generateCSS: (component) => {
-      const styles = component.props.style || component.defaultStyles?.base || {};
+      const styles = component.props.style || component.styles?.base || {};
       const cssProps = Object.entries(styles)
         .map(([prop, value]) => `  ${prop.replace(/([A-Z])/g, '-$1').toLowerCase()}: ${value};`)
         .join('\n');
@@ -248,7 +248,7 @@ export const formComponentDefinitions: Record<string, ComponentDefinition> = {
   label: {
     type: 'label' as any,
     displayName: 'Label',
-    category: 'form',
+    category: 'form' as const,
     icon: 'label',
     acceptsChildren: false,
     defaultProps: {
@@ -272,7 +272,7 @@ export const formComponentDefinitions: Record<string, ComponentDefinition> = {
       return `<label class="c-${component.id}" id="${component.id}" ${forAttr}>${text}${required}</label>`;
     },
     generateCSS: (component) => {
-      const styles = component.props.style || component.defaultStyles?.base || {};
+      const styles = component.props.style || component.styles?.base || {};
       const cssProps = Object.entries(styles)
         .map(([prop, value]) => `  ${prop.replace(/([A-Z])/g, '-$1').toLowerCase()}: ${value};`)
         .join('\n');
@@ -283,7 +283,7 @@ export const formComponentDefinitions: Record<string, ComponentDefinition> = {
   formGroup: {
     type: 'formGroup' as any,
     displayName: 'Form Group',
-    category: 'form',
+    category: 'form' as const,
     icon: 'form-group',
     acceptsChildren: true,
     defaultProps: {},
@@ -296,7 +296,7 @@ export const formComponentDefinitions: Record<string, ComponentDefinition> = {
       return `<div class="c-${component.id} form-group" id="${component.id}">`;
     },
     generateCSS: (component) => {
-      const styles = component.props.style || component.defaultStyles?.base || {};
+      const styles = component.props.style || component.styles?.base || {};
       const cssProps = Object.entries(styles)
         .map(([prop, value]) => `  ${prop.replace(/([A-Z])/g, '-$1').toLowerCase()}: ${value};`)
         .join('\n');
@@ -307,7 +307,7 @@ export const formComponentDefinitions: Record<string, ComponentDefinition> = {
   submitButton: {
     type: 'submitButton' as any,
     displayName: 'Submit Button',
-    category: 'form',
+    category: 'form' as const,
     icon: 'button',
     acceptsChildren: false,
     defaultProps: {
@@ -333,7 +333,7 @@ export const formComponentDefinitions: Record<string, ComponentDefinition> = {
       return `<button class="c-${component.id}" id="${component.id}" type="submit" ${disabled}>${text}</button>`;
     },
     generateCSS: (component) => {
-      const styles = component.props.style || component.defaultStyles?.base || {};
+      const styles = component.props.style || component.styles?.base || {};
       const cssProps = Object.entries(styles)
         .map(([prop, value]) => `  ${prop.replace(/([A-Z])/g, '-$1').toLowerCase()}: ${value};`)
         .join('\n');

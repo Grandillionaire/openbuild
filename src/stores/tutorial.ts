@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import type { Tutorial, TutorialStep, TutorialProgress, TutorialState } from '@/types/tutorial'
-import { tutorials, getTutorialById, getNextRecommendedTutorial } from '@/data/tutorials'
+import type { Tutorial, TutorialStep, TutorialProgress } from '@/types/tutorial'
+import { getTutorialById, getNextRecommendedTutorial } from '@/data/tutorials'
 import { TutorialEngine } from '@/services/tutorialEngine'
 
 export const useTutorialStore = defineStore('tutorial', () => {
@@ -94,7 +94,7 @@ export const useTutorialStore = defineStore('tutorial', () => {
       onSkip: () => {
         skipTutorial(tutorialId)
       },
-      onProgress: (progressValue) => {
+      onProgress: (_progressValue: number) => {
         // Update progress percentage
         const tutProgress = progress.value.get(tutorialId)
         if (tutProgress) {
