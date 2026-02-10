@@ -63,7 +63,7 @@ export class CodeGenerator {
   }
   
   private registerHelpers() {
-    this.Handlebars.registerHelper('json', (context) => {
+    this.Handlebars.registerHelper('json', (context: unknown) => {
       return JSON.stringify(context, null, 2);
     });
   }
@@ -593,7 +593,7 @@ button {
     try {
       return await this.prettier.format(html, {
         parser: 'html',
-        plugins: [htmlPlugin],
+        plugins: [this.htmlPlugin],
         printWidth: 100,
         tabWidth: 2,
         useTabs: false
@@ -608,7 +608,7 @@ button {
     try {
       return await this.prettier.format(css, {
         parser: 'css',
-        plugins: [cssPlugin],
+        plugins: [this.cssPlugin],
         printWidth: 100,
         tabWidth: 2,
         useTabs: false

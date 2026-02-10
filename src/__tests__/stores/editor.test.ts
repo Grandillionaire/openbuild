@@ -25,27 +25,27 @@ describe('Editor Store', () => {
       const component = store.addComponent('container');
       
       expect(store.components).toHaveLength(1);
-      expect(component.type).toBe('container');
-      expect(component.id).toBeDefined();
-      expect(store.selectedId).toBe(component.id);
+      expect(component?.type).toBe('container');
+      expect(component?.id).toBeDefined();
+      expect(store.selectedId).toBe(component?.id);
     });
 
     it('should add a component with parent', () => {
       const store = useEditorStore();
       
       const parent = store.addComponent('container');
-      const child = store.addComponent('heading', parent.id);
+      const child = store.addComponent('heading', parent?.id);
       
-      expect(parent.children).toHaveLength(1);
-      expect(parent.children![0].id).toBe(child.id);
-      expect(child.parent).toBe(parent.id);
+      expect(parent?.children).toHaveLength(1);
+      expect(parent?.children![0].id).toBe(child?.id);
+      expect(child?.parent).toBe(parent?.id);
     });
 
     it('should update a component', () => {
       const store = useEditorStore();
       
       const component = store.addComponent('heading');
-      store.updateComponent(component.id, {
+      store.updateComponent(component!.id, {
         props: { content: 'Updated Heading' }
       });
       
@@ -56,7 +56,7 @@ describe('Editor Store', () => {
       const store = useEditorStore();
       
       const component = store.addComponent('heading');
-      store.deleteComponent(component.id);
+      store.deleteComponent(component!.id);
       
       expect(store.components).toHaveLength(0);
       expect(store.selectedId).toBe(null);
@@ -66,15 +66,15 @@ describe('Editor Store', () => {
       const store = useEditorStore();
       
       const original = store.addComponent('heading');
-      store.updateComponent(original.id, {
+      store.updateComponent(original!.id, {
         props: { content: 'Original' }
       });
       
-      store.duplicateComponent(original.id);
+      store.duplicateComponent(original!.id);
       
       expect(store.components).toHaveLength(2);
       expect(store.components[1].props.content).toBe('Original');
-      expect(store.components[1].id).not.toBe(original.id);
+      expect(store.components[1].id).not.toBe(original!.id);
     });
 
     it('should move a component', () => {
@@ -85,11 +85,11 @@ describe('Editor Store', () => {
       const comp3 = store.addComponent('button');
       
       // Move comp3 to position 0
-      store.moveComponent(comp3.id, null, 0);
+      store.moveComponent(comp3!.id, null, 0);
       
-      expect(store.components[0].id).toBe(comp3.id);
-      expect(store.components[1].id).toBe(comp1.id);
-      expect(store.components[2].id).toBe(comp2.id);
+      expect(store.components[0].id).toBe(comp3!.id);
+      expect(store.components[1].id).toBe(comp1!.id);
+      expect(store.components[2].id).toBe(comp2!.id);
     });
   });
 
@@ -98,7 +98,7 @@ describe('Editor Store', () => {
       const store = useEditorStore();
       
       // Add component
-      const component = store.addComponent('heading');
+      const _component = store.addComponent('heading');
       expect(store.components).toHaveLength(1);
       expect(store.canUndo).toBe(true);
       expect(store.canRedo).toBe(false);
@@ -122,7 +122,7 @@ describe('Editor Store', () => {
       const store = useEditorStore();
       
       const component = store.addComponent('heading');
-      store.updateComponentStyle(component.id, 'color', '#ff0000');
+      store.updateComponentStyle(component!.id, 'color', '#ff0000');
       
       expect(store.components[0].styles.base.color).toBe('#ff0000');
     });
@@ -131,7 +131,7 @@ describe('Editor Store', () => {
       const store = useEditorStore();
       
       const component = store.addComponent('heading');
-      store.updateMultipleStyles(component.id, {
+      store.updateMultipleStyles(component!.id, {
         color: '#ff0000',
         fontSize: '24px',
         fontWeight: 'bold'
@@ -147,8 +147,8 @@ describe('Editor Store', () => {
       const store = useEditorStore();
       
       const component = store.addComponent('heading');
-      store.updateComponentStyle(component.id, 'fontSize', '16px', 'sm');
-      store.updateComponentStyle(component.id, 'fontSize', '24px', 'md');
+      store.updateComponentStyle(component!.id, 'fontSize', '16px', 'sm');
+      store.updateComponentStyle(component!.id, 'fontSize', '24px', 'md');
       
       const styles = store.components[0].styles;
       expect(styles.sm?.fontSize).toBe('16px');
@@ -173,7 +173,7 @@ describe('Editor Store', () => {
         timeline: []
       };
       
-      store.addAnimation(component.id, animation);
+      store.addAnimation(component!.id, animation);
       
       expect(store.components[0].props.animations).toHaveLength(1);
       expect(store.components[0].props.animations![0].name).toBe('Fade In');

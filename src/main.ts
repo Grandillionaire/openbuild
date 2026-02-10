@@ -11,7 +11,7 @@ const app = createApp(App);
 const pinia = createPinia();
 
 // Global error handler
-app.config.errorHandler = (err, instance, info) => {
+app.config.errorHandler = (_err, _instance, _info) => {
   if (import.meta.env.PROD) {
     // Production error tracking
   }

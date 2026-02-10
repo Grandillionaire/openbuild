@@ -1,4 +1,14 @@
-import type { Component } from '@/types/component';
+import type { Component, ComponentType } from '@/types/component';
+
+// Partial component type for section templates - will be normalized at runtime
+type PartialComponent = {
+  id: string;
+  type: ComponentType | string;
+  props?: Record<string, unknown>;
+  children?: PartialComponent[];
+  displayName?: string;
+  styles?: Record<string, unknown>;
+};
 
 export interface SectionTemplate {
   id: string;
@@ -13,7 +23,23 @@ export interface SectionVariation {
   id: string;
   name: string;
   style: 'modern' | 'classic' | 'minimal' | 'bold';
-  components: Component[];
+  components: PartialComponent[];
+}
+
+// Helper to normalize partial components to full Component type at runtime
+export function normalizeComponents(partials: PartialComponent[]): Component[] {
+  return partials.map(p => normalizeComponent(p));
+}
+
+function normalizeComponent(partial: PartialComponent): Component {
+  return {
+    id: partial.id,
+    type: partial.type as ComponentType,
+    displayName: partial.displayName || String(partial.type).charAt(0).toUpperCase() + String(partial.type).slice(1),
+    props: (partial.props || {}) as Component['props'],
+    styles: (partial.styles || { base: partial.props?.style || {} }) as Component['styles'],
+    children: partial.children ? normalizeComponents(partial.children) : undefined,
+  };
 }
 
 export const sectionTemplates: SectionTemplate[] = [

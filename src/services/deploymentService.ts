@@ -2,7 +2,7 @@ export class DeploymentService {
   async deployToVercel(
     files: Map<string, string>,
     token: string,
-    projectName: string
+    _projectName: string
   ): Promise<{ url: string; deploymentId: string }> {
     const formData = new FormData();
     

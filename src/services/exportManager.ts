@@ -45,6 +45,9 @@ export class ExportManager {
       // Create ZIP
       const zip = new JSZip();
       
+      // Ensure html/css are generated (suppress unused variable warning)
+      void html; void css;
+      
       // Main files
       zip.file('index.html', fullPage);
       zip.file('styles.css', css);
@@ -73,7 +76,8 @@ export class ExportManager {
       const fileName = `${projectName.toLowerCase().replace(/\s+/g, '-')}.zip`;
       saveAs(blob, fileName);
       
-      const exportTime = performance.now() - startTime;
+      // Log export performance
+      const _exportTime = performance.now() - startTime;
       
     } catch (error) {
       // Preserve original error information for debugging

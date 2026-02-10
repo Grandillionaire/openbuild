@@ -65,7 +65,7 @@ export interface ComponentVariant {
 export interface ComponentDefinition {
   type: ComponentType;
   displayName: string;
-  category: 'layout' | 'content' | 'media' | 'blocks';
+  category: 'layout' | 'content' | 'media' | 'blocks' | 'form';
   icon: string;
   defaultProps: ComponentProps;
   defaultStyles: ResponsiveStyles;
