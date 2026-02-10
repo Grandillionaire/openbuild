@@ -79,6 +79,27 @@
 
       <!-- Command Palette (⌘K) -->
       <CommandPalette ref="commandPaletteRef" />
+
+      <!-- AI Component Generator -->
+      <AIComponentGenerator
+        v-if="showAIGenerator"
+        @close="showAIGenerator = false"
+      />
+
+      <!-- AI Floating Button -->
+      <button 
+        class="ai-fab" 
+        @click="showAIGenerator = true"
+        title="Generate component with AI"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
+          <path d="M5 3v4"/>
+          <path d="M19 17v4"/>
+          <path d="M3 5h4"/>
+          <path d="M17 19h4"/>
+        </svg>
+      </button>
     </ErrorBoundary>
 
   </div>
@@ -120,6 +141,7 @@ import TutorialOverlay from '@/components/Tutorial/TutorialOverlay.vue';
 import TutorialLauncher from '@/components/Tutorial/TutorialLauncher.vue';
 import WelcomeGuide from '@/components/UI/WelcomeGuide.vue';
 import CommandPalette from '@/components/UI/CommandPalette.vue';
+import AIComponentGenerator from '@/components/Editor/AIComponentGenerator.vue';
 import { useKeyboardShortcuts } from '@/composables/useKeyboardShortcuts';
 import { usePerformance } from '@/composables/usePerformance';
 import { storageService } from '@/services/storageService';
@@ -137,6 +159,9 @@ const showTemplateLibrary = ref(false);
 
 // Welcome guide state
 const showWelcomeGuide = ref(false);
+
+// AI Generator state
+const showAIGenerator = ref(false);
 
 // Initialize keyboard shortcuts
 useKeyboardShortcuts();
@@ -313,5 +338,43 @@ onMounted(async () => {
   .main-content {
     min-width: 320px;
   }
+}
+
+/* AI Floating Action Button */
+.ai-fab {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+  border: none;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(124, 58, 237, 0.4);
+  transition: all 0.3s ease;
+  z-index: 100;
+}
+
+.ai-fab:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 8px 30px rgba(124, 58, 237, 0.5);
+}
+
+.ai-fab:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.ai-fab svg {
+  animation: sparkle 2s ease-in-out infinite;
+}
+
+@keyframes sparkle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
 }
 </style>

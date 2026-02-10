@@ -41,6 +41,7 @@
 
 ## ✨ Features
 
+- **🤖 AI Component Generator**: Describe what you want, AI creates it for you
 - **🎯 Drag & Drop Editor**: Intuitive visual interface for building websites
 - **🧩 15+ Components**: Layout, content, media, and pre-built blocks
 - **📱 Responsive Design**: Built-in controls for mobile, tablet, and desktop
@@ -50,6 +51,23 @@
 - **💾 Auto-Save**: Local storage with automatic project saving
 - **↩️ Undo/Redo**: Full history tracking for easy corrections
 - **⚡ Performance**: 60fps editing experience with optimized rendering
+
+### 🤖 AI-Powered Component Generation
+
+Generate components using natural language! Just click the sparkle button in the bottom-right corner and describe what you want:
+
+```
+"A hero section with a gradient background, large heading, 
+subtitle, and call-to-action button"
+```
+
+The AI understands common patterns like:
+- **Hero sections** - Landing page headers with CTAs
+- **Feature grids** - Showcase your product features
+- **Contact forms** - User input sections
+- **Cards** - Reusable content blocks
+
+Choose from style presets: Modern, Minimal, Bold, or Elegant.
 
 ## 🚀 Quick Start
 
