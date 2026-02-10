@@ -100,6 +100,12 @@
           <path d="M17 19h4"/>
         </svg>
       </button>
+
+      <!-- Keyboard Shortcuts Help Modal -->
+      <KeyboardHelpModal
+        :isOpen="showKeyboardHelp"
+        @close="showKeyboardHelp = false"
+      />
     </ErrorBoundary>
 
   </div>
@@ -142,7 +148,8 @@ import TutorialLauncher from '@/components/Tutorial/TutorialLauncher.vue';
 import WelcomeGuide from '@/components/UI/WelcomeGuide.vue';
 import CommandPalette from '@/components/UI/CommandPalette.vue';
 import AIComponentGenerator from '@/components/Editor/AIComponentGenerator.vue';
-import { useKeyboardShortcuts } from '@/composables/useKeyboardShortcuts';
+import KeyboardHelpModal from '@/components/UI/KeyboardHelpModal.vue';
+import { useKeyboardShortcuts, showKeyboardHelp } from '@/composables/useKeyboardShortcuts';
 import { usePerformance } from '@/composables/usePerformance';
 import { storageService } from '@/services/storageService';
 import { useAnimationStyles } from '@/composables/useAnimationStyles';

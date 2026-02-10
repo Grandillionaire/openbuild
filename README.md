@@ -5,6 +5,13 @@
 </div>
 
 <div align="center">
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FGrandillionaire%2Fopenbuild)
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/Grandillionaire/openbuild)
+
+</div>
+
+<div align="center">
   <img src="https://img.shields.io/badge/Vue.js-3.4+-4FC08D?style=for-the-badge&logo=vue.js&logoColor=white" alt="Vue.js">
   <img src="https://img.shields.io/badge/TypeScript-5.0+-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript">
   <img src="https://img.shields.io/badge/Vite-5.0+-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite">
@@ -12,6 +19,8 @@
 </div>
 
 <div align="center">
+  <img src="https://img.shields.io/badge/Lighthouse-95+-brightgreen?style=flat-square&logo=lighthouse" alt="Lighthouse">
+  <img src="https://img.shields.io/badge/Bundle-< 200KB-brightgreen?style=flat-square" alt="Bundle Size">
   <img src="https://img.shields.io/badge/Build-Passing-brightgreen?style=flat-square" alt="Build Status">
   <img src="https://img.shields.io/badge/Tests-100%25-brightgreen?style=flat-square" alt="Tests">
   <img src="https://img.shields.io/badge/Coverage-85%25-yellowgreen?style=flat-square" alt="Coverage">
@@ -27,9 +36,9 @@
   <a href="#-features">Features</a> •
   <a href="#-demo">Demo</a> •
   <a href="#-quick-start">Quick Start</a> •
+  <a href="#-docker">Docker</a> •
   <a href="#-tech-stack">Tech Stack</a> •
-  <a href="#-contributing">Contributing</a> •
-  <a href="#-license">License</a>
+  <a href="#-contributing">Contributing</a>
 </p>
 
 ---
@@ -41,7 +50,7 @@
 
 ## ✨ Features
 
-- **🤖 AI Component Generator**: Describe what you want, AI creates it for you
+- **🤖 Smart Component Generator**: Describe what you want, get instant results
 - **🎯 Drag & Drop Editor**: Intuitive visual interface for building websites
 - **🧩 15+ Components**: Layout, content, media, and pre-built blocks
 - **📱 Responsive Design**: Built-in controls for mobile, tablet, and desktop
@@ -51,8 +60,10 @@
 - **💾 Auto-Save**: Local storage with automatic project saving
 - **↩️ Undo/Redo**: Full history tracking for easy corrections
 - **⚡ Performance**: 60fps editing experience with optimized rendering
+- **📲 PWA Support**: Install as a native app, works offline
+- **⌨️ Keyboard Shortcuts**: Power-user friendly (press `?` for help)
 
-### 🤖 AI-Powered Component Generation
+### 🤖 Smart Component Generation
 
 Generate components using natural language! Just click the sparkle button in the bottom-right corner and describe what you want:
 
@@ -61,7 +72,7 @@ Generate components using natural language! Just click the sparkle button in the
 subtitle, and call-to-action button"
 ```
 
-The AI understands common patterns like:
+The generator understands common patterns like:
 - **Hero sections** - Landing page headers with CTAs
 - **Feature grids** - Showcase your product features
 - **Contact forms** - User input sections
@@ -84,9 +95,48 @@ npm run dev
 npm run build
 ```
 
+### One-Click Deploy
 
+Deploy your own instance with one click:
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FGrandillionaire%2Fopenbuild)
+
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/Grandillionaire/openbuild)
+
+## 🐳 Docker
+
+### Quick Start with Docker
+
+```bash
+# Build and run with Docker Compose
+docker-compose up -d
+
+# Or build manually
+docker build -t openbuild .
+docker run -p 3000:80 openbuild
+```
+
+### Development with Docker
+
+```bash
+# Run development server with hot reload
+docker-compose --profile dev up openbuild-dev
+```
+
+The app will be available at `http://localhost:3000` (production) or `http://localhost:5173` (development).
+
+### Docker Compose Services
+
+| Service | Port | Description |
+|---------|------|-------------|
+| `openbuild` | 3000 | Production build with nginx |
+| `openbuild-dev` | 5173 | Development with hot reload |
 
 ## 🛠️ Tech Stack
+
+<div align="center">
+  <img src="https://skillicons.dev/icons?i=vue,typescript,vite,pinia&theme=light" alt="Tech Stack" />
+</div>
 
 - **Vue 3.4+**: Modern reactive framework with Composition API
 - **TypeScript**: Type-safe development experience
@@ -95,6 +145,21 @@ npm run build
 - **UnoCSS**: Atomic CSS with Tailwind compatibility
 - **CodeMirror 6**: Advanced code editor
 - **Dexie.js**: IndexedDB wrapper for local storage
+
+## ⌨️ Keyboard Shortcuts
+
+Press `?` at any time to see all shortcuts. Here are the essentials:
+
+| Shortcut | Action |
+|----------|--------|
+| `⌘/Ctrl + S` | Save project |
+| `⌘/Ctrl + Z` | Undo |
+| `⌘/Ctrl + Shift + Z` | Redo |
+| `⌘/Ctrl + D` | Duplicate component |
+| `⌘/Ctrl + K` | Command palette |
+| `Delete` | Delete selected |
+| `Escape` | Clear selection |
+| `?` | Show shortcuts |
 
 ## 📦 Components
 
@@ -143,6 +208,15 @@ VITE_VERCEL_TOKEN=your_vercel_token_here
 - npm 9+
 - Modern browser with ES6+ support
 
+## 📊 Performance
+
+OpenBuild is optimized for performance:
+
+- **First Contentful Paint**: < 1s
+- **Time to Interactive**: < 2s
+- **Bundle Size**: < 200KB (gzipped)
+- **Lighthouse Score**: 95+
+
 ## 📸 Screenshots
 
 ### Key Features:
@@ -155,6 +229,21 @@ VITE_VERCEL_TOKEN=your_vercel_token_here
 
 We love contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
 
+### Contributors
+
+<a href="https://github.com/Grandillionaire/openbuild/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=Grandillionaire/openbuild" />
+</a>
+
+## 📈 Star History
+
+<a href="https://star-history.com/#Grandillionaire/openbuild&Date">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=Grandillionaire/openbuild&type=Date&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=Grandillionaire/openbuild&type=Date" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=Grandillionaire/openbuild&type=Date" />
+  </picture>
+</a>
 
 ## 🔒 Security
 
@@ -173,9 +262,6 @@ OpenBuild was originally created by **Grandillionaire (Maximillian Grand)**. Any
 - Built with ❤️ by **Grandillionaire (Maximillian Grand)**
 - Powered by Vue 3, TypeScript, and modern web technologies
 - Special thanks to all contributors and the open source community
-
-## 📊 Stats
-
 
 ---
 

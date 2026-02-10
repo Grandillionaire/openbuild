@@ -1,5 +1,8 @@
-import { onMounted, onUnmounted } from 'vue';
+import { onMounted, onUnmounted, ref } from 'vue';
 import { useEditorStore } from '@/stores/editor';
+
+// Global state for keyboard help modal
+export const showKeyboardHelp = ref(false);
 
 export function useKeyboardShortcuts() {
   const store = useEditorStore();
@@ -107,6 +110,18 @@ export function useKeyboardShortcuts() {
         e?.preventDefault();
         const allIds = getAllComponentIds(store.components);
         store.selectMultipleComponents(allIds);
+      }
+    },
+
+    // Help
+    '?': (_e: KeyboardEvent) => {
+      if (!isInputFocused()) {
+        showKeyboardHelp.value = !showKeyboardHelp.value;
+      }
+    },
+    'shift+?': (_e: KeyboardEvent) => {
+      if (!isInputFocused()) {
+        showKeyboardHelp.value = !showKeyboardHelp.value;
       }
     }
   };
