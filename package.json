@@ -12,7 +12,9 @@
     "format": "prettier --write src/",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "test:coverage": "vitest --coverage"
+    "test:coverage": "vitest --coverage",
+    "test:e2e": "playwright test -c e2e/playwright.config.ts",
+    "test:e2e:ui": "playwright test -c e2e/playwright.config.ts --ui"
   },
   "dependencies": {
     "@codemirror/lang-css": "^6.3.1",
@@ -37,6 +39,7 @@
     "vuedraggable": "^4.1.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.40.0",
     "@testing-library/vue": "^8.1.0",
     "@types/file-saver": "^2.0.7",
     "@types/node": "^20.10.5",

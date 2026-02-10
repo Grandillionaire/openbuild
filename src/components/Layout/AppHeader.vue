@@ -57,10 +57,28 @@
           <FileText :size="18" />
         </button>
         <button
-          @click="showSEOPanel = true"
-          title="SEO Settings"
+          @click="showSEOAnalyzer = true"
+          title="SEO Analyzer"
         >
           <Search :size="18" />
+        </button>
+        <button
+          @click="showMarketplace = true"
+          title="Template Marketplace"
+        >
+          <Store :size="18" />
+        </button>
+        <button
+          @click="showFigmaImport = true"
+          title="Import from Figma"
+        >
+          <Figma :size="18" />
+        </button>
+        <button
+          @click="showAnalytics = true"
+          title="Analytics Dashboard"
+        >
+          <BarChart3 :size="18" />
         </button>
         <button
           @click="showThemeModal = true"
@@ -102,6 +120,17 @@
         <Menu :size="20" />
       </button>
       
+      <!-- Collaboration Button -->
+      <button 
+        @click="toggleCollaboration"
+        class="collab-btn"
+        :class="{ connected: isCollabConnected }"
+        title="Collaboration"
+      >
+        <Users :size="16" />
+        <span v-if="isCollabConnected" class="collab-count">{{ onlineCount }}</span>
+      </button>
+
       <button @click="saveProject" class="btn-secondary">
         <Save :size="16" />
         <span>Save</span>
@@ -145,7 +174,7 @@
       </div>
     </teleport>
 
-    <!-- SEO Panel Modal -->
+    <!-- SEO Panel Modal (Legacy) -->
     <teleport to="body">
       <div v-if="showSEOPanel" class="modal-overlay" @click="showSEOPanel = false">
         <div class="modal-content-large" @click.stop>
@@ -153,6 +182,73 @@
           <button @click="showSEOPanel = false" class="modal-close-btn">
             <X :size="20" />
           </button>
+        </div>
+      </div>
+    </teleport>
+
+    <!-- SEO Analyzer Modal -->
+    <teleport to="body">
+      <div v-if="showSEOAnalyzer" class="modal-overlay" @click="showSEOAnalyzer = false">
+        <div class="modal-content-large seo-analyzer-modal" @click.stop>
+          <SEOAnalyzer />
+          <button @click="showSEOAnalyzer = false" class="modal-close-btn">
+            <X :size="20" />
+          </button>
+        </div>
+      </div>
+    </teleport>
+
+    <!-- Marketplace Modal -->
+    <MarketplaceModal v-if="showMarketplace" @close="showMarketplace = false" />
+
+    <!-- Figma Import Modal -->
+    <FigmaImportModal v-if="showFigmaImport" @close="showFigmaImport = false" />
+
+    <!-- Analytics Modal -->
+    <teleport to="body">
+      <div v-if="showAnalytics" class="modal-overlay" @click="showAnalytics = false">
+        <div class="modal-content-large analytics-modal" @click.stop>
+          <AnalyticsDashboard />
+          <button @click="showAnalytics = false" class="modal-close-btn">
+            <X :size="20" />
+          </button>
+        </div>
+      </div>
+    </teleport>
+
+    <!-- Collaboration Panel -->
+    <teleport to="body">
+      <div v-if="showCollabPanel" class="collab-panel">
+        <div class="collab-header">
+          <h3>Collaboration</h3>
+          <button @click="showCollabPanel = false" class="close-collab">
+            <X :size="18" />
+          </button>
+        </div>
+        <div v-if="!isCollabConnected" class="collab-content">
+          <p>Invite others to edit this project in real-time.</p>
+          <button @click="startCollaboration" class="start-collab-btn">
+            <Share2 :size="16" />
+            Start Collaboration
+          </button>
+        </div>
+        <div v-else class="collab-content">
+          <div class="share-link">
+            <input :value="collabShareLink" readonly />
+            <button @click="copyShareLink">
+              <Copy :size="16" />
+            </button>
+          </div>
+          <div class="collaborators">
+            <div v-for="collab in collaborators" :key="collab.id" class="collaborator">
+              <div class="collab-avatar" :style="{ backgroundColor: collab.color }">
+                {{ collab.name.charAt(0) }}
+              </div>
+              <span>{{ collab.name }}</span>
+              <span :class="['status', collab.isOnline ? 'online' : 'offline']"></span>
+            </div>
+          </div>
+          <button @click="endCollaboration" class="end-collab-btn">End Session</button>
         </div>
       </div>
     </teleport>
@@ -184,7 +280,11 @@ import {
   FileText,
   Search,
   X,
-  GraduationCap
+  GraduationCap,
+  BarChart3,
+  Users,
+  Share2,
+  Copy
 } from 'lucide-vue-next';
 import ExportModal from './ExportModal.vue';
 import DeployModal from './DeployModal.vue';
@@ -194,12 +294,39 @@ import ThemeModal from './ThemeModal.vue';
 import GlobalCodeEditor from '../Editor/GlobalCodeEditor.vue';
 import PagesManager from '../Editor/PagesManager.vue';
 import SEOPanel from '../Editor/SEOPanel.vue';
+import SEOAnalyzer from '../Tools/SEOAnalyzer.vue';
+import MarketplaceModal from '../Marketplace/MarketplaceModal.vue';
+import FigmaImportModal from '../UI/FigmaImportModal.vue';
+import AnalyticsDashboard from '../Analytics/AnalyticsDashboard.vue';
 import { useToast } from '@/composables/useToast';
 import { storageService } from '@/services/storageService';
+import { useCollaboration } from '@/services/collaborationService';
+
+// Custom icons
+const Store = {
+  template: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" :width="size" :height="size"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><path d="M2 7h20"/></svg>`,
+  props: { size: { type: Number, default: 18 } }
+};
+
+const Figma = {
+  template: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" :width="size" :height="size"><path d="M5 5.5A3.5 3.5 0 0 1 8.5 2H12v7H8.5A3.5 3.5 0 0 1 5 5.5z"/><path d="M12 2h3.5a3.5 3.5 0 1 1 0 7H12V2z"/><path d="M12 12.5a3.5 3.5 0 1 1 7 0 3.5 3.5 0 1 1-7 0z"/><path d="M5 19.5A3.5 3.5 0 0 1 8.5 16H12v3.5a3.5 3.5 0 1 1-7 0z"/><path d="M5 12.5A3.5 3.5 0 0 1 8.5 9H12v7H8.5A3.5 3.5 0 0 1 5 12.5z"/></svg>`,
+  props: { size: { type: Number, default: 18 } }
+};
 
 const store = useEditorStore();
 const tutorialStore = useTutorialStore();
 const { showToast } = useToast();
+
+// Collaboration service
+const {
+  isConnected: isCollabConnected,
+  shareLink: collabShareLink,
+  collaborators,
+  onlineCount,
+  createSession,
+  leaveSession,
+  copyShareLink: copyCollabLink
+} = useCollaboration();
 
 const projectName = ref(store.projectName);
 const showExportModal = ref(false);
@@ -210,6 +337,45 @@ const showGlobalCode = ref(false);
 const showMobileMenu = ref(false);
 const showPagesManager = ref(false);
 const showSEOPanel = ref(false);
+
+// New feature modals
+const showSEOAnalyzer = ref(false);
+const showMarketplace = ref(false);
+const showFigmaImport = ref(false);
+const showAnalytics = ref(false);
+const showCollabPanel = ref(false);
+
+// Collaboration functions
+function toggleCollaboration() {
+  showCollabPanel.value = !showCollabPanel.value;
+}
+
+async function startCollaboration() {
+  try {
+    await createSession();
+    showToast('Collaboration session started!', 'success');
+  } catch (error) {
+    showToast('Failed to start collaboration', 'error');
+  }
+}
+
+async function endCollaboration() {
+  try {
+    await leaveSession();
+    showToast('Collaboration session ended', 'info');
+  } catch (error) {
+    showToast('Failed to end session', 'error');
+  }
+}
+
+async function copyShareLink() {
+  const success = await copyCollabLink();
+  if (success) {
+    showToast('Link copied to clipboard!', 'success');
+  } else {
+    showToast('Failed to copy link', 'error');
+  }
+}
 
 function updateProjectName() {
   store.projectName = projectName.value || 'Untitled Project';
@@ -489,6 +655,217 @@ async function togglePreview() {
   color: #374151;
 }
 
+/* Extended modals */
+.seo-analyzer-modal,
+.analytics-modal {
+  max-width: 900px;
+  max-height: 85vh;
+}
+
+/* Collaboration Button */
+.collab-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: white;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  color: #6B7280;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.collab-btn:hover {
+  background: #F9FAFB;
+  border-color: #D1D5DB;
+}
+
+.collab-btn.connected {
+  background: #ECFDF5;
+  border-color: #10B981;
+  color: #059669;
+}
+
+.collab-count {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  background: #10B981;
+  color: white;
+  border-radius: 9px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* Collaboration Panel */
+.collab-panel {
+  position: fixed;
+  top: 70px;
+  right: 20px;
+  width: 320px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  z-index: 10000;
+  overflow: hidden;
+}
+
+.collab-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid #E5E7EB;
+}
+
+.collab-header h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1F2937;
+  margin: 0;
+}
+
+.close-collab {
+  padding: 4px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #6B7280;
+  border-radius: 4px;
+}
+
+.close-collab:hover {
+  background: #F3F4F6;
+}
+
+.collab-content {
+  padding: 20px;
+}
+
+.collab-content p {
+  font-size: 14px;
+  color: #6B7280;
+  margin: 0 0 16px;
+}
+
+.start-collab-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px;
+  background: #6366F1;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.start-collab-btn:hover {
+  background: #4F46E5;
+}
+
+.share-link {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.share-link input {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid #E5E7EB;
+  border-radius: 6px;
+  font-size: 13px;
+  background: #F9FAFB;
+}
+
+.share-link button {
+  padding: 10px;
+  background: #6366F1;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.share-link button:hover {
+  background: #4F46E5;
+}
+
+.collaborators {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.collaborator {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  background: #F9FAFB;
+  border-radius: 8px;
+}
+
+.collab-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.collaborator span:first-of-type {
+  flex: 1;
+  font-size: 14px;
+  color: #1F2937;
+}
+
+.collaborator .status {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.collaborator .status.online {
+  background: #10B981;
+}
+
+.collaborator .status.offline {
+  background: #D1D5DB;
+}
+
+.end-collab-btn {
+  width: 100%;
+  padding: 10px;
+  background: transparent;
+  color: #EF4444;
+  border: 1px solid #FCA5A5;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.end-collab-btn:hover {
+  background: #FEF2F2;
+}
+
 /* Responsive styles */
 @media (max-width: 768px) {
   .app-header {
@@ -518,6 +895,12 @@ async function togglePreview() {
 
   .mobile-menu-btn {
     display: block;
+  }
+
+  .collab-panel {
+    right: 10px;
+    width: calc(100% - 20px);
+    max-width: 320px;
   }
 }
 </style>
