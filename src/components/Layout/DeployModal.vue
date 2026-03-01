@@ -96,7 +96,7 @@ const emit = defineEmits<{
 const store = useEditorStore();
 const { showToast } = useToast();
 
-const token = ref(localStorage.getItem('vercel_token') || '');
+const token = ref(sessionStorage.getItem('vercel_token') || '');
 const projectName = ref(store.projectName.toLowerCase().replace(/\s+/g, '-'));
 const isDeploying = ref(false);
 const deploymentUrl = ref('');
@@ -109,7 +109,7 @@ async function handleDeploy() {
   
   try {
     // Save token for future use
-    localStorage.setItem('vercel_token', token.value);
+    sessionStorage.setItem('vercel_token', token.value);
     
     // Generate code
     const { fullPage } = await codeGenerator.generateProject(

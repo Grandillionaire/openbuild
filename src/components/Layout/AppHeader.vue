@@ -414,10 +414,16 @@ async function togglePreview() {
       }
     );
     
-    // Open in new window
+    // Open in new window with sandboxed iframe
+    const blob = new Blob([result.fullPage], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
     const previewWindow = window.open('', '_blank');
     if (previewWindow) {
-      previewWindow.document.write(result.fullPage);
+      previewWindow.document.write(`
+        <!DOCTYPE html>
+        <html><head><title>Preview</title><style>body,html{margin:0;padding:0;height:100%}iframe{width:100%;height:100%;border:none}</style></head>
+        <body><iframe src="${url}" sandbox="allow-scripts"></iframe></body></html>
+      `);
       previewWindow.document.close();
     } else {
       showToast('Please allow popups to preview', 'warning');

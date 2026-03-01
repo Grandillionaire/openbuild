@@ -37,7 +37,7 @@
       <div v-if="activeTab === 'javascript'" class="editor-section">
         <div class="editor-info">
           <Info :size="14" />
-          <span>JavaScript runs in a sandboxed environment</span>
+          <span>JavaScript runs directly in exported sites and previews. Ensure code is safe before deploying.</span>
         </div>
         <div class="editor-container">
           <codemirror

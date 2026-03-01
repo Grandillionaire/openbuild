@@ -167,9 +167,14 @@ export class CodeGenerator {
   
   private generateThemeCSS(variables: Record<string, string>): string {
     const cssVars = Object.entries(variables)
-      .map(([key, value]) => `  ${key}: ${value};`)
+      .filter(([key]) => /^--[a-zA-Z0-9-]+$/.test(key))
+      .map(([key, value]) => {
+        // Sanitize CSS values - remove anything that could break out of the declaration
+        const safeValue = value.replace(/[{}]/g, '').replace(/;(?!$)/g, '');
+        return `  ${key}: ${safeValue};`;
+      })
       .join('\n');
-      
+
     return `:root {\n${cssVars}\n}`;
   }
   

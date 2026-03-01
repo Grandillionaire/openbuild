@@ -1,4 +1,5 @@
 import type { ComponentDefinition } from '@/types/component';
+import { escapeHtml, sanitizeUrl } from '@/utils/htmlEscape';
 
 export const formComponentDefinitions: Record<string, ComponentDefinition> = {
   form: {
@@ -25,7 +26,7 @@ export const formComponentDefinitions: Record<string, ComponentDefinition> = {
     generateHTML: (component) => {
       const method = component.props.method || 'POST';
       const action = component.props.action || '#';
-      return `<form class="c-${component.id}" id="${component.id}" method="${method}" action="${action}">`;
+      return `<form class="c-${component.id}" id="${component.id}" method="${escapeHtml(method)}" action="${sanitizeUrl(action)}">`;
     },
     generateCSS: (component) => {
       const styles = component.props.style || component.styles?.base || {};
@@ -65,7 +66,7 @@ export const formComponentDefinitions: Record<string, ComponentDefinition> = {
       const name = component.props.name || 'input';
       const required = component.props.required ? 'required' : '';
       const value = component.props.value || '';
-      return `<input class="c-${component.id}" id="${component.id}" type="${type}" name="${name}" placeholder="${placeholder}" value="${value}" ${required} />`;
+      return `<input class="c-${component.id}" id="${component.id}" type="${escapeHtml(type)}" name="${escapeHtml(name)}" placeholder="${escapeHtml(placeholder)}" value="${escapeHtml(value)}" ${required} />`;
     },
     generateCSS: (component) => {
       const styles = component.props.style || component.styles?.base || {};
@@ -107,7 +108,7 @@ export const formComponentDefinitions: Record<string, ComponentDefinition> = {
       const rows = component.props.rows || 5;
       const required = component.props.required ? 'required' : '';
       const value = component.props.value || '';
-      return `<textarea class="c-${component.id}" id="${component.id}" name="${name}" placeholder="${placeholder}" rows="${rows}" ${required}>${value}</textarea>`;
+      return `<textarea class="c-${component.id}" id="${component.id}" name="${escapeHtml(name)}" placeholder="${escapeHtml(placeholder)}" rows="${rows}" ${required}>${escapeHtml(value)}</textarea>`;
     },
     generateCSS: (component) => {
       const styles = component.props.style || component.styles?.base || {};
@@ -151,9 +152,9 @@ export const formComponentDefinitions: Record<string, ComponentDefinition> = {
       const required = component.props.required ? 'required' : '';
       const options = component.props.options || [];
       const optionsHTML = options.map((opt: any) =>
-        `<option value="${opt.value}">${opt.label}</option>`
+        `<option value="${escapeHtml(opt.value)}">${escapeHtml(opt.label)}</option>`
       ).join('\n');
-      return `<select class="c-${component.id}" id="${component.id}" name="${name}" ${required}>\n${optionsHTML}\n</select>`;
+      return `<select class="c-${component.id}" id="${component.id}" name="${escapeHtml(name)}" ${required}>\n${optionsHTML}\n</select>`;
     },
     generateCSS: (component) => {
       const styles = component.props.style || component.styles?.base || {};
@@ -189,8 +190,8 @@ export const formComponentDefinitions: Record<string, ComponentDefinition> = {
       const required = component.props.required ? 'required' : '';
       const checked = component.props.checked ? 'checked' : '';
       return `<label class="c-${component.id}" id="${component.id}">
-        <input type="checkbox" name="${name}" ${required} ${checked} />
-        <span>${label}</span>
+        <input type="checkbox" name="${escapeHtml(name)}" ${required} ${checked} />
+        <span>${escapeHtml(label)}</span>
       </label>`;
     },
     generateCSS: (component) => {
@@ -230,8 +231,8 @@ export const formComponentDefinitions: Record<string, ComponentDefinition> = {
       const required = component.props.required ? 'required' : '';
       const optionsHTML = options.map((opt: any, index: number) =>
         `<label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-          <input type="radio" name="${name}" value="${opt.value}" ${index === 0 ? required : ''} />
-          <span>${opt.label}</span>
+          <input type="radio" name="${escapeHtml(name)}" value="${escapeHtml(opt.value)}" ${index === 0 ? required : ''} />
+          <span>${escapeHtml(opt.label)}</span>
         </label>`
       ).join('\n');
       return `<div class="c-${component.id}" id="${component.id}">\n${optionsHTML}\n</div>`;
@@ -267,9 +268,9 @@ export const formComponentDefinitions: Record<string, ComponentDefinition> = {
     },
     generateHTML: (component) => {
       const text = component.props.text || 'Label';
-      const forAttr = component.props.for ? `for="${component.props.for}"` : '';
+      const forAttr = component.props.for ? `for="${escapeHtml(component.props.for)}"` : '';
       const required = component.props.required ? '<span style="color: #ef4444;">*</span>' : '';
-      return `<label class="c-${component.id}" id="${component.id}" ${forAttr}>${text}${required}</label>`;
+      return `<label class="c-${component.id}" id="${component.id}" ${forAttr}>${escapeHtml(text)}${required}</label>`;
     },
     generateCSS: (component) => {
       const styles = component.props.style || component.styles?.base || {};
@@ -330,7 +331,7 @@ export const formComponentDefinitions: Record<string, ComponentDefinition> = {
     generateHTML: (component) => {
       const text = component.props.text || 'Submit';
       const disabled = component.props.disabled ? 'disabled' : '';
-      return `<button class="c-${component.id}" id="${component.id}" type="submit" ${disabled}>${text}</button>`;
+      return `<button class="c-${component.id}" id="${component.id}" type="submit" ${disabled}>${escapeHtml(text)}</button>`;
     },
     generateCSS: (component) => {
       const styles = component.props.style || component.styles?.base || {};

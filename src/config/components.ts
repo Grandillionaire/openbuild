@@ -1,6 +1,7 @@
 import type { ComponentDefinition, ComponentType, Component } from '@/types/component';
 import { componentVariants } from './componentVariants';
 import { formComponentDefinitions } from './formComponents';
+import { escapeHtml, sanitizeUrl } from '@/utils/htmlEscape';
 
 // Helper function to add variants and theme support
 function addVariantsToDefinition(definition: ComponentDefinition): ComponentDefinition {
@@ -205,7 +206,7 @@ const baseComponentDefinitions: Record<ComponentType, ComponentDefinition> = {
     generateHTML: (component) => {
       const level = component.props.attributes?.level || 'h2';
       const content = component.props.content || 'Heading';
-      return `<${level} class="c-${component.id}" id="${component.id}">${content}</${level}>`;
+      return `<${level} class="c-${component.id}" id="${component.id}">${escapeHtml(content)}</${level}>`;
     },
     generateCSS: (component) => {
       return generateResponsiveCSS(`.c-${component.id}`, component.styles);
@@ -231,7 +232,7 @@ const baseComponentDefinitions: Record<ComponentType, ComponentDefinition> = {
     },
     generateHTML: (component) => {
       const content = component.props.content || 'Text content';
-      return `<p class="c-${component.id}" id="${component.id}">${content}</p>`;
+      return `<p class="c-${component.id}" id="${component.id}">${escapeHtml(content)}</p>`;
     },
     generateCSS: (component) => {
       return generateResponsiveCSS(`.c-${component.id}`, component.styles);
@@ -269,7 +270,7 @@ const baseComponentDefinitions: Record<ComponentType, ComponentDefinition> = {
       const content = component.props.content || 'Button';
       const type = component.props.attributes?.type || 'button';
       const openTag = addAnimationAttributes(component, 'button', `type="${type}"`);
-      return `${openTag}${content}</button>`;
+      return `${openTag}${escapeHtml(content)}</button>`;
     },
     generateCSS: (component) => {
       const css = generateResponsiveCSS(`.c-${component.id}`, component.styles);
@@ -302,7 +303,7 @@ const baseComponentDefinitions: Record<ComponentType, ComponentDefinition> = {
       const content = component.props.content || 'Link';
       const href = component.props.attributes?.href || '#';
       const target = component.props.attributes?.target || '_self';
-      return `<a href="${href}" target="${target}" class="c-${component.id}" id="${component.id}">${content}</a>`;
+      return `<a href="${sanitizeUrl(href)}" target="${target}" class="c-${component.id}" id="${component.id}">${escapeHtml(content)}</a>`;
     },
     generateCSS: (component) => {
       const css = generateResponsiveCSS(`.c-${component.id}`, component.styles);
@@ -335,7 +336,7 @@ const baseComponentDefinitions: Record<ComponentType, ComponentDefinition> = {
       const alt = component.props.alt || component.props.attributes?.alt || 'Image';
       const objectFit = component.props.objectFit || 'cover';
       const loading = component.props.loading || 'lazy';
-      return `<img src="${src}" alt="${alt}" style="object-fit: ${objectFit};" loading="${loading}" class="c-${component.id}" id="${component.id}" />`;
+      return `<img src="${sanitizeUrl(src)}" alt="${escapeHtml(alt)}" style="object-fit: ${objectFit};" loading="${loading}" class="c-${component.id}" id="${component.id}" />`;
     },
     generateCSS: (component) => {
       return generateResponsiveCSS(`.c-${component.id}`, component.styles);
@@ -413,9 +414,9 @@ const baseComponentDefinitions: Record<ComponentType, ComponentDefinition> = {
       return `
         <section class="c-${component.id} hero" id="${component.id}">
           <div class="hero-content">
-            <h1>${heading}</h1>
-            <p>${subheading}</p>
-            <button class="hero-btn">${buttonText}</button>
+            <h1>${escapeHtml(heading)}</h1>
+            <p>${escapeHtml(subheading)}</p>
+            <button class="hero-btn">${escapeHtml(buttonText)}</button>
           </div>
         </section>
       `;
@@ -465,12 +466,12 @@ const baseComponentDefinitions: Record<ComponentType, ComponentDefinition> = {
       const { features } = component.props.content as any;
       const items = features.map((f: any) => `
         <div class="feature-item">
-          <div class="feature-icon">${f.icon}</div>
-          <h3>${f.title}</h3>
-          <p>${f.description}</p>
+          <div class="feature-icon">${escapeHtml(f.icon)}</div>
+          <h3>${escapeHtml(f.title)}</h3>
+          <p>${escapeHtml(f.description)}</p>
         </div>
       `).join('');
-      
+
       return `
         <section class="c-${component.id} features" id="${component.id}">
           <div class="features-grid">${items}</div>
@@ -521,9 +522,9 @@ const baseComponentDefinitions: Record<ComponentType, ComponentDefinition> = {
       return `
         <section class="c-${component.id} cta" id="${component.id}">
           <div class="cta-content">
-            <h2>${heading}</h2>
-            <p>${description}</p>
-            <button class="cta-btn">${buttonText}</button>
+            <h2>${escapeHtml(heading)}</h2>
+            <p>${escapeHtml(description)}</p>
+            <button class="cta-btn">${escapeHtml(buttonText)}</button>
           </div>
         </section>
       `;
@@ -572,14 +573,14 @@ const baseComponentDefinitions: Record<ComponentType, ComponentDefinition> = {
     },
     generateHTML: (component) => {
       const { copyright, links } = component.props.content as any;
-      const linksHtml = links.map((l: string) => 
-        `<a href="#" class="footer-link">${l}</a>`
+      const linksHtml = links.map((l: string) =>
+        `<a href="#" class="footer-link">${escapeHtml(l)}</a>`
       ).join(' · ');
-      
+
       return `
         <footer class="c-${component.id}" id="${component.id}">
           <div class="footer-links">${linksHtml}</div>
-          <p class="footer-copyright">${copyright}</p>
+          <p class="footer-copyright">${escapeHtml(copyright)}</p>
         </footer>
       `;
     },
@@ -625,14 +626,14 @@ const baseComponentDefinitions: Record<ComponentType, ComponentDefinition> = {
     },
     generateHTML: (component) => {
       const { logo, links } = component.props.content as any;
-      const navLinks = links.map((l: any) => 
-        `<a href="${l.href}" class="nav-link">${l.text}</a>`
+      const navLinks = links.map((l: any) =>
+        `<a href="${sanitizeUrl(l.href)}" class="nav-link">${escapeHtml(l.text)}</a>`
       ).join('');
-      
+
       return `
         <nav class="c-${component.id}" id="${component.id}">
           <div class="nav-container">
-            <div class="nav-logo">${logo}</div>
+            <div class="nav-logo">${escapeHtml(logo)}</div>
             <div class="nav-links">${navLinks}</div>
           </div>
         </nav>
