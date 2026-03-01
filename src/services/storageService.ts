@@ -149,6 +149,14 @@ class StorageService extends Dexie {
   
   async importProject(jsonData: string): Promise<Project> {
     const data = safeParse(jsonData);
+
+    // Validate imported data structure
+    if (!data || typeof data !== 'object') throw new Error('Invalid project data');
+    if (data.components && !Array.isArray(data.components)) throw new Error('Invalid components');
+    if (data.components) {
+      data.components = data.components.filter((c: any) => c && typeof c === 'object' && typeof c.type === 'string');
+    }
+
     const project: Project = {
       id: nanoid(),
       name: data.name || 'Imported Project',
@@ -156,7 +164,7 @@ class StorageService extends Dexie {
       createdAt: new Date(),
       updatedAt: new Date()
     };
-    
+
     await this.saveProject(project);
     return project;
   }

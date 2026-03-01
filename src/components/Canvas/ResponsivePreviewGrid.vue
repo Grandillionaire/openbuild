@@ -57,7 +57,7 @@
                 <iframe
                   :srcdoc="generatedHTML"
                   class="preview-iframe"
-                  sandbox="allow-scripts allow-same-origin"
+                  sandbox="allow-scripts"
                 ></iframe>
               </div>
             </div>
@@ -79,7 +79,7 @@
                   <iframe
                     :srcdoc="generatedHTML"
                     class="preview-iframe"
-                    sandbox="allow-scripts allow-same-origin"
+                    sandbox="allow-scripts"
                   ></iframe>
                 </div>
               </div>
@@ -102,7 +102,7 @@
                   <iframe
                     :srcdoc="generatedHTML"
                     class="preview-iframe"
-                    sandbox="allow-scripts allow-same-origin"
+                    sandbox="allow-scripts"
                   ></iframe>
                 </div>
               </div>
