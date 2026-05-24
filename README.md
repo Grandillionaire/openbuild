@@ -1,274 +1,216 @@
-# OpenBuild - Open Source Website Builder
-
 <div align="center">
-  <img src="PreviewOpenBuild.jpg" alt="OpenBuild Preview" width="100%" style="border-radius: 12px; margin-bottom: 20px;">
+  <img src="PreviewOpenBuild.jpg" alt="OpenBuild — visual website builder with commerce" width="100%" style="border-radius: 12px; margin-bottom: 20px;">
+
+  <h1>OpenBuild</h1>
+
+  <p><strong>The open-source visual website builder with built-in commerce.</strong><br>
+  Drag, drop, sell. Free forever, self-hostable, no lock-in.</p>
+
+  <p>
+    <a href="#quick-start">Quick start</a> ·
+    <a href="#commerce">Commerce</a> ·
+    <a href="#architecture">Architecture</a> ·
+    <a href="docs/COMMERCE.md">Commerce guide</a> ·
+    <a href="docs/ARCHITECTURE.md">Architecture deep-dive</a> ·
+    <a href="CONTRIBUTING.md">Contributing</a>
+  </p>
+
+  <p>
+    <img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="License">
+    <img src="https://img.shields.io/badge/vue-3.4-4FC08D?style=flat-square&logo=vue.js&logoColor=white" alt="Vue 3.4">
+    <img src="https://img.shields.io/badge/typescript-strict-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript strict">
+    <img src="https://img.shields.io/badge/node-%E2%89%A520-43853D?style=flat-square&logo=node.js&logoColor=white" alt="Node ≥20">
+    <img src="https://img.shields.io/badge/bundle-%3C%20250%20KB%20gz-success?style=flat-square" alt="Initial bundle <250 KB gz">
+    <img src="https://img.shields.io/badge/PRs-welcome-brightgreen?style=flat-square" alt="PRs welcome">
+  </p>
+
+  <p>
+    <a href="https://openbuild-five.vercel.app"><strong>Try it live →</strong></a>
+  </p>
 </div>
-
-<div align="center">
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FGrandillionaire%2Fopenbuild)
-[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/Grandillionaire/openbuild)
-
-</div>
-
-<div align="center">
-  <img src="https://img.shields.io/badge/Vue.js-3.4+-4FC08D?style=for-the-badge&logo=vue.js&logoColor=white" alt="Vue.js">
-  <img src="https://img.shields.io/badge/TypeScript-5.0+-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript">
-  <img src="https://img.shields.io/badge/Vite-5.0+-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite">
-  <img src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge" alt="License">
-</div>
-
-<div align="center">
-  <img src="https://img.shields.io/badge/Lighthouse-95+-brightgreen?style=flat-square&logo=lighthouse" alt="Lighthouse">
-  <img src="https://img.shields.io/badge/Bundle-< 200KB-brightgreen?style=flat-square" alt="Bundle Size">
-  <img src="https://img.shields.io/badge/Build-Passing-brightgreen?style=flat-square" alt="Build Status">
-  <img src="https://img.shields.io/badge/Tests-100%25-brightgreen?style=flat-square" alt="Tests">
-  <img src="https://img.shields.io/badge/Coverage-85%25-yellowgreen?style=flat-square" alt="Coverage">
-  <img src="https://img.shields.io/badge/PRs-Welcome-brightgreen?style=flat-square" alt="PRs Welcome">
-</div>
-
-<p align="center">
-  <strong>I was bored and built this because I don't understand why people use Squarespace.</strong><br>
-  <em>OpenBuild actually lets you see the code and modify it however you like.</em>
-</p>
-
-<p align="center">
-  <a href="#-features">Features</a> •
-  <a href="#-demo">Demo</a> •
-  <a href="#-quick-start">Quick Start</a> •
-  <a href="#-docker">Docker</a> •
-  <a href="#-tech-stack">Tech Stack</a> •
-  <a href="#-contributing">Contributing</a>
-</p>
 
 ---
 
-## 🎬 Demo
+OpenBuild is a free alternative to Squarespace, Wix and Webflow — but the code is yours, the data is yours, and there's no monthly bill. Build a marketing site, a portfolio, a blog, or a fully functional online store; export to clean, framework-free HTML/CSS/JS or to a Vite project; deploy anywhere static hosting lives.
 
-🌐 **[Try OpenBuild Live →](https://openbuild-five.vercel.app)**
+Where most "free" website builders force you onto a hosted plan the moment you want a custom domain or to accept payments, OpenBuild ships its commerce engine with the editor. Wire it to your own Stripe account in 30 seconds and you have a working store — no backend required for single-product checkouts, with a clean extension point for multi-item carts.
 
+## Why OpenBuild
 
-## ✨ Features
+| | Squarespace | Wix | Webflow | **OpenBuild** |
+|---|:---:|:---:|:---:|:---:|
+| Monthly fee | $16+ | $17+ | $14+ | **$0** |
+| Own your code & data | ❌ | ❌ | Partial | **✅** |
+| Self-host anywhere | ❌ | ❌ | ❌ | **✅** |
+| Drag & drop editor | ✅ | ✅ | ✅ | **✅** |
+| Built-in Stripe checkout | ✅ | ✅ | Plugin | **✅** |
+| Export to clean HTML | ❌ | ❌ | Limited | **✅** |
+| Open source | ❌ | ❌ | ❌ | **✅ MIT** |
+| Plugin system | ❌ | ❌ | ❌ | **✅** |
 
-- **🤖 Smart Component Generator**: Describe what you want, get instant results
-- **🎯 Drag & Drop Editor**: Intuitive visual interface for building websites
-- **🧩 15+ Components**: Layout, content, media, and pre-built blocks
-- **📱 Responsive Design**: Built-in controls for mobile, tablet, and desktop
-- **🎨 Real-time Styling**: Visual property editor with live preview
-- **💻 Clean Code Generation**: Produces semantic HTML and optimized CSS
-- **📦 Export & Deploy**: Download as ZIP or deploy directly to Vercel
-- **💾 Auto-Save**: Local storage with automatic project saving
-- **↩️ Undo/Redo**: Full history tracking for easy corrections
-- **⚡ Performance**: 60fps editing experience with optimized rendering
-- **📲 PWA Support**: Install as a native app, works offline
-- **⌨️ Keyboard Shortcuts**: Power-user friendly (press `?` for help)
+## Features
 
-### 🤖 Smart Component Generation
+### Visual editor
+- **45+ components** across layout, content, media, blocks, forms and commerce
+- **Drag & drop** with smart snapping, alignment guides and live preview
+- **Responsive design** with per-breakpoint overrides (mobile / tablet / desktop)
+- **Multi-page sites** with global theme tokens (colors, fonts, spacing scale)
+- **Theme system** with CSS custom properties — design once, restyle anywhere
+- **Undo / redo** with a real command-pattern history (50 states deep)
+- **Command palette** (⌘K) and full keyboard shortcuts
+- **Tutorial system** with interactive overlays for first-time users
+- **AI component generator** — describe what you want in plain English
 
-Generate components using natural language! Just click the sparkle button in the bottom-right corner and describe what you want:
+### Commerce (built in, free, no subscription)
+- **Products** with images, variants (size/color), inventory, SKUs, compare-at pricing
+- **Categories, tags, collections**
+- **Cart drawer** with localStorage persistence — works on any exported site
+- **Stripe Payment Links** — no backend required, free to use
+- **Stripe Checkout Sessions** — point at your own endpoint for multi-item carts
+- **Custom webhook** mode — plug in any payment processor
+- **25 currencies** including JPY zero-decimal handling
+- **Tax rules** by country / region with `included-in-price` support
+- **Shipping zones** with free-shipping thresholds
+- **Discount codes** (percentage and fixed) with min-subtotal and expiry
+- **FAQ component** emits schema.org JSON-LD for richer search results
+- **SEO** with auto-generated meta, OG, Twitter Card and canonical tags
+- **Multi-page export** with `sitemap.xml` and `robots.txt`
 
-```
-"A hero section with a gradient background, large heading, 
-subtitle, and call-to-action button"
-```
+### Engineering
+- **TypeScript strict** across the codebase
+- **ESLint flat config** with `--max-warnings=0` in CI
+- **Vitest** unit tests with v8 coverage, **Playwright** for end-to-end
+- **Bundle budget** enforced in CI (250 KB gzipped for initial route)
+- **License policy** check — fails CI if a GPL dep sneaks in
+- **Telemetry interface** — drop in Sentry/Bugsnag with one line
+- **Plugin API** — third parties can ship components, exporters, integrations
+- **Per-Node-version matrix** on CI (Node 20.x and 22.x)
+- **PWA** with offline support and installable manifest
 
-The generator understands common patterns like:
-- **Hero sections** - Landing page headers with CTAs
-- **Feature grids** - Showcase your product features
-- **Contact forms** - User input sections
-- **Cards** - Reusable content blocks
-
-Choose from style presets: Modern, Minimal, Bold, or Elegant.
-
-## 🚀 Quick Start
-
-### Development
+## Quick start
 
 ```bash
-# Install dependencies
+git clone https://github.com/Grandillionaire/openbuild.git
+cd openbuild
 npm install
-
-# Start development server
 npm run dev
-
-# Build for production
-npm run build
+# open http://localhost:5173
 ```
 
-### One-Click Deploy
+Build a production bundle:
 
-Deploy your own instance with one click:
+```bash
+npm run build
+npm run preview
+```
+
+Run the full quality gate (lint, typecheck, tests, build):
+
+```bash
+npm run check
+```
+
+## Commerce
+
+The shortest path to a working store:
+
+1. Open **Store** in the editor's left sidebar
+2. Click **Add demo products** (or **New product** to start from scratch)
+3. In **Store settings**, set checkout mode to **Stripe Payment Links**
+4. Paste a `https://buy.stripe.com/…` link on each product
+5. Drop the **Product Grid** component on your page
+6. Export, deploy, sell
+
+For multi-item carts, choose **Stripe Checkout Session** and point at any endpoint that returns `{ url: 'https://checkout.stripe.com/…' }`. See [docs/COMMERCE.md](docs/COMMERCE.md) for a complete walkthrough including a 40-line serverless function template.
+
+## Architecture
+
+OpenBuild is a Vue 3 + Pinia SPA that compiles to static assets. The interesting parts:
+
+- **`src/types/`** — the domain model (components, pages, commerce, projects)
+- **`src/config/components.ts`** — every renderable component, defined as an immutable `ComponentDefinition` with `generateHTML` and `generateCSS`
+- **`src/stores/`** — `editor`, `pages`, `theme`, `commerce` — Pinia stores with persisted state
+- **`src/services/`** — pure, framework-free logic: code generation, export, commerce math, AI, storage
+- **`src/lib/plugins.ts`** — plugin registry. Components, exporters and integrations all register through one interface
+- **`src/lib/telemetry.ts`** — error/event reporter interface. No-op by default; drop in your provider with `setTelemetryReporter()`
+- **`src/services/commerceRuntime.ts`** — self-contained ~10 KB JS that ships with exported sites to power cart and checkout
+
+Read the full deep-dive in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+
+## Plugin system
+
+Add a custom component without forking:
+
+```ts
+import { registerPlugin } from 'openbuild/lib/plugins';
+
+registerPlugin({
+  id: 'my-org.calendar',
+  name: 'Calendar widget',
+  version: '1.0.0',
+  components: [{
+    type: 'calendar' as never,
+    displayName: 'Calendar',
+    category: 'blocks',
+    icon: 'calendar',
+    defaultProps: { content: { calendarUrl: '' } },
+    defaultStyles: { base: { width: '100%' } },
+    generateHTML: (c) => `<iframe src="${c.props.content.calendarUrl}" loading="lazy"></iframe>`,
+    generateCSS: () => '',
+  }],
+});
+```
+
+Plugins also register **exporters** (e.g. ship a custom static-site framework adapter) and **integrations** (Stripe, Mailchimp, Google Analytics, anything with a config schema).
+
+## Project quality
+
+| Signal | Status |
+|---|---|
+| TypeScript | strict, `noUnusedLocals`, `noUnusedParameters` |
+| Lint | ESLint 9 flat config, 0 warnings tolerated in CI |
+| Tests | Vitest + Playwright, per-PR coverage upload |
+| CI | Node 20.x + 22.x matrix, bundle budget, license audit, npm audit |
+| Performance | < 250 KB gzipped initial route, code-split editor & UI chunks |
+| Accessibility | semantic HTML across components, ARIA on interactive bits |
+| Security | sandboxed embed wrappers, sanitized URLs, CSP-friendly export |
+
+## Deployment
+
+One-click:
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FGrandillionaire%2Fopenbuild)
-
 [![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/Grandillionaire/openbuild)
 
-## 🐳 Docker
-
-### Quick Start with Docker
+Docker:
 
 ```bash
-# Build and run with Docker Compose
-docker-compose up -d
-
-# Or build manually
-docker build -t openbuild .
-docker run -p 3000:80 openbuild
+docker compose up -d        # production at http://localhost:3000
+docker compose --profile dev up openbuild-dev   # dev at http://localhost:5173
 ```
 
-### Development with Docker
+## Roadmap
 
-```bash
-# Run development server with hot reload
-docker-compose --profile dev up openbuild-dev
-```
+See [ROADMAP.md](docs/ROADMAP.md) for the full plan. Highlights:
 
-The app will be available at `http://localhost:3000` (production) or `http://localhost:5173` (development).
+- Real-time multi-cursor collaboration
+- Form submissions endpoint (with anti-spam)
+- Headless CMS connector (Sanity, Contentful, Strapi)
+- A11y audit panel
+- Visual regression diff on PRs
 
-### Docker Compose Services
+## Contributing
 
-| Service | Port | Description |
-|---------|------|-------------|
-| `openbuild` | 3000 | Production build with nginx |
-| `openbuild-dev` | 5173 | Development with hot reload |
+We love contributions — bugfixes, components, exporters, translations. Read [CONTRIBUTING.md](CONTRIBUTING.md), check the issue tracker for `good first issue` labels, or open a discussion.
 
-## 🛠️ Tech Stack
+## License
+
+MIT. See [LICENSE](LICENSE).
+
+## Credits
+
+OpenBuild was originally created by **[Grandillionaire (Maximillian Grand)](https://github.com/Grandillionaire)** and is built on Vue 3, Pinia, TypeScript, UnoCSS, CodeMirror 6, Dexie and Vite — every one of them open source, every one of them excellent.
 
 <div align="center">
-  <img src="https://skillicons.dev/icons?i=vue,typescript,vite,pinia&theme=light" alt="Tech Stack" />
+  <p><strong>If OpenBuild helps you ship something, star the repo ⭐</strong></p>
 </div>
-
-- **Vue 3.4+**: Modern reactive framework with Composition API
-- **TypeScript**: Type-safe development experience
-- **Vite 5.0+**: Lightning-fast build tooling
-- **Pinia**: Next-generation state management
-- **UnoCSS**: Atomic CSS with Tailwind compatibility
-- **CodeMirror 6**: Advanced code editor
-- **Dexie.js**: IndexedDB wrapper for local storage
-
-## ⌨️ Keyboard Shortcuts
-
-Press `?` at any time to see all shortcuts. Here are the essentials:
-
-| Shortcut | Action |
-|----------|--------|
-| `⌘/Ctrl + S` | Save project |
-| `⌘/Ctrl + Z` | Undo |
-| `⌘/Ctrl + Shift + Z` | Redo |
-| `⌘/Ctrl + D` | Duplicate component |
-| `⌘/Ctrl + K` | Command palette |
-| `Delete` | Delete selected |
-| `Escape` | Clear selection |
-| `?` | Show shortcuts |
-
-## 📦 Components
-
-### Layout Components
-- **Container**: Responsive max-width wrapper
-- **Section**: Full-width section blocks
-- **Grid**: Flexible grid system
-- **Flex**: Flexbox container
-- **Spacer**: Vertical spacing element
-
-### Content Components
-- **Heading**: H1-H6 with styling options
-- **Text**: Paragraph blocks
-- **Button**: Interactive buttons with hover states
-- **Link**: Styled anchor elements
-- **Image**: Responsive images
-
-### Pre-built Blocks
-- **Hero**: Landing page hero sections
-- **Features**: Feature showcase grids
-- **CTA**: Call-to-action sections
-- **Navigation**: Responsive nav bars
-- **Footer**: Site footer blocks
-
-## 🎯 Usage
-
-1. **Add Components**: Drag components from the left sidebar onto the canvas
-2. **Edit Properties**: Select any component to modify its content and styles
-3. **Responsive Design**: Use viewport controls to design for different screen sizes
-4. **Export Project**: Download your website as a ZIP file with clean code
-5. **Deploy**: One-click deployment to Vercel (requires API token)
-
-## 🔧 Configuration
-
-### Environment Variables
-
-Create a `.env.local` file for local development:
-
-```env
-VITE_VERCEL_TOKEN=your_vercel_token_here
-```
-
-## 📋 Requirements
-
-- Node.js 18+ or 20+
-- npm 9+
-- Modern browser with ES6+ support
-
-## 📊 Performance
-
-OpenBuild is optimized for performance:
-
-- **First Contentful Paint**: < 1s
-- **Time to Interactive**: < 2s
-- **Bundle Size**: < 200KB (gzipped)
-- **Lighthouse Score**: 95+
-
-## 📸 Screenshots
-
-### Key Features:
-- **Rich Component Library** - 15+ pre-built components
-- **Visual Property Editor** - Real-time style updates
-- **Responsive Design Tools** - Mobile, tablet, and desktop views
-- **Clean Code Export** - Production-ready HTML/CSS/JS
-
-## 🤝 Contributing
-
-We love contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
-
-### Contributors
-
-<a href="https://github.com/Grandillionaire/openbuild/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=Grandillionaire/openbuild" />
-</a>
-
-## 📈 Star History
-
-<a href="https://star-history.com/#Grandillionaire/openbuild&Date">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=Grandillionaire/openbuild&type=Date&theme=dark" />
-    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=Grandillionaire/openbuild&type=Date" />
-    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=Grandillionaire/openbuild&type=Date" />
-  </picture>
-</a>
-
-## 🔒 Security
-
-For security issues, please see our [Security Policy](SECURITY.md).
-
-## 📄 License
-
-This project is licensed under the MIT License with attribution requirement - see the [LICENSE](LICENSE) file for details.
-
-### Attribution
-
-OpenBuild was originally created by **Grandillionaire (Maximillian Grand)**. Any use, modification, or distribution of this software must include attribution to the original creator.
-
-## 🙏 Acknowledgments
-
-- Built with ❤️ by **Grandillionaire (Maximillian Grand)**
-- Powered by Vue 3, TypeScript, and modern web technologies
-- Special thanks to all contributors and the open source community
-
----
-
-<p align="center">
-  <strong>⭐ Star this repository if you find it helpful!</strong>
-</p>
-
-<p align="center">
-  Made with ❤️ by <a href="https://github.com/grandillionaire">Grandillionaire</a>
-</p>

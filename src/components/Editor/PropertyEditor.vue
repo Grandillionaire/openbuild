@@ -1,357 +1,285 @@
 <template>
   <div class="property-editor">
     <div class="editor-header">
-      <h3>Properties</h3>
-      <button v-if="selectedComponent" @click="store.deleteComponent(selectedComponent.id)" class="delete-btn">
-        <Trash2 :size="16" />
-      </button>
+      <div class="header-title">
+        <Sliders :size="18" />
+        <h3>Properties</h3>
+      </div>
+      <div class="header-actions">
+        <button 
+          v-if="selectedComponent" 
+          @click="duplicateComponent" 
+          class="action-btn"
+          title="Duplicate"
+        >
+          <Copy :size="16" />
+        </button>
+        <button 
+          v-if="selectedComponent" 
+          @click="store.deleteComponent(selectedComponent.id)" 
+          class="action-btn delete"
+          title="Delete"
+        >
+          <Trash2 :size="16" />
+        </button>
+      </div>
     </div>
     
     <div v-if="!selectedComponent" class="empty-state">
-      <MousePointer2 :size="32" />
-      <p>Select a component to edit its properties</p>
+      <div class="empty-icon">
+        <MousePointer2 :size="32" />
+      </div>
+      <p>Select a component to edit</p>
+      <span class="hint">Click on any element in the canvas</span>
     </div>
     
     <div v-else class="editor-content">
-      <!-- Component Info -->
-      <div class="section">
-        <div class="section-header">Component</div>
-        <div class="info-row">
-          <label>Type</label>
-          <span class="type-badge">{{ selectedComponent.type }}</span>
+      <!-- Quick Style Switcher -->
+      <QuickStyleSwitcher />
+
+      <!-- Responsive Editor -->
+      <ResponsiveEditor />
+
+      <!-- Image Editor (for image components) -->
+      <ImageEditor />
+
+      <!-- Search/Filter -->
+      <div class="search-box">
+        <Search :size="16" />
+        <input
+          v-model="searchQuery"
+          placeholder="Search properties..."
+          @input="filterProperties"
+        />
+      </div>
+
+      <!-- Component Info Section -->
+      <div class="property-section">
+        <div class="section-header" @click="toggleSection('info')">
+          <ChevronDown 
+            :size="16" 
+            :class="{ rotated: !collapsedSections.info }"
+          />
+          <span class="section-title">
+            <Info :size="14" />
+            Component Info
+          </span>
+          <span class="component-type">{{ selectedComponent.type }}</span>
         </div>
-        <div class="info-row">
-          <label>ID</label>
-          <span class="id-text">{{ selectedComponent.id }}</span>
+        
+        <div v-show="!collapsedSections.info" class="section-content">
+          <div class="info-grid">
+            <div class="info-item">
+              <label>Name</label>
+              <input
+                :value="selectedComponent.displayName || selectedComponent.type || ''"
+                @input="updateDisplayName($event.target.value)"
+                placeholder="Component name"
+              />
+            </div>
+            <div class="info-item">
+              <label>ID</label>
+              <div class="id-display">
+                <code>{{ selectedComponent.id }}</code>
+                <button @click="copyId" class="copy-btn">
+                  <Copy :size="12" />
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-      
-      <!-- Content Properties -->
-      <div class="section" v-if="hasContentProps">
-        <div class="section-header">Content</div>
+
+      <!-- Content Properties Section -->
+      <div class="property-section" v-if="hasContentProps">
+        <div class="section-header" @click="toggleSection('content')">
+          <ChevronDown 
+            :size="16" 
+            :class="{ rotated: !collapsedSections.content }"
+          />
+          <span class="section-title">
+            <Type :size="14" />
+            Content
+          </span>
+        </div>
         
-        <!-- Text Content -->
-        <div v-if="selectedComponent.props.content && typeof selectedComponent.props.content === 'string'" class="form-group">
-          <label>Text</label>
-          <textarea
-            :value="selectedComponent.props.content"
-            @input="updateContent($event.target.value)"
-            rows="3"
+        <div v-show="!collapsedSections.content" class="section-content">
+          <!-- Dynamic content based on component type -->
+          <component 
+            v-if="getContentEditor"
+            :is="getContentEditor" 
+            :component="selectedComponent"
+            @update="updateComponent"
+          />
+          <div v-else class="no-content-editor">
+            <p>Content editing for {{ selectedComponent.type }} coming soon</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Variants Section -->
+      <div class="property-section" v-if="hasVariants">
+        <div class="section-header" @click="toggleSection('variants')">
+          <ChevronDown 
+            :size="16" 
+            :class="{ rotated: !collapsedSections.variants }"
+          />
+          <span class="section-title">
+            <Layers :size="14" />
+            Variants
+          </span>
+        </div>
+        
+        <div v-show="!collapsedSections.variants" class="section-content">
+          <VariantSelector />
+        </div>
+      </div>
+
+      <!-- Layout Properties -->
+      <div class="property-section">
+        <div class="section-header" @click="toggleSection('layout')">
+          <ChevronDown 
+            :size="16" 
+            :class="{ rotated: !collapsedSections.layout }"
+          />
+          <span class="section-title">
+            <Layout :size="14" />
+            Layout
+          </span>
+          <ResponsiveToggle v-model="currentBreakpoint" />
+        </div>
+        
+        <div v-show="!collapsedSections.layout" class="section-content">
+          <LayoutProperties 
+            :component="selectedComponent" 
+            :breakpoint="currentBreakpoint"
+            @update="updateStyles"
           />
         </div>
-        
-        <!-- Hero Content -->
-        <template v-if="selectedComponent.type === 'hero'">
-          <div class="form-group">
-            <label>Heading</label>
-            <input
-              :value="selectedComponent.props.content?.heading"
-              @input="updateContentField('heading', $event.target.value)"
-            />
-          </div>
-          <div class="form-group">
-            <label>Subheading</label>
-            <textarea
-              :value="selectedComponent.props.content?.subheading"
-              @input="updateContentField('subheading', $event.target.value)"
-              rows="2"
-            />
-          </div>
-          <div class="form-group">
-            <label>Button Text</label>
-            <input
-              :value="selectedComponent.props.content?.buttonText"
-              @input="updateContentField('buttonText', $event.target.value)"
-            />
-          </div>
-        </template>
-        
-        <!-- Image Properties -->
-        <template v-if="selectedComponent.type === 'image'">
-          <div class="form-group">
-            <label>Image URL</label>
-            <div class="input-with-button">
-              <input
-                :value="selectedComponent.props.attributes?.src"
-                @input="updateAttribute('src', $event.target.value)"
-                placeholder="https://..."
-              />
-              <button @click="openAssetManager" class="asset-btn">
-                <Image :size="16" />
-              </button>
-            </div>
-          </div>
-          <div class="form-group">
-            <label>Alt Text</label>
-            <input
-              :value="selectedComponent.props.attributes?.alt"
-              @input="updateAttribute('alt', $event.target.value)"
-              placeholder="Description of image"
-            />
-          </div>
-        </template>
-        
-        <!-- Link Properties -->
-        <template v-if="selectedComponent.type === 'link'">
-          <div class="form-group">
-            <label>URL</label>
-            <input
-              :value="selectedComponent.props.attributes?.href"
-              @input="updateAttribute('href', $event.target.value)"
-              placeholder="https://..."
-            />
-          </div>
-          <div class="form-group">
-            <label>Target</label>
-            <select
-              :value="selectedComponent.props.attributes?.target"
-              @change="updateAttribute('target', $event.target.value)"
-            >
-              <option value="_self">Same Window</option>
-              <option value="_blank">New Window</option>
-            </select>
-          </div>
-        </template>
-        
-        <!-- Heading Level -->
-        <template v-if="selectedComponent.type === 'heading'">
-          <div class="form-group">
-            <label>Level</label>
-            <select
-              :value="selectedComponent.props.attributes?.level || 'h2'"
-              @change="updateAttribute('level', $event.target.value)"
-            >
-              <option value="h1">H1</option>
-              <option value="h2">H2</option>
-              <option value="h3">H3</option>
-              <option value="h4">H4</option>
-              <option value="h5">H5</option>
-              <option value="h6">H6</option>
-            </select>
-          </div>
-        </template>
       </div>
-      
-      <!-- Component Variants -->
-      <VariantSelector />
-      
-      <!-- Animations -->
-      <AnimationEditor />
-      
-      <!-- Custom Code -->
-      <CustomCodeEditor />
-      
-      <!-- Style Properties -->
-      <div class="section">
-        <div class="section-header">
-          <span>Styles</span>
-          <select v-model="currentBreakpoint" class="breakpoint-select">
-            <option value="base">Base</option>
-            <option value="sm">SM (640px+)</option>
-            <option value="md">MD (768px+)</option>
-            <option value="lg">LG (1024px+)</option>
-            <option value="xl">XL (1280px+)</option>
-          </select>
+
+      <!-- Spacing Properties -->
+      <div class="property-section">
+        <div class="section-header" @click="toggleSection('spacing')">
+          <ChevronDown 
+            :size="16" 
+            :class="{ rotated: !collapsedSections.spacing }"
+          />
+          <span class="section-title">
+            <Move :size="14" />
+            Spacing
+          </span>
         </div>
         
-        <!-- Layout -->
-        <div class="style-group">
-          <div class="group-label">Layout</div>
-          
-          <div class="form-row">
-            <div class="form-group flex-1">
-              <label>Width</label>
-              <input
-                :value="getCurrentStyle('width')"
-                @input="updateStyle('width', $event.target.value)"
-                placeholder="auto"
-              />
-            </div>
-            <div class="form-group flex-1">
-              <label>Height</label>
-              <input
-                :value="getCurrentStyle('height')"
-                @input="updateStyle('height', $event.target.value)"
-                placeholder="auto"
-              />
-            </div>
-          </div>
-          
-          <div class="form-group">
-            <label>Display</label>
-            <select
-              :value="getCurrentStyle('display')"
-              @change="updateStyle('display', $event.target.value)"
-            >
-              <option value="">Default</option>
-              <option value="block">Block</option>
-              <option value="inline-block">Inline Block</option>
-              <option value="flex">Flex</option>
-              <option value="grid">Grid</option>
-              <option value="none">None</option>
-            </select>
-          </div>
+        <div v-show="!collapsedSections.spacing" class="section-content">
+          <SpacingProperties 
+            :component="selectedComponent" 
+            :breakpoint="currentBreakpoint"
+            @update="updateStyles"
+          />
+        </div>
+      </div>
+
+      <!-- Typography Properties -->
+      <div class="property-section" v-if="hasTextStyles">
+        <div class="section-header" @click="toggleSection('typography')">
+          <ChevronDown 
+            :size="16" 
+            :class="{ rotated: !collapsedSections.typography }"
+          />
+          <span class="section-title">
+            <Type :size="14" />
+            Typography
+          </span>
         </div>
         
-        <!-- Spacing -->
-        <div class="style-group">
-          <div class="group-label">Spacing</div>
-          
-          <div class="form-group">
-            <label>Padding</label>
-            <div class="spacing-inputs">
-              <input
-                :value="getCurrentStyle('paddingTop')"
-                @input="updateStyle('paddingTop', $event.target.value)"
-                placeholder="T"
-              />
-              <input
-                :value="getCurrentStyle('paddingRight')"
-                @input="updateStyle('paddingRight', $event.target.value)"
-                placeholder="R"
-              />
-              <input
-                :value="getCurrentStyle('paddingBottom')"
-                @input="updateStyle('paddingBottom', $event.target.value)"
-                placeholder="B"
-              />
-              <input
-                :value="getCurrentStyle('paddingLeft')"
-                @input="updateStyle('paddingLeft', $event.target.value)"
-                placeholder="L"
-              />
-            </div>
-          </div>
-          
-          <div class="form-group">
-            <label>Margin</label>
-            <div class="spacing-inputs">
-              <input
-                :value="getCurrentStyle('marginTop')"
-                @input="updateStyle('marginTop', $event.target.value)"
-                placeholder="T"
-              />
-              <input
-                :value="getCurrentStyle('marginRight')"
-                @input="updateStyle('marginRight', $event.target.value)"
-                placeholder="R"
-              />
-              <input
-                :value="getCurrentStyle('marginBottom')"
-                @input="updateStyle('marginBottom', $event.target.value)"
-                placeholder="B"
-              />
-              <input
-                :value="getCurrentStyle('marginLeft')"
-                @input="updateStyle('marginLeft', $event.target.value)"
-                placeholder="L"
-              />
-            </div>
-          </div>
+        <div v-show="!collapsedSections.typography" class="section-content">
+          <TypographyProperties 
+            :component="selectedComponent" 
+            :breakpoint="currentBreakpoint"
+            @update="updateStyles"
+          />
+        </div>
+      </div>
+
+      <!-- Appearance Properties -->
+      <div class="property-section">
+        <div class="section-header" @click="toggleSection('appearance')">
+          <ChevronDown 
+            :size="16" 
+            :class="{ rotated: !collapsedSections.appearance }"
+          />
+          <span class="section-title">
+            <Palette :size="14" />
+            Appearance
+          </span>
         </div>
         
-        <!-- Typography -->
-        <div class="style-group" v-if="hasTextStyles">
-          <div class="group-label">Typography</div>
-          
-          <div class="form-group">
-            <label>Font Size</label>
-            <input
-              :value="getCurrentStyle('fontSize')"
-              @input="updateStyle('fontSize', $event.target.value)"
-              placeholder="16px"
-            />
-          </div>
-          
-          <div class="form-group">
-            <label>Font Weight</label>
-            <select
-              :value="getCurrentStyle('fontWeight')"
-              @change="updateStyle('fontWeight', $event.target.value)"
-            >
-              <option value="">Normal</option>
-              <option value="300">Light</option>
-              <option value="400">Regular</option>
-              <option value="500">Medium</option>
-              <option value="600">Semibold</option>
-              <option value="700">Bold</option>
-            </select>
-          </div>
-          
-          <div class="form-group">
-            <label>Text Align</label>
-            <div class="button-group">
-              <button
-                @click="updateStyle('textAlign', 'left')"
-                :class="{ active: getCurrentStyle('textAlign') === 'left' }"
-              >
-                <AlignLeft :size="16" />
-              </button>
-              <button
-                @click="updateStyle('textAlign', 'center')"
-                :class="{ active: getCurrentStyle('textAlign') === 'center' }"
-              >
-                <AlignCenter :size="16" />
-              </button>
-              <button
-                @click="updateStyle('textAlign', 'right')"
-                :class="{ active: getCurrentStyle('textAlign') === 'right' }"
-              >
-                <AlignRight :size="16" />
-              </button>
-            </div>
-          </div>
-          
-          <div class="form-group">
-            <label>Color</label>
-            <div class="color-input">
-              <input
-                type="color"
-                :value="getCurrentStyle('color') || '#000000'"
-                @input="updateStyle('color', $event.target.value)"
-              />
-              <input
-                :value="getCurrentStyle('color')"
-                @input="updateStyle('color', $event.target.value)"
-                placeholder="#000000"
-              />
-            </div>
-          </div>
+        <div v-show="!collapsedSections.appearance" class="section-content">
+          <AppearanceProperties 
+            :component="selectedComponent" 
+            :breakpoint="currentBreakpoint"
+            @update="updateStyles"
+          />
+        </div>
+      </div>
+
+      <!-- Effects Properties -->
+      <div class="property-section">
+        <div class="section-header" @click="toggleSection('effects')">
+          <ChevronDown 
+            :size="16" 
+            :class="{ rotated: !collapsedSections.effects }"
+          />
+          <span class="section-title">
+            <Zap :size="14" />
+            Effects
+          </span>
         </div>
         
-        <!-- Background -->
-        <div class="style-group">
-          <div class="group-label">Background</div>
-          
-          <div class="form-group">
-            <label>Background Color</label>
-            <div class="color-input">
-              <input
-                type="color"
-                :value="getCurrentStyle('backgroundColor') || '#ffffff'"
-                @input="updateStyle('backgroundColor', $event.target.value)"
-              />
-              <input
-                :value="getCurrentStyle('backgroundColor')"
-                @input="updateStyle('backgroundColor', $event.target.value)"
-                placeholder="transparent"
-              />
-            </div>
-          </div>
+        <div v-show="!collapsedSections.effects" class="section-content">
+          <EffectsProperties 
+            :component="selectedComponent" 
+            :breakpoint="currentBreakpoint"
+            @update="updateStyles"
+          />
+        </div>
+      </div>
+
+      <!-- Animations Section -->
+      <div class="property-section">
+        <div class="section-header" @click="toggleSection('animations')">
+          <ChevronDown 
+            :size="16" 
+            :class="{ rotated: !collapsedSections.animations }"
+          />
+          <span class="section-title">
+            <Sparkles :size="14" />
+            Animations
+          </span>
+          <span class="count" v-if="animationCount > 0">{{ animationCount }}</span>
         </div>
         
-        <!-- Border -->
-        <div class="style-group">
-          <div class="group-label">Border</div>
-          
-          <div class="form-group">
-            <label>Border Radius</label>
-            <input
-              :value="getCurrentStyle('borderRadius')"
-              @input="updateStyle('borderRadius', $event.target.value)"
-              placeholder="0px"
-            />
-          </div>
+        <div v-show="!collapsedSections.animations" class="section-content no-padding">
+          <AnimationEditor />
+        </div>
+      </div>
+
+      <!-- Custom Code Section -->
+      <div class="property-section">
+        <div class="section-header" @click="toggleSection('code')">
+          <ChevronDown 
+            :size="16" 
+            :class="{ rotated: !collapsedSections.code }"
+          />
+          <span class="section-title">
+            <Code2 :size="14" />
+            Custom Code
+          </span>
+        </div>
+        
+        <div v-show="!collapsedSections.code" class="section-content no-padding">
+          <CustomCodeEditor />
         </div>
       </div>
     </div>
@@ -359,25 +287,69 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { useEditorStore } from '@/stores/editor';
+import { nanoid } from 'nanoid';
 import VariantSelector from './VariantSelector.vue';
 import AnimationEditor from './AnimationEditor.vue';
 import CustomCodeEditor from './CustomCodeEditor.vue';
+import QuickStyleSwitcher from './QuickStyleSwitcher.vue';
+import ResponsiveEditor from './ResponsiveEditor.vue';
+import ImageEditor from './ImageEditor.vue';
+
+// Sub-components for different property groups
+import ResponsiveToggle from './properties/ResponsiveToggle.vue';
+import LayoutProperties from './properties/LayoutProperties.vue';
+import SpacingProperties from './properties/SpacingProperties.vue';
+import TypographyProperties from './properties/TypographyProperties.vue';
+import AppearanceProperties from './properties/AppearanceProperties.vue';
+import EffectsProperties from './properties/EffectsProperties.vue';
+
+// Content editors for different component types
+// import TextContentEditor from './content/TextContentEditor.vue';
+// import ImageContentEditor from './content/ImageContentEditor.vue';
+// import LinkContentEditor from './content/LinkContentEditor.vue';
+// import HeadingContentEditor from './content/HeadingContentEditor.vue';
+// import ButtonContentEditor from './content/ButtonContentEditor.vue';
+
 import { 
   Trash2, 
   MousePointer2,
-  AlignLeft,
-  AlignCenter,
-  AlignRight,
-  Image
+  Copy,
+  Search,
+  ChevronDown,
+  Info,
+  Type,
+  Layout,
+  Move,
+  Palette,
+  Zap,
+  Sparkles,
+  Code2,
+  Layers,
+  Sliders
 } from 'lucide-vue-next';
 
 const store = useEditorStore();
-const currentBreakpoint = ref<'base' | 'sm' | 'md' | 'lg' | 'xl'>('base');
-
 const selectedComponent = computed(() => store.selectedComponent);
+const currentBreakpoint = ref<'base' | 'sm' | 'md' | 'lg' | 'xl'>('base');
+const searchQuery = ref('');
 
+// Collapsed sections state
+const collapsedSections = ref({
+  info: false,
+  content: false,
+  variants: false,
+  layout: false,
+  spacing: false,
+  typography: false,
+  appearance: false,
+  effects: true,
+  animations: false,
+  code: true
+});
+
+// Computed properties
 const hasContentProps = computed(() => {
   const comp = selectedComponent.value;
   if (!comp) return false;
@@ -389,57 +361,81 @@ const hasTextStyles = computed(() => {
   return selectedComponent.value && textComponents.includes(selectedComponent.value.type);
 });
 
-function getCurrentStyle(property: string) {
-  if (!selectedComponent.value) return '';
-  const styles = selectedComponent.value.styles[currentBreakpoint.value] || {};
-  return styles[property] || '';
+const hasVariants = computed(() => {
+  return false;
+});
+
+const animationCount = computed(() => {
+  return selectedComponent.value?.props.animations?.length || 0;
+});
+
+// Get content editor component based on type
+const getContentEditor = computed(() => {
+  const type = selectedComponent.value?.type;
+  const contentEditors: Record<string, any> = {
+    // text: TextContentEditor,
+    // heading: HeadingContentEditor,
+    // image: ImageContentEditor,
+    // link: LinkContentEditor,
+    // button: ButtonContentEditor,
+    // Add more as needed
+  };
+  return contentEditors[type] || null;
+});
+
+// Functions
+function toggleSection(section: keyof typeof collapsedSections.value) {
+  collapsedSections.value[section] = !collapsedSections.value[section];
 }
 
-function updateStyle(property: string, value: string) {
+function updateComponent(updates: any) {
+  if (!selectedComponent.value) return;
+  store.updateComponent(selectedComponent.value.id, updates);
+}
+
+function updateStyles(styles: Record<string, string | number>) {
+  if (!selectedComponent.value) return;
+  store.updateMultipleStyles(selectedComponent.value.id, styles, currentBreakpoint.value);
+}
+
+function updateDisplayName(name: string) {
+  if (!selectedComponent.value) return;
+  store.updateComponent(selectedComponent.value.id, { displayName: name });
+}
+
+function duplicateComponent() {
   if (!selectedComponent.value) return;
   
-  const component = selectedComponent.value;
-  if (!component.styles[currentBreakpoint.value]) {
-    component.styles[currentBreakpoint.value] = {};
-  }
+  const duplicate = {
+    ...selectedComponent.value,
+    id: nanoid(),
+    displayName: `${selectedComponent.value.displayName || selectedComponent.value.type} (Copy)`
+  };
   
-  if (value === '') {
-    delete component.styles[currentBreakpoint.value][property];
+  // Add to parent or canvas
+  if (selectedComponent.value.parent) {
+    store.addComponentToParent(duplicate, selectedComponent.value.parent);
   } else {
-    component.styles[currentBreakpoint.value][property] = value;
+    store.addComponent(duplicate);
   }
-  
-  store.updateComponent(component.id, { styles: component.styles });
 }
 
-function updateContent(value: string) {
+function copyId() {
   if (!selectedComponent.value) return;
-  store.updateComponent(selectedComponent.value.id, {
-    props: { ...selectedComponent.value.props, content: value }
-  });
+  navigator.clipboard.writeText(selectedComponent.value.id);
 }
 
-function updateContentField(field: string, value: string) {
-  if (!selectedComponent.value) return;
-  const content = { ...selectedComponent.value.props.content as any };
-  content[field] = value;
-  store.updateComponent(selectedComponent.value.id, {
-    props: { ...selectedComponent.value.props, content }
-  });
+function filterProperties() {
+  // Property filtering handled via computed properties
 }
 
-function updateAttribute(attr: string, value: string) {
-  if (!selectedComponent.value) return;
-  const attributes = { ...selectedComponent.value.props.attributes };
-  attributes[attr] = value;
-  store.updateComponent(selectedComponent.value.id, {
-    props: { ...selectedComponent.value.props, attributes }
-  });
-}
-
-function openAssetManager() {
-  store.toggleAssetManager();
-}
+// Watch for component changes to auto-expand relevant sections
+watch(selectedComponent, (newComponent) => {
+  if (newComponent) {
+    // Auto-expand content section for new selections
+    collapsedSections.value.content = false;
+  }
+});
 </script>
 
 <style scoped>
@@ -447,35 +443,60 @@ function openAssetManager() {
   height: 100%;
   display: flex;
   flex-direction: column;
+  background: #FAFBFC;
 }
 
 .editor-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 20px;
+  padding: 16px;
+  background: white;
   border-bottom: 1px solid #E5E7EB;
 }
 
-.editor-header h3 {
-  font-size: 16px;
-  font-weight: 600;
+.header-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   color: #1F2937;
 }
 
-.delete-btn {
+.header-title h3 {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.header-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.action-btn {
   padding: 6px;
   background: white;
-  border: 1px solid #EF4444;
-  border-radius: 4px;
-  color: #EF4444;
+  border: 1px solid #E5E7EB;
+  border-radius: 6px;
+  color: #6B7280;
   cursor: pointer;
   transition: all 0.2s;
 }
 
-.delete-btn:hover {
-  background: #EF4444;
-  color: white;
+.action-btn:hover {
+  background: #F3F4F6;
+  color: #4B5563;
+  border-color: #D1D5DB;
+}
+
+.action-btn.delete {
+  color: #EF4444;
+  border-color: #FEE2E2;
+}
+
+.action-btn.delete:hover {
+  background: #FEE2E2;
+  border-color: #FCA5A5;
 }
 
 .empty-state {
@@ -484,206 +505,213 @@ function openAssetManager() {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  padding: 40px 20px;
+}
+
+.empty-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 12px;
+  background: #F3F4F6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
   color: #9CA3AF;
-  padding: 20px;
-  text-align: center;
 }
 
 .empty-state p {
-  margin-top: 12px;
+  margin: 0 0 4px;
   font-size: 14px;
+  font-weight: 500;
+  color: #4B5563;
+}
+
+.empty-state .hint {
+  font-size: 13px;
+  color: #9CA3AF;
 }
 
 .editor-content {
   flex: 1;
   overflow-y: auto;
-  padding: 20px;
+  overflow-x: hidden;
 }
 
-.section {
-  margin-bottom: 24px;
-  padding-bottom: 24px;
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: white;
+  border-bottom: 1px solid #E5E7EB;
+}
+
+.search-box input {
+  flex: 1;
+  padding: 6px 8px;
+  border: 1px solid #E5E7EB;
+  border-radius: 6px;
+  font-size: 13px;
+  outline: none;
+}
+
+.search-box input:focus {
+  border-color: #3B82F6;
+}
+
+/* Property Sections */
+.property-section {
+  background: white;
   border-bottom: 1px solid #E5E7EB;
 }
 
 .section-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  font-size: 14px;
-  font-weight: 600;
-  color: #4B5563;
-  margin-bottom: 16px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  gap: 8px;
+  padding: 12px 16px;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s;
 }
 
-.breakpoint-select {
-  font-size: 12px;
-  padding: 2px 6px;
-  border: 1px solid #D1D5DB;
-  border-radius: 4px;
-  background: white;
+.section-header:hover {
+  background-color: #F9FAFB;
 }
 
-.info-row {
+.section-header svg {
+  color: #6B7280;
+  transition: transform 0.2s;
+}
+
+.section-header svg.rotated {
+  transform: rotate(-90deg);
+}
+
+.section-title {
+  flex: 1;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
-  font-size: 14px;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1F2937;
 }
 
-.info-row label {
+.section-title svg {
   color: #6B7280;
 }
 
-.type-badge {
+.component-type {
+  font-size: 11px;
   padding: 2px 8px;
   background: #EFF6FF;
   color: #3B82F6;
   border-radius: 4px;
-  font-size: 12px;
   font-weight: 500;
 }
 
-.id-text {
-  font-family: monospace;
-  font-size: 12px;
-  color: #9CA3AF;
-}
-
-.form-group {
-  margin-bottom: 16px;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 6px;
-  font-size: 13px;
-  font-weight: 500;
-  color: #4B5563;
-}
-
-.input-with-button {
-  display: flex;
-  gap: 4px;
-}
-
-.input-with-button input {
-  flex: 1;
-}
-
-.asset-btn {
-  padding: 8px;
+.count {
+  font-size: 11px;
+  padding: 2px 6px;
   background: #F3F4F6;
+  color: #6B7280;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.section-content {
+  padding: 16px;
+  border-top: 1px solid #F3F4F6;
+}
+
+.section-content.no-padding {
+  padding: 0;
+}
+
+.no-content-editor {
+  padding: 20px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+/* Info Section */
+.info-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.info-item label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: #6B7280;
+  margin-bottom: 6px;
+}
+
+.info-item input {
+  width: 100%;
+  padding: 6px 10px;
   border: 1px solid #E5E7EB;
   border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.info-item input:focus {
+  border-color: #3B82F6;
+}
+
+.id-display {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  background: #F9FAFB;
+  border: 1px solid #E5E7EB;
+  border-radius: 6px;
+}
+
+.id-display code {
+  flex: 1;
+  font-family: monospace;
+  font-size: 12px;
   color: #6B7280;
 }
 
-.asset-btn:hover {
+.copy-btn {
+  padding: 4px;
+  background: transparent;
+  border: none;
+  color: #6B7280;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.copy-btn:hover {
   background: #E5E7EB;
   color: #4B5563;
 }
 
-.form-group input,
-.form-group textarea,
-.form-group select {
-  width: 100%;
-  padding: 8px 12px;
-  border: 1px solid #D1D5DB;
-  border-radius: 6px;
-  font-size: 14px;
-  transition: border-color 0.2s;
+/* Scrollbar styling */
+.editor-content::-webkit-scrollbar {
+  width: 6px;
 }
 
-.form-group input:focus,
-.form-group textarea:focus,
-.form-group select:focus {
-  outline: none;
-  border-color: #3B82F6;
-}
-
-.form-row {
-  display: flex;
-  gap: 12px;
-}
-
-.flex-1 {
-  flex: 1;
-}
-
-.style-group {
-  margin-bottom: 20px;
-}
-
-.group-label {
-  font-size: 13px;
-  font-weight: 600;
-  color: #6B7280;
-  margin-bottom: 12px;
-}
-
-.spacing-inputs {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-}
-
-.spacing-inputs input {
-  padding: 6px 8px;
-  text-align: center;
-  font-size: 12px;
-}
-
-.button-group {
-  display: flex;
-  border: 1px solid #D1D5DB;
-  border-radius: 6px;
-  overflow: hidden;
-}
-
-.button-group button {
-  flex: 1;
-  padding: 8px;
-  background: white;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-}
-
-.button-group button:not(:last-child) {
-  border-right: 1px solid #D1D5DB;
-}
-
-.button-group button:hover {
+.editor-content::-webkit-scrollbar-track {
   background: #F3F4F6;
 }
 
-.button-group button.active {
-  background: #3B82F6;
-  color: white;
+.editor-content::-webkit-scrollbar-thumb {
+  background: #D1D5DB;
+  border-radius: 3px;
 }
 
-.color-input {
-  display: flex;
-  gap: 8px;
-}
-
-.color-input input[type="color"] {
-  width: 40px;
-  height: 36px;
-  padding: 2px;
-  cursor: pointer;
-}
-
-.color-input input[type="text"] {
-  flex: 1;
+.editor-content::-webkit-scrollbar-thumb:hover {
+  background: #9CA3AF;
 }
 </style>

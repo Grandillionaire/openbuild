@@ -1,11 +1,14 @@
 import type { Tutorial, TutorialStep, TutorialProgress } from '@/types/tutorial'
 import { nextTick } from 'vue'
 
+// Re-export so downstream callers can keep importing from the engine module.
+export type { TutorialProgress }
+
 export class TutorialEngine {
   private currentTutorial: Tutorial | null = null
   private currentStepIndex = 0
   private observers: Map<string, MutationObserver> = new Map()
-  private eventListeners: Map<string, Function> = new Map()
+  private eventListeners: Map<string, EventListener> = new Map()
   private onStepChange?: (step: TutorialStep, index: number) => void
   private onComplete?: () => void
   private onSkip?: () => void
@@ -191,9 +194,10 @@ export class TutorialEngine {
         // This would be tracked by event listeners
         return true
 
-      case 'value-equals':
+      case 'value-equals': {
         const element = document.querySelector(step.validation.target!) as HTMLInputElement
         return element?.value === step.validation.value
+      }
 
       case 'custom':
         return step.validation.customValidator?.() ?? true
@@ -210,7 +214,7 @@ export class TutorialEngine {
     if (!target) return
 
     switch (step.validation.type) {
-      case 'element-clicked':
+      case 'element-clicked': {
         const clickHandler = () => {
           this.nextStep()
           target.removeEventListener('click', clickHandler)
@@ -218,8 +222,9 @@ export class TutorialEngine {
         target.addEventListener('click', clickHandler)
         this.eventListeners.set(`${step.id}-click`, clickHandler)
         break
+      }
 
-      case 'value-equals':
+      case 'value-equals': {
         const inputHandler = (e: Event) => {
           const input = e.target as HTMLInputElement
           if (input.value === step.validation!.value) {
@@ -230,6 +235,7 @@ export class TutorialEngine {
         target.addEventListener('input', inputHandler)
         this.eventListeners.set(`${step.id}-input`, inputHandler)
         break
+      }
     }
   }
 

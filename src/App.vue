@@ -137,7 +137,7 @@ import { useTutorialStore } from '@/stores/tutorial';
 import AppHeader from '@/components/Layout/AppHeader.vue';
 import ComponentLibrary from '@/components/Editor/ComponentLibrary.vue';
 import Canvas from '@/components/Canvas/Canvas.vue';
-import PropertyEditor from '@/components/Editor/PropertyEditorNew.vue';
+import PropertyEditor from '@/components/Editor/PropertyEditor.vue';
 import CodeViewer from '@/components/Editor/CodeViewer.vue';
 import ErrorBoundary from '@/components/UI/ErrorBoundary.vue';
 import AssetManager from '@/components/Assets/AssetManager.vue';
