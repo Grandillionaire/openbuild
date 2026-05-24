@@ -30,3 +30,8 @@ dist-ssr
 .env.test
 .env.production
 .vercel
+
+# Test artifacts
+playwright-report/
+test-results/
+coverage/
