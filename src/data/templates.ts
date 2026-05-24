@@ -2963,8 +2963,13 @@ const _minimalEcommerceTemplate: Template = {
   ]
 };
 
-// Export all templates
+import { v2Templates } from './templates/v2Templates';
+
+// Export all templates. v2 templates appear first — they use the new component
+// library (faq, pricing, testimonials, gallery, productGrid, accordion) and
+// are the recommended starting points.
 export const templates: Template[] = [
+  ...v2Templates,
   // Modern Templates (Featured)
   modernStartupTemplate,
   professionalAgencyTemplate,

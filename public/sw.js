@@ -1,71 +1,102 @@
-const CACHE_NAME = 'openbuild-v1';
-const STATIC_ASSETS = [
-  '/',
-  '/index.html',
-  '/manifest.json'
-];
+/**
+ * OpenBuild service worker — caching with a stale-while-revalidate strategy
+ * for app shell + static assets, network-first for editor API-ish endpoints,
+ * and an offline fallback for navigation. Commerce-aware: critical commerce
+ * runtime artifacts (catalog snapshot, runtime script) are cached eagerly so
+ * the published storefront stays interactive on flaky connections.
+ */
 
-// Install event - cache static assets
+const SHELL_CACHE = 'openbuild-shell-v2';
+const ASSET_CACHE = 'openbuild-assets-v2';
+const COMMERCE_CACHE = 'openbuild-commerce-v2';
+
+const SHELL_ASSETS = ['/', '/index.html', '/manifest.json'];
+
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(STATIC_ASSETS);
-    })
+    caches.open(SHELL_CACHE).then((cache) => cache.addAll(SHELL_ASSETS))
   );
   self.skipWaiting();
 });
 
-// Activate event - clean up old caches
 self.addEventListener('activate', (event) => {
+  const keep = new Set([SHELL_CACHE, ASSET_CACHE, COMMERCE_CACHE]);
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames
-          .filter((name) => name !== CACHE_NAME)
-          .map((name) => caches.delete(name))
-      );
-    })
+    caches.keys().then((names) => Promise.all(names.filter((n) => !keep.has(n)).map((n) => caches.delete(n))))
   );
   self.clients.claim();
 });
 
-// Fetch event - network first, fallback to cache
+function isStaticAsset(url) {
+  return /\.(?:js|css|woff2?|ttf|otf|eot|svg|png|jpe?g|webp|avif|gif|ico)$/.test(url.pathname);
+}
+
+function isCommerceArtifact(url) {
+  // The exported commerce runtime is inlined into HTML and product images come
+  // from third-party CDNs (see imageOpt.ts). What we DO want to cache is the
+  // hydrated catalog snapshot the editor saves under /commerce/catalog.json
+  // and any locally-hosted product images.
+  return url.pathname.startsWith('/commerce/') || url.pathname.startsWith('/products/');
+}
+
+// Stale-while-revalidate: serve from cache instantly, refresh in background.
+async function staleWhileRevalidate(request, cacheName) {
+  const cache = await caches.open(cacheName);
+  const cached = await cache.match(request);
+  const networkFetch = fetch(request)
+    .then((response) => {
+      if (response.status === 200) cache.put(request, response.clone());
+      return response;
+    })
+    .catch(() => null);
+  return cached || (await networkFetch) || new Response('Offline', { status: 503 });
+}
+
+// Network first: try the network, fall back to cache, then to offline page.
+async function networkFirst(request) {
+  try {
+    const response = await fetch(request);
+    if (response.status === 200) {
+      const cache = await caches.open(SHELL_CACHE);
+      cache.put(request, response.clone());
+    }
+    return response;
+  } catch {
+    const cached = await caches.match(request);
+    if (cached) return cached;
+    if (request.mode === 'navigate') {
+      const shell = await caches.match('/index.html');
+      if (shell) return shell;
+    }
+    return new Response('Offline', { status: 503 });
+  }
+}
+
 self.addEventListener('fetch', (event) => {
-  // Skip non-GET requests
-  if (event.request.method !== 'GET') return;
+  const { request } = event;
+  if (request.method !== 'GET') return;
 
-  // Skip cross-origin requests
-  if (!event.request.url.startsWith(self.location.origin)) return;
+  const url = new URL(request.url);
+  if (url.origin !== self.location.origin) return;
 
-  event.respondWith(
-    fetch(event.request)
-      .then((response) => {
-        // Clone response for caching
-        const responseClone = response.clone();
-        
-        // Cache successful responses
-        if (response.status === 200) {
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseClone);
-          });
-        }
-        
-        return response;
-      })
-      .catch(() => {
-        // Network failed, try cache
-        return caches.match(event.request).then((cachedResponse) => {
-          if (cachedResponse) {
-            return cachedResponse;
-          }
-          
-          // Return offline page for navigation requests
-          if (event.request.mode === 'navigate') {
-            return caches.match('/index.html');
-          }
-          
-          return new Response('Offline', { status: 503 });
-        });
-      })
-  );
+  if (isCommerceArtifact(url)) {
+    event.respondWith(staleWhileRevalidate(request, COMMERCE_CACHE));
+    return;
+  }
+  if (isStaticAsset(url)) {
+    event.respondWith(staleWhileRevalidate(request, ASSET_CACHE));
+    return;
+  }
+  event.respondWith(networkFirst(request));
+});
+
+// Allow the editor to evict its own caches without touching the user's other PWA caches.
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'CLEAR_CACHE') {
+    event.waitUntil(
+      caches.keys().then((names) =>
+        Promise.all(names.filter((n) => n.startsWith('openbuild-')).map((n) => caches.delete(n)))
+      )
+    );
+  }
 });
