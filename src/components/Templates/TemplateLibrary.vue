@@ -310,22 +310,22 @@ const showSort = ref(false);
 const favorites = ref<Set<string>>(new Set());
 
 // Categories with icons and better labels
-const categories = [
+const categories: ReadonlyArray<{ value: TemplateCategory | 'all'; label: string; icon: unknown }> = [
   { value: 'all', label: 'All', icon: Layout },
   { value: 'landing', label: 'Landing', icon: Layout },
   { value: 'portfolio', label: 'Portfolio', icon: PenTool },
   { value: 'blog', label: 'Blog', icon: FileText },
   { value: 'business', label: 'Business', icon: Briefcase },
-  { value: 'ecommerce', label: 'Shop', icon: ShoppingBag }
+  { value: 'ecommerce', label: 'Shop', icon: ShoppingBag },
 ];
 
 // Computed filtered templates
-const filteredTemplates = computed(() => {
-  let templates = templateStore.filteredTemplates;
+const filteredTemplates = computed<Template[]>(() => {
+  let templates: Template[] = templateStore.filteredTemplates;
 
   // Filter by category
   if (selectedCategory.value !== 'all') {
-    templates = templates.filter(t => t.category === selectedCategory.value);
+    templates = templates.filter((t) => t.category === selectedCategory.value);
   }
 
   return templates;

@@ -206,8 +206,9 @@ function addSectionToCanvas(section: SectionTemplate) {
     // Add the default variation
     const defaultVariation = section.variations[0];
     if (defaultVariation) {
-      // Use the addSectionComponents method from store
-      store.addSectionComponents(defaultVariation.components);
+      // PartialComponent matches Component at runtime; the data layer keeps
+      // it loose so authors can omit defaults. Cast at the store boundary.
+      store.addSectionComponents(defaultVariation.components as never);
       showToast(`Added ${section.name} to canvas`, 'success');
     }
   }
@@ -224,8 +225,7 @@ function closeVariationsModal() {
 }
 
 function selectVariation(variation: SectionVariation) {
-  // Use the addSectionComponents method from store
-  store.addSectionComponents(variation.components);
+  store.addSectionComponents(variation.components as never);
   showToast(`Added ${variation.name} to canvas`, 'success');
   closeVariationsModal();
 }

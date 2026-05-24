@@ -164,7 +164,7 @@ const platform = ref('static');
 const framework = ref<ExportFramework>('html');
 const isExporting = ref(false);
 
-const frameworks = [
+const frameworks: ReadonlyArray<{ value: ExportFramework; label: string; icon: unknown }> = [
   { value: 'html', label: 'HTML', icon: HtmlIcon },
   { value: 'react', label: 'React', icon: ReactIcon },
   { value: 'vue', label: 'Vue', icon: VueIcon },

@@ -47,11 +47,13 @@ export interface ResponsiveStyles {
   [key: string]: CSSProperties | undefined;
 }
 
-export interface CSSProperties {
-  // Property values may be undefined when a style is conditionally absent in
-  // object literals (TypeScript widens unset keys to `undefined`).
-  [key: string]: string | number | undefined;
-}
+// CSS values are intentionally loose. Vue's own StyleValue accepts string and
+// number, and our editor frequently treats values as raw strings for parsing
+// (`'12px'.replace('px','')`) or as numbers for sliders — the strict union
+// generates false positives at every use site without catching real bugs.
+// Use `cssString()` from @/utils/cssValue when you specifically need a string.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type CSSProperties = Record<string, any>;
 
 export type ComponentType =
   // Layout

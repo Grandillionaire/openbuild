@@ -12,8 +12,8 @@ export const useTemplateStore = defineStore('templates', () => {
   const filter = ref<TemplateFilter>({});
   
   // Computed
-  const filteredTemplates = computed(() => {
-    let result = [...templates.value];
+  const filteredTemplates = computed<Template[]>(() => {
+    let result: Template[] = [...templates.value];
     
     // Filter by category
     if (filter.value.category) {

@@ -203,6 +203,7 @@ import { useEditorStore } from '@/stores/editor';
 import { useToast } from '@/composables/useToast';
 import { formComponentDefinitions } from '@/config/formComponents';
 import { nanoid } from 'nanoid';
+import type { Component } from '@/types/component';
 import {
   ChevronDown,
   Type,
@@ -361,16 +362,18 @@ function addFormElement(element: any) {
   showToast(`Added ${element.label} to form`, 'success');
 }
 
-function createFormComponent() {
+function createFormComponent(): Component {
   return {
     id: nanoid(),
     type: 'form',
+    displayName: 'Form',
     props: {
       method: 'POST',
       action: '#',
-      style: formComponentDefinitions.form.defaultStyles?.base
+      style: formComponentDefinitions.form.defaultStyles?.base,
     },
-    children: []
+    styles: formComponentDefinitions.form.defaultStyles ?? { base: {} },
+    children: [] as Component[],
   };
 }
 

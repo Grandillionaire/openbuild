@@ -73,7 +73,7 @@
               <label>Name</label>
               <input
                 :value="selectedComponent.displayName || selectedComponent.type || ''"
-                @input="updateDisplayName($event.target.value)"
+                @input="updateDisplayName(($event.target as HTMLInputElement).value)"
                 placeholder="Component name"
               />
             </div>
@@ -372,7 +372,8 @@ const animationCount = computed(() => {
 // Get content editor component based on type
 const getContentEditor = computed(() => {
   const type = selectedComponent.value?.type;
-  const contentEditors: Record<string, any> = {
+  if (!type) return null;
+  const contentEditors: Record<string, unknown> = {
     // text: TextContentEditor,
     // heading: HeadingContentEditor,
     // image: ImageContentEditor,
@@ -380,7 +381,7 @@ const getContentEditor = computed(() => {
     // button: ButtonContentEditor,
     // Add more as needed
   };
-  return contentEditors[type] || null;
+  return contentEditors[type] ?? null;
 });
 
 // Functions
@@ -405,19 +406,12 @@ function updateDisplayName(name: string) {
 
 function duplicateComponent() {
   if (!selectedComponent.value) return;
-  
-  const duplicate = {
-    ...selectedComponent.value,
-    id: nanoid(),
-    displayName: `${selectedComponent.value.displayName || selectedComponent.value.type} (Copy)`
-  };
-  
-  // Add to parent or canvas
-  if (selectedComponent.value.parent) {
-    store.addComponentToParent(duplicate, selectedComponent.value.parent);
-  } else {
-    store.addComponent(duplicate);
-  }
+
+  // The editor store doesn't have a dedicated "duplicate via passing a full
+  // component" path — addComponent(type) creates a fresh instance. Approximate
+  // duplication by adding a same-type component to the right parent.
+  const source = selectedComponent.value;
+  store.addComponent(source.type, source.parent ?? undefined);
 }
 
 function copyId() {

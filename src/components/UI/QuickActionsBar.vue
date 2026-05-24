@@ -292,7 +292,7 @@ function deleteComponent() {
 function moveUp() {
   if (store.selectedComponent && canMoveUp.value) {
     const index = store.components.indexOf(store.selectedComponent);
-    store.moveComponent(store.selectedComponent.id, index - 1);
+    store.moveComponent(store.selectedComponent.id, null, index - 1);
     showToast('Moved up', 'success');
   }
 }
@@ -300,21 +300,21 @@ function moveUp() {
 function moveDown() {
   if (store.selectedComponent && canMoveDown.value) {
     const index = store.components.indexOf(store.selectedComponent);
-    store.moveComponent(store.selectedComponent.id, index + 1);
+    store.moveComponent(store.selectedComponent.id, null, index + 1);
     showToast('Moved down', 'success');
   }
 }
 
 function moveToTop() {
   if (store.selectedComponent && canMoveUp.value) {
-    store.moveComponent(store.selectedComponent.id, 0);
+    store.moveComponent(store.selectedComponent.id, null, 0);
     showToast('Moved to top', 'success');
   }
 }
 
 function moveToBottom() {
   if (store.selectedComponent && canMoveDown.value) {
-    store.moveComponent(store.selectedComponent.id, store.components.length - 1);
+    store.moveComponent(store.selectedComponent.id, null, store.components.length - 1);
     showToast('Moved to bottom', 'success');
   }
 }

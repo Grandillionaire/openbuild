@@ -316,12 +316,12 @@ const gridStyles = computed(() => {
   };
 });
 
-const flexStyles = computed(() => ({
+const flexStyles = computed<Record<string, string>>(() => ({
   display: 'flex',
   flexDirection: String(props.component.styles.base?.flexDirection || 'row'),
   alignItems: String(props.component.styles.base?.alignItems || 'stretch'),
   justifyContent: String(props.component.styles.base?.justifyContent || 'flex-start'),
-  gap: String(props.component.styles.base?.gap || '16px')
+  gap: String(props.component.styles.base?.gap || '16px'),
 }));
 
 const imageStyles = computed(() => {

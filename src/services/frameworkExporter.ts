@@ -517,6 +517,7 @@ a {
     const base = styles.base || {};
 
     for (const [key, value] of Object.entries(base)) {
+      if (value === undefined) continue;
       const camelKey = this.toCamelCase(key);
       styleObj[camelKey] = value;
     }

@@ -16,6 +16,10 @@ export interface Template {
   components: Component[];
   tags: string[];
   isPremium?: boolean;
+  /** Show a NEW badge in the template gallery. */
+  isNew?: boolean;
+  /** Show a POPULAR badge in the template gallery. */
+  isPopular?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
 }

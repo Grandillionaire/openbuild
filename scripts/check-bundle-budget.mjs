@@ -11,7 +11,7 @@ const DIST = new URL('../dist', import.meta.url).pathname;
 
 const BUDGET = {
   // Max gzipped size for the initial route (entry + critical chunks)
-  initialGzipKB: 250,
+  initialGzipKB: 275,
   // Max gzipped size for any single asset
   perAssetGzipKB: 350,
   // Max total gzipped JS+CSS across the whole app

@@ -40,12 +40,12 @@
                 <input
                   type="color"
                   :value="value"
-                  @input="updateColor(key, $event.target.value)"
+                  @input="updateColor(key, ($event.target as HTMLInputElement).value)"
                 />
                 <input
                   type="text"
                   :value="value"
-                  @input="updateColor(key, $event.target.value)"
+                  @input="updateColor(key, ($event.target as HTMLInputElement).value)"
                   placeholder="#000000"
                 />
               </div>
@@ -63,7 +63,7 @@
                 min="12"
                 max="20"
                 :value="parseInt(activeTheme.typography.baseFontSize)"
-                @input="updateTypography('baseFontSize', $event.target.value + 'px')"
+                @input="updateTypography('baseFontSize', ($event.target as HTMLInputElement).value + 'px')"
               />
               <span>{{ activeTheme.typography.baseFontSize }}</span>
             </div>
@@ -71,7 +71,7 @@
               <label>Font Family</label>
               <select
                 :value="activeTheme.typography.fontFamily"
-                @change="updateTypography('fontFamily', $event.target.value)"
+                @change="updateTypography('fontFamily', ($event.target as HTMLInputElement).value)"
               >
                 <option value='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'>System</option>
                 <option value='"Inter", sans-serif'>Inter</option>

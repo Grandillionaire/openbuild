@@ -157,7 +157,7 @@
           <input 
             type="checkbox" 
             :checked="flexWrap === 'wrap'"
-            @change="updateStyles({ flexWrap: $event.target.checked ? 'wrap' : 'nowrap' })"
+            @change="updateStyles({ flexWrap: ($event.target as HTMLInputElement).checked ? 'wrap' : 'nowrap' })"
           />
           Allow wrapping
         </label>

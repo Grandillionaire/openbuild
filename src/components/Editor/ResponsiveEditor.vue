@@ -205,10 +205,11 @@ import { Smartphone, Tablet, Monitor } from 'lucide-vue-next';
 const store = useEditorStore();
 
 // Device configurations
-const devices = [
+type Device = 'mobile' | 'tablet' | 'desktop';
+const devices: ReadonlyArray<{ id: Device; label: string; icon: unknown }> = [
   { id: 'mobile', label: 'Mobile', icon: Smartphone },
   { id: 'tablet', label: 'Tablet', icon: Tablet },
-  { id: 'desktop', label: 'Desktop', icon: Monitor }
+  { id: 'desktop', label: 'Desktop', icon: Monitor },
 ];
 
 // Breakpoints

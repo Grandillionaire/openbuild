@@ -76,7 +76,7 @@ describe('ComponentRenderer', () => {
       displayName: 'Heading',
       props: {
         content: 'Test Heading',
-        attributes: { level: 2 }
+        attributes: { level: '2' }
       }
     });
     

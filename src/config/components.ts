@@ -17,7 +17,9 @@ function addVariantsToDefinition(definition: ComponentDefinition): ComponentDefi
   };
 }
 
-const baseComponentDefinitions: Record<ComponentType, ComponentDefinition> = {
+// `Partial` because the content/commerce/form definitions live in their own
+// modules and are spread into the merged `componentDefinitions` below.
+const baseComponentDefinitions: Partial<Record<ComponentType, ComponentDefinition>> = {
   // Layout Components
   container: {
     type: 'container',

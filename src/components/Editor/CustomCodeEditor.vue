@@ -136,14 +136,14 @@ const showTemplates = ref(false);
 // Code state
 const cssCode = ref('');
 const jsCode = ref('');
-const eventCode = ref({
+const eventCode = ref<Record<string, string>>({
   onClick: '',
   onHover: '',
-  onScroll: ''
+  onScroll: '',
 });
-const lifecycleCode = ref({
+const lifecycleCode = ref<Record<string, string>>({
   beforeMount: '',
-  onMount: ''
+  onMount: '',
 });
 
 // Tab configuration
@@ -295,10 +295,11 @@ function updateCode(type: 'css' | 'javascript', value: any) {
 
 function updateEventCode(event: string, value: any) {
   if (!selectedComponent.value) return;
-  
-  const customCode = { ...selectedComponent.value.props.customCode };
+  // customCode has a known shape; cast to a string-indexed alias so we can
+  // write through dynamic keys without each access being TS7053.
+  const customCode = { ...selectedComponent.value.props.customCode } as Record<string, string>;
   customCode[event] = value;
-  
+
   store.updateComponent(selectedComponent.value.id, {
     props: {
       ...selectedComponent.value.props,
@@ -309,8 +310,8 @@ function updateEventCode(event: string, value: any) {
 
 function updateLifecycleCode(hook: string, value: any) {
   if (!selectedComponent.value) return;
-  
-  const customCode = { ...selectedComponent.value.props.customCode };
+
+  const customCode = { ...selectedComponent.value.props.customCode } as Record<string, string>;
   customCode[hook] = value;
   
   store.updateComponent(selectedComponent.value.id, {

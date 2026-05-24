@@ -228,10 +228,10 @@ export const useThemeStore = defineStore('theme', () => {
     vars['--font-weight-medium'] = theme.typography.fontWeightMedium.toString();
     vars['--font-weight-bold'] = theme.typography.fontWeightBold.toString();
     
-    // Spacing
+    // Spacing — the `unit` key is a number, everything else is a CSS length string.
     Object.entries(theme.spacing).forEach(([key, value]) => {
       if (key !== 'unit') {
-        vars[`--spacing-${key}`] = value;
+        vars[`--spacing-${key}`] = String(value);
       }
     });
     

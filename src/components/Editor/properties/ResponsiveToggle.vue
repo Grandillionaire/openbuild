@@ -23,7 +23,8 @@ defineEmits<{
   'update:modelValue': [value: 'base' | 'sm' | 'md' | 'lg' | 'xl']
 }>();
 
-const breakpoints = [
+type Breakpoint = 'base' | 'sm' | 'md' | 'lg' | 'xl';
+const breakpoints: ReadonlyArray<{ value: Breakpoint; label: string; icon: unknown }> = [
   { value: 'base', label: 'Base', icon: Smartphone },
   { value: 'sm', label: 'Small (640px+)', icon: Tablet },
   { value: 'md', label: 'Medium (768px+)', icon: Laptop },

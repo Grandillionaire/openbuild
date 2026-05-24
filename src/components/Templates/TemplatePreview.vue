@@ -132,10 +132,10 @@ const colorScheme = computed(() => {
   return categoryColors[props.template.category as keyof typeof categoryColors] || categoryColors.landing;
 });
 
-const canvasStyle = computed(() => ({
+const canvasStyle = computed<Record<string, string>>(() => ({
   background: '#ffffff',
   position: 'relative',
-  overflow: 'hidden'
+  overflow: 'hidden',
 }));
 
 const overlayStyle = computed(() => ({
