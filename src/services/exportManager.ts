@@ -5,6 +5,7 @@ import { useThemeStore } from '@/stores/theme';
 import { useEditorStore } from '@/stores/editor';
 import { useCommerceStore } from '@/stores/commerce';
 import { usePagesStore, type Page } from '@/stores/pages';
+import { useIntegrationsStore } from '@/stores/integrations';
 import { telemetry } from '@/lib/telemetry';
 
 export interface ExportOptions {
@@ -46,6 +47,12 @@ export class ExportManager {
           }
         : undefined;
 
+      const integrationsStore = useIntegrationsStore();
+      const integrations = {
+        analytics: integrationsStore.analytics,
+        forms: integrationsStore.forms,
+      };
+
       const pagesStore = options.multiPage ? usePagesStore() : null;
       const pages = pagesStore?.pages;
 
@@ -59,6 +66,7 @@ export class ExportManager {
           themeVariables,
           globalCustomCode,
           commerce,
+          integrations,
         });
         zip.file('sitemap.xml', this.generateSitemap(pages));
         zip.file('robots.txt', this.generateRobots());
@@ -68,6 +76,7 @@ export class ExportManager {
           themeVariables,
           globalCustomCode,
           commerce,
+          integrations,
         });
         zip.file('index.html', fullPage);
         zip.file('styles.css', css);
@@ -115,6 +124,7 @@ export class ExportManager {
       themeVariables: Record<string, string> | undefined;
       globalCustomCode: { css?: string; javascript?: string; headHTML?: string };
       commerce: { enabled: boolean; products: ReadonlyArray<unknown>; settings: unknown } | undefined;
+      integrations: { analytics: unknown; forms: unknown };
     },
   ): Promise<void> {
     for (const page of pages) {
@@ -123,6 +133,7 @@ export class ExportManager {
         themeVariables: ctx.themeVariables,
         globalCustomCode: ctx.globalCustomCode,
         commerce: ctx.commerce as never,
+        integrations: ctx.integrations as never,
         seo: {
           title: page.seo?.title || page.name,
           description: page.seo?.description,

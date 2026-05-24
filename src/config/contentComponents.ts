@@ -7,6 +7,8 @@
 
 import type { Component, ComponentDefinition, ComponentType } from '@/types/component';
 import { escapeHtml, sanitizeUrl } from '@/utils/htmlEscape';
+import { responsiveImage } from '@/utils/imageOpt';
+import { T, FOCUS_RING } from './themeTokens';
 
 function generateResponsiveCSS(selector: string, styles: Component['styles']): string {
   let css = '';
@@ -73,7 +75,7 @@ const dividerDefinition: ComponentDefinition = {
 .c-${component.id} { border: 0; border-top: ${thickness}px ${style} ${color}; }
 .c-${component.id}.divider-label { display: flex; align-items: center; gap: 12px; border-top: 0; }
 .c-${component.id} .divider-line { flex: 1; border-top: ${thickness}px ${style} ${color}; }
-.c-${component.id} .divider-text { color: #6B7280; font-size: 0.875rem; letter-spacing: 0.05em; text-transform: uppercase; }`;
+.c-${component.id} .divider-text { color: ${T.textMuted}; font-size: 0.875rem; letter-spacing: 0.05em; text-transform: uppercase; }`;
   },
 };
 
@@ -197,7 +199,7 @@ const galleryDefinition: ComponentDefinition = {
     });
     const items = cfg.images
       .map((img) => `<figure class="gallery-item">
-  <img src="${sanitizeUrl(img.url)}" alt="${escapeHtml(img.alt)}" loading="lazy" />
+  ${responsiveImage({ src: img.url, alt: img.alt, sizes: '(max-width: 768px) 50vw, 33vw' })}
   ${img.caption ? `<figcaption>${escapeHtml(img.caption)}</figcaption>` : ''}
 </figure>`)
       .join('\n');
@@ -211,10 +213,10 @@ ${items}
     });
     return `${generateResponsiveCSS(`.c-${component.id}`, component.styles)}
 .c-${component.id}.gallery { display: grid; grid-template-columns: repeat(${cfg.columns}, 1fr); gap: ${cfg.gap}px; }
-.c-${component.id} .gallery-item { margin: 0; border-radius: 8px; overflow: hidden; background: #F9FAFB; }
+.c-${component.id} .gallery-item { margin: 0; border-radius: 8px; overflow: hidden; background: ${T.surface}; }
 .c-${component.id} .gallery-item img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.4s ease; }
 .c-${component.id} .gallery-item:hover img { transform: scale(1.05); }
-.c-${component.id} .gallery-item figcaption { padding: 8px 12px; font-size: 0.875rem; color: #4B5563; background: white; }
+.c-${component.id} .gallery-item figcaption { padding: 8px 12px; font-size: 0.875rem; color: ${T.textMuted}; background: white; }
 @media (max-width: 768px) {
   .c-${component.id}.gallery { grid-template-columns: repeat(${Math.max(1, Math.min(2, cfg.columns))}, 1fr); }
 }`;
@@ -259,12 +261,12 @@ const accordionDefinition: ComponentDefinition = {
     return `<div class="c-${component.id} accordion">\n${items}\n</div>`;
   },
   generateCSS: (component) => `${generateResponsiveCSS(`.c-${component.id}`, component.styles)}
-.c-${component.id} .accordion-item { border: 1px solid #E5E7EB; border-radius: 8px; margin-bottom: 8px; overflow: hidden; background: white; }
+.c-${component.id} .accordion-item { border: 1px solid ${T.border}; border-radius: 8px; margin-bottom: 8px; overflow: hidden; background: white; }
 .c-${component.id} .accordion-item summary { padding: 16px 20px; font-weight: 600; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
 .c-${component.id} .accordion-item summary::-webkit-details-marker { display: none; }
-.c-${component.id} .accordion-item summary::after { content: '+'; font-size: 1.25rem; color: #6B7280; transition: transform 0.2s; }
+.c-${component.id} .accordion-item summary::after { content: '+'; font-size: 1.25rem; color: ${T.textMuted}; transition: transform 0.2s; }
 .c-${component.id} .accordion-item[open] summary::after { content: '−'; }
-.c-${component.id} .accordion-item .accordion-body { padding: 0 20px 16px; color: #4B5563; line-height: 1.6; }`,
+.c-${component.id} .accordion-item .accordion-body { padding: 0 20px 16px; color: ${T.textMuted}; line-height: 1.6; }`,
 };
 
 /* ------------------------------------------------------------------ */
@@ -310,15 +312,15 @@ const tabsDefinition: ComponentDefinition = {
     let panelRules = '';
     cfg.tabs.forEach((_, i) => {
       panelRules += `.c-${component.id} #tabs-${component.id}-${i}:checked ~ .tab-panels .tab-panel-${i} { display: block; }\n`;
-      panelRules += `.c-${component.id} #tabs-${component.id}-${i}:checked ~ label[for='tabs-${component.id}-${i}'] { color: #111827; border-bottom-color: #3B82F6; }\n`;
+      panelRules += `.c-${component.id} #tabs-${component.id}-${i}:checked ~ label[for='tabs-${component.id}-${i}'] { color: ${T.text}; border-bottom-color: ${T.primary}; }\n`;
     });
     return `${generateResponsiveCSS(`.c-${component.id}`, component.styles)}
 .c-${component.id}.tabs { display: flex; flex-wrap: wrap; }
 .c-${component.id} .tab-input { display: none; }
-.c-${component.id} .tab-label { padding: 12px 24px; cursor: pointer; color: #6B7280; border-bottom: 2px solid transparent; font-weight: 500; }
-.c-${component.id} .tab-label:hover { color: #111827; }
+.c-${component.id} .tab-label { padding: 12px 24px; cursor: pointer; color: ${T.textMuted}; border-bottom: 2px solid transparent; font-weight: 500; }
+.c-${component.id} .tab-label:hover { color: ${T.text}; }
 .c-${component.id} .tab-panels { flex: 1 0 100%; padding: 24px 0; }
-.c-${component.id} .tab-panel { display: none; line-height: 1.7; color: #4B5563; }
+.c-${component.id} .tab-panel { display: none; line-height: 1.7; color: ${T.textMuted}; }
 ${panelRules}`;
   },
 };
@@ -375,16 +377,16 @@ const faqDefinition: ComponentDefinition = {
   },
   generateCSS: (component) => `${generateResponsiveCSS(`.c-${component.id}`, component.styles)}
 .c-${component.id}.faq { max-width: 820px; margin: 0 auto; }
-.c-${component.id} .faq-title { font-size: 2.25rem; font-weight: 700; text-align: center; margin: 0 0 12px; color: #111827; }
-.c-${component.id} .faq-subtitle { text-align: center; color: #6B7280; margin: 0 0 40px; }
+.c-${component.id} .faq-title { font-size: 2.25rem; font-weight: 700; text-align: center; margin: 0 0 12px; color: ${T.text}; }
+.c-${component.id} .faq-subtitle { text-align: center; color: ${T.textMuted}; margin: 0 0 40px; }
 .c-${component.id} .faq-list { display: flex; flex-direction: column; gap: 12px; }
-.c-${component.id} .faq-item { border: 1px solid #E5E7EB; border-radius: 12px; padding: 4px 0; background: white; transition: border-color 0.2s; }
-.c-${component.id} .faq-item:hover { border-color: #C7D2FE; }
-.c-${component.id} .faq-item summary { padding: 18px 24px; font-weight: 600; color: #111827; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
+.c-${component.id} .faq-item { border: 1px solid ${T.border}; border-radius: 12px; padding: 4px 0; background: white; transition: border-color 0.2s; }
+.c-${component.id} .faq-item:hover { border-color: ${T.borderHover}; }
+.c-${component.id} .faq-item summary { padding: 18px 24px; font-weight: 600; color: ${T.text}; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
 .c-${component.id} .faq-item summary::-webkit-details-marker { display: none; }
-.c-${component.id} .faq-item summary::after { content: '+'; font-size: 1.5rem; color: #6B7280; }
+.c-${component.id} .faq-item summary::after { content: '+'; font-size: 1.5rem; color: ${T.textMuted}; }
 .c-${component.id} .faq-item[open] summary::after { content: '−'; }
-.c-${component.id} .faq-item p { margin: 0; padding: 0 24px 20px; color: #4B5563; line-height: 1.7; }`,
+.c-${component.id} .faq-item p { margin: 0; padding: 0 24px 20px; color: ${T.textMuted}; line-height: 1.7; }`,
 };
 
 /* ------------------------------------------------------------------ */
@@ -417,7 +419,7 @@ const testimonialsDefinition: ComponentDefinition = {
       ],
     },
   },
-  defaultStyles: { base: { width: '100%', padding: '80px 24px', background: '#F9FAFB' } },
+  defaultStyles: { base: { width: '100%', padding: '80px 24px', background: 'var(--color-surface, #F9FAFB)' } },
   generateHTML: (component) => {
     const cfg = readObjectProp<TestimonialsConfig>(component, { title: '', items: [] });
     const cards = cfg.items
@@ -445,15 +447,15 @@ const testimonialsDefinition: ComponentDefinition = {
   },
   generateCSS: (component) => `${generateResponsiveCSS(`.c-${component.id}`, component.styles)}
 .c-${component.id}.testimonials { max-width: 1200px; margin: 0 auto; }
-.c-${component.id} .testimonials-title { font-size: 2.25rem; font-weight: 700; text-align: center; color: #111827; margin: 0 0 48px; }
+.c-${component.id} .testimonials-title { font-size: 2.25rem; font-weight: 700; text-align: center; color: ${T.text}; margin: 0 0 48px; }
 .c-${component.id} .testimonials-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
-.c-${component.id} .testimonial-card { background: white; border: 1px solid #E5E7EB; border-radius: 16px; padding: 28px; margin: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
-.c-${component.id} .testimonial-stars { color: #F59E0B; font-size: 1.125rem; margin-bottom: 12px; letter-spacing: 2px; }
-.c-${component.id} .testimonial-card blockquote { margin: 0 0 20px; font-size: 1.0625rem; line-height: 1.6; color: #1F2937; }
+.c-${component.id} .testimonial-card { background: white; border: 1px solid ${T.border}; border-radius: 16px; padding: 28px; margin: 0; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
+.c-${component.id} .testimonial-stars { color: ${T.accent}; font-size: 1.125rem; margin-bottom: 12px; letter-spacing: 2px; }
+.c-${component.id} .testimonial-card blockquote { margin: 0 0 20px; font-size: 1.0625rem; line-height: 1.6; color: ${T.ctaBgHover}; }
 .c-${component.id} .testimonial-card figcaption { display: flex; align-items: center; gap: 12px; }
 .c-${component.id} .testimonial-card figcaption img { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; }
-.c-${component.id} .testimonial-name { font-weight: 600; color: #111827; }
-.c-${component.id} .testimonial-title { font-size: 0.875rem; color: #6B7280; }`,
+.c-${component.id} .testimonial-name { font-weight: 600; color: ${T.text}; }
+.c-${component.id} .testimonial-title { font-size: 0.875rem; color: ${T.textMuted}; }`,
 };
 
 /* ------------------------------------------------------------------ */
@@ -532,25 +534,25 @@ const pricingDefinition: ComponentDefinition = {
   },
   generateCSS: (component) => `${generateResponsiveCSS(`.c-${component.id}`, component.styles)}
 .c-${component.id}.pricing { max-width: 1200px; margin: 0 auto; }
-.c-${component.id} .pricing-title { font-size: 2.5rem; font-weight: 700; text-align: center; color: #111827; margin: 0 0 12px; }
-.c-${component.id} .pricing-subtitle { text-align: center; color: #6B7280; margin: 0 0 48px; }
+.c-${component.id} .pricing-title { font-size: 2.5rem; font-weight: 700; text-align: center; color: ${T.text}; margin: 0 0 12px; }
+.c-${component.id} .pricing-subtitle { text-align: center; color: ${T.textMuted}; margin: 0 0 48px; }
 .c-${component.id} .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; align-items: stretch; }
-.c-${component.id} .pricing-tier { position: relative; background: white; border: 1px solid #E5E7EB; border-radius: 16px; padding: 32px; display: flex; flex-direction: column; transition: transform 0.2s, box-shadow 0.2s; }
+.c-${component.id} .pricing-tier { position: relative; background: white; border: 1px solid ${T.border}; border-radius: 16px; padding: 32px; display: flex; flex-direction: column; transition: transform 0.2s, box-shadow 0.2s; }
 .c-${component.id} .pricing-tier:hover { transform: translateY(-4px); box-shadow: 0 12px 24px -8px rgba(0,0,0,0.1); }
-.c-${component.id} .pricing-tier.highlighted { border-color: #3B82F6; box-shadow: 0 12px 28px -10px rgba(59,130,246,0.4); }
-.c-${component.id} .pricing-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #3B82F6; color: white; font-size: 0.75rem; font-weight: 600; padding: 4px 12px; border-radius: 999px; letter-spacing: 0.05em; text-transform: uppercase; }
-.c-${component.id} .pricing-tier h3 { margin: 0 0 12px; font-size: 1.25rem; color: #111827; }
+.c-${component.id} .pricing-tier.highlighted { border-color: ${T.primary}; box-shadow: 0 12px 28px -10px rgba(59,130,246,0.4); }
+.c-${component.id} .pricing-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: ${T.primary}; color: white; font-size: 0.75rem; font-weight: 600; padding: 4px 12px; border-radius: 999px; letter-spacing: 0.05em; text-transform: uppercase; }
+.c-${component.id} .pricing-tier h3 { margin: 0 0 12px; font-size: 1.25rem; color: ${T.text}; }
 .c-${component.id} .pricing-price { display: flex; align-items: baseline; gap: 4px; margin-bottom: 8px; }
-.c-${component.id} .pricing-amount { font-size: 2.5rem; font-weight: 700; color: #111827; }
-.c-${component.id} .pricing-period { color: #6B7280; }
-.c-${component.id} .pricing-desc { color: #6B7280; margin: 0 0 24px; }
+.c-${component.id} .pricing-amount { font-size: 2.5rem; font-weight: 700; color: ${T.text}; }
+.c-${component.id} .pricing-period { color: ${T.textMuted}; }
+.c-${component.id} .pricing-desc { color: ${T.textMuted}; margin: 0 0 24px; }
 .c-${component.id} .pricing-tier ul { list-style: none; padding: 0; margin: 0 0 32px; flex: 1; }
-.c-${component.id} .pricing-tier ul li { padding: 8px 0 8px 28px; position: relative; color: #1F2937; }
-.c-${component.id} .pricing-tier ul li::before { content: '✓'; position: absolute; left: 0; color: #10B981; font-weight: 700; }
-.c-${component.id} .pricing-cta { display: block; text-align: center; padding: 12px 24px; border-radius: 8px; background: #111827; color: white; text-decoration: none; font-weight: 600; transition: background 0.2s; }
-.c-${component.id} .pricing-cta:hover { background: #1F2937; }
-.c-${component.id} .pricing-tier.highlighted .pricing-cta { background: #3B82F6; }
-.c-${component.id} .pricing-tier.highlighted .pricing-cta:hover { background: #2563EB; }`,
+.c-${component.id} .pricing-tier ul li { padding: 8px 0 8px 28px; position: relative; color: ${T.ctaBgHover}; }
+.c-${component.id} .pricing-tier ul li::before { content: '✓'; position: absolute; left: 0; color: ${T.success}; font-weight: 700; }
+.c-${component.id} .pricing-cta { display: block; text-align: center; padding: 12px 24px; border-radius: 8px; background: ${T.text}; color: white; text-decoration: none; font-weight: 600; transition: background 0.2s; }
+.c-${component.id} .pricing-cta:hover { background: ${T.ctaBgHover}; }
+.c-${component.id} .pricing-tier.highlighted .pricing-cta { background: ${T.primary}; }
+.c-${component.id} .pricing-tier.highlighted .pricing-cta:hover { background: ${T.primaryStrong}; }`,
 };
 
 /* ------------------------------------------------------------------ */
@@ -568,32 +570,44 @@ const newsletterDefinition: ComponentDefinition = {
       subtitle: 'Monthly updates, new templates, zero spam.',
       placeholder: 'you@example.com',
       buttonLabel: 'Subscribe',
-      action: 'https://example.com/subscribe',
+      action: '',
+      useGlobalFormProvider: true,
+      successMessage: "Thanks — you're on the list.",
     },
   },
   defaultStyles: { base: { width: '100%', padding: '64px 24px', textAlign: 'center' } },
   generateHTML: (component) => {
     const cfg = readObjectProp(component, {
-      title: '', subtitle: '', placeholder: '', buttonLabel: '', action: '#',
+      title: '', subtitle: '', placeholder: '', buttonLabel: '',
+      action: '', useGlobalFormProvider: true, successMessage: '',
     });
+    // When `useGlobalFormProvider` is true we emit a data-attribute the codegen
+    // post-processor replaces with the configured provider's action + hidden fields.
+    // Otherwise we use the literal action URL the user typed.
+    const action = cfg.useGlobalFormProvider ? 'data-ob-form-action="newsletter"' : `action="${sanitizeUrl(cfg.action)}"`;
     return `<section class="c-${component.id} newsletter">
   ${cfg.title ? `<h2>${escapeHtml(cfg.title)}</h2>` : ''}
   ${cfg.subtitle ? `<p>${escapeHtml(cfg.subtitle)}</p>` : ''}
-  <form action="${sanitizeUrl(cfg.action)}" method="post" class="newsletter-form">
-    <input type="email" name="email" required placeholder="${escapeHtml(cfg.placeholder)}" aria-label="Email address" />
+  <form ${cfg.useGlobalFormProvider ? action : action} method="post" class="newsletter-form" data-ob-form="newsletter" data-ob-success="${escapeHtml(cfg.successMessage || '')}">
+    <input type="email" name="email" required placeholder="${escapeHtml(cfg.placeholder)}" aria-label="Email address" autocomplete="email" />
+    <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true" class="newsletter-honeypot" />
     <button type="submit">${escapeHtml(cfg.buttonLabel)}</button>
   </form>
+  <div class="newsletter-status" role="status" aria-live="polite"></div>
 </section>`;
   },
   generateCSS: (component) => `${generateResponsiveCSS(`.c-${component.id}`, component.styles)}
 .c-${component.id}.newsletter { max-width: 560px; margin: 0 auto; }
-.c-${component.id} h2 { font-size: 2rem; font-weight: 700; color: #111827; margin: 0 0 12px; }
-.c-${component.id} p { color: #6B7280; margin: 0 0 24px; }
+.c-${component.id} h2 { font-size: 2rem; font-weight: 700; color: ${T.text}; margin: 0 0 12px; }
+.c-${component.id} p { color: ${T.textMuted}; margin: 0 0 24px; }
 .c-${component.id} .newsletter-form { display: flex; gap: 8px; max-width: 480px; margin: 0 auto; }
-.c-${component.id} input[type='email'] { flex: 1; padding: 12px 16px; border: 1px solid #D1D5DB; border-radius: 8px; font-size: 1rem; }
-.c-${component.id} input[type='email']:focus { outline: none; border-color: #3B82F6; box-shadow: 0 0 0 3px rgba(59,130,246,0.15); }
-.c-${component.id} button { padding: 12px 24px; background: #111827; color: white; border: 0; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
-.c-${component.id} button:hover { background: #1F2937; }
+.c-${component.id} input[type='email'] { flex: 1; padding: 12px 16px; border: 1px solid ${T.border}; border-radius: 8px; font-size: 1rem; }
+.c-${component.id} input[type='email']:focus { outline: none; border-color: ${T.primary}; box-shadow: 0 0 0 3px ${FOCUS_RING.replace('0 0 0 3px ', '')}; }
+.c-${component.id} button { padding: 12px 24px; background: ${T.text}; color: white; border: 0; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+.c-${component.id} button:hover { background: ${T.ctaBgHover}; }
+.c-${component.id} .newsletter-honeypot { position: absolute; left: -10000px; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.c-${component.id} .newsletter-status { min-height: 1.5rem; margin-top: 12px; font-size: 0.875rem; color: ${T.success}; }
+.c-${component.id} .newsletter-status[data-state='error'] { color: ${T.danger}; }
 @media (max-width: 540px) {
   .c-${component.id} .newsletter-form { flex-direction: column; }
 }`,
@@ -651,10 +665,10 @@ const socialLinksDefinition: ComponentDefinition = {
   },
   generateCSS: (component) => `${generateResponsiveCSS(`.c-${component.id}`, component.styles)}
 .c-${component.id}.social-links { align-items: center; }
-.c-${component.id} .social-link { display: inline-flex; align-items: center; gap: 8px; color: #6B7280; text-decoration: none; transition: color 0.2s, transform 0.2s; }
-.c-${component.id} .social-link:hover { color: #111827; transform: translateY(-2px); }
+.c-${component.id} .social-link { display: inline-flex; align-items: center; gap: 8px; color: ${T.textMuted}; text-decoration: none; transition: color 0.2s, transform 0.2s; }
+.c-${component.id} .social-link:hover { color: ${T.text}; transform: translateY(-2px); }
 .c-${component.id} .social-link svg { width: 24px; height: 24px; display: block; }
-.c-${component.id}[data-style='buttons'] .social-link { padding: 10px 14px; background: white; border: 1px solid #E5E7EB; border-radius: 8px; }`,
+.c-${component.id}[data-style='buttons'] .social-link { padding: 10px 14px; background: white; border: 1px solid ${T.border}; border-radius: 8px; }`,
 };
 
 /* ------------------------------------------------------------------ */

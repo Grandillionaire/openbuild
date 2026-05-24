@@ -5,6 +5,7 @@ import { contentComponentDefinitions } from './contentComponents';
 import { commerceComponentDefinitions } from './commerceComponents';
 import { getRegisteredComponents } from '@/lib/plugins';
 import { escapeHtml, sanitizeUrl } from '@/utils/htmlEscape';
+import { responsiveImage } from '@/utils/imageOpt';
 
 // Helper function to add variants and theme support
 function addVariantsToDefinition(definition: ComponentDefinition): ComponentDefinition {
@@ -338,11 +339,25 @@ const baseComponentDefinitions: Record<ComponentType, ComponentDefinition> = {
       const src = component.props.src || component.props.attributes?.src || 'https://via.placeholder.com/600x400';
       const alt = component.props.alt || component.props.attributes?.alt || 'Image';
       const objectFit = component.props.objectFit || 'cover';
-      const loading = component.props.loading || 'lazy';
-      return `<img src="${sanitizeUrl(src)}" alt="${escapeHtml(alt)}" style="object-fit: ${objectFit};" loading="${loading}" class="c-${component.id}" id="${component.id}" />`;
+      const eager = component.props.loading === 'eager';
+      const inner = responsiveImage({
+        src,
+        alt,
+        sizes: component.props.sizes || '100vw',
+        eager,
+        highPriority: !!component.props.highPriority,
+        className: `c-${component.id}`,
+        style: `object-fit: ${objectFit};`,
+      });
+      // Wrap in a span so the wrapper picks up id + animation hooks even when
+      // responsiveImage emits a <picture>. Bare <img> doesn't need a wrapper.
+      return inner.startsWith('<picture')
+        ? `<span id="${component.id}" class="c-${component.id}-wrap">${inner}</span>`
+        : inner;
     },
     generateCSS: (component) => {
-      return generateResponsiveCSS(`.c-${component.id}`, component.styles);
+      const wrapCss = `.c-${component.id}-wrap { display: inline-block; width: 100%; }\n.c-${component.id}-wrap img { width: 100%; height: auto; display: block; }`;
+      return `${generateResponsiveCSS(`.c-${component.id}`, component.styles)}\n${wrapCss}`;
     }
   },
 

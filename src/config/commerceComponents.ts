@@ -9,6 +9,7 @@
 
 import type { Component, ComponentDefinition, ComponentType } from '@/types/component';
 import { escapeHtml } from '@/utils/htmlEscape';
+import { T } from './themeTokens';
 
 function generateResponsiveCSS(selector: string, styles: Component['styles']): string {
   let css = '';
@@ -92,23 +93,23 @@ const productDefinition: ComponentDefinition = {
 </article>`;
   },
   generateCSS: (component) => `${generateResponsiveCSS(`.c-${component.id}`, component.styles)}
-.c-${component.id}.product-card { display: flex; flex-direction: column; background: white; border: 1px solid #E5E7EB; border-radius: 16px; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; }
+.c-${component.id}.product-card { display: flex; flex-direction: column; background: white; border: 1px solid ${T.border}; border-radius: 16px; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; }
 .c-${component.id}.product-card:hover { transform: translateY(-2px); box-shadow: 0 10px 24px -10px rgba(0,0,0,0.15); }
-.c-${component.id} .product-card__media { display: block; aspect-ratio: 4/5; background: #F9FAFB; overflow: hidden; }
+.c-${component.id} .product-card__media { display: block; aspect-ratio: 4/5; background: ${T.surface}; overflow: hidden; }
 .c-${component.id} .product-card__media img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s; }
 .c-${component.id}.product-card:hover .product-card__media img { transform: scale(1.05); }
 .c-${component.id} .product-card__body { padding: 16px; display: flex; flex-direction: column; gap: 8px; }
-.c-${component.id} .product-card__body h3 { margin: 0; font-size: 1rem; font-weight: 600; color: #111827; }
-.c-${component.id} .product-card__price { display: flex; align-items: baseline; gap: 8px; font-weight: 600; color: #111827; }
-.c-${component.id} .product-card__compare { text-decoration: line-through; color: #9CA3AF; font-weight: 400; font-size: 0.875rem; }
-.c-${component.id} .product-card__cta { margin-top: 4px; padding: 10px 16px; background: #111827; color: white; border: 0; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
-.c-${component.id} .product-card__cta:hover { background: #1F2937; }
+.c-${component.id} .product-card__body h3 { margin: 0; font-size: 1rem; font-weight: 600; color: ${T.text}; }
+.c-${component.id} .product-card__price { display: flex; align-items: baseline; gap: 8px; font-weight: 600; color: ${T.text}; }
+.c-${component.id} .product-card__compare { text-decoration: line-through; color: ${T.textSubtle}; font-weight: 400; font-size: 0.875rem; }
+.c-${component.id} .product-card__cta { margin-top: 4px; padding: 10px 16px; background: ${T.text}; color: white; border: 0; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+.c-${component.id} .product-card__cta:hover { background: ${T.ctaBgHover}; }
 .c-${component.id} .product-card__cta:disabled { opacity: 0.5; cursor: not-allowed; }
 .c-${component.id}.product-card--minimal { border: 0; }
 .c-${component.id}.product-card--overlay { position: relative; }
 .c-${component.id}.product-card--overlay .product-card__body { position: absolute; inset: auto 0 0 0; background: linear-gradient(transparent, rgba(0,0,0,0.7)); color: white; }
 .c-${component.id}.product-card--overlay .product-card__body h3, .c-${component.id}.product-card--overlay .product-card__price { color: white; }
-.c-${component.id} .product-card__placeholder { padding: 64px 24px; text-align: center; color: #9CA3AF; border: 2px dashed #E5E7EB; border-radius: 16px; }`,
+.c-${component.id} .product-card__placeholder { padding: 64px 24px; text-align: center; color: ${T.textSubtle}; border: 2px dashed ${T.border}; border-radius: 16px; }`,
 };
 
 /* ------------------------------------------------------------------ */
@@ -165,18 +166,18 @@ const productGridDefinition: ComponentDefinition = {
     });
     return `${generateResponsiveCSS(`.c-${component.id}`, component.styles)}
 .c-${component.id}.product-grid { display: grid; grid-template-columns: repeat(${cfg.columns}, 1fr); gap: 24px; }
-.c-${component.id} .product-grid__item { background: white; border: 1px solid #E5E7EB; border-radius: 16px; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; display: flex; flex-direction: column; }
+.c-${component.id} .product-grid__item { background: white; border: 1px solid ${T.border}; border-radius: 16px; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; display: flex; flex-direction: column; }
 .c-${component.id} .product-grid__item:hover { transform: translateY(-2px); box-shadow: 0 10px 24px -10px rgba(0,0,0,0.15); }
-.c-${component.id} .product-grid__media { aspect-ratio: 4/5; overflow: hidden; background: #F9FAFB; }
+.c-${component.id} .product-grid__media { aspect-ratio: 4/5; overflow: hidden; background: ${T.surface}; }
 .c-${component.id} .product-grid__media img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s; }
 .c-${component.id} .product-grid__item:hover .product-grid__media img { transform: scale(1.05); }
 .c-${component.id} .product-grid__body { padding: 16px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
-.c-${component.id} .product-grid__name { margin: 0; font-size: 1rem; font-weight: 600; color: #111827; }
-.c-${component.id} .product-grid__price { font-weight: 600; color: #111827; display: flex; gap: 8px; align-items: baseline; }
-.c-${component.id} .product-grid__compare { text-decoration: line-through; color: #9CA3AF; font-weight: 400; font-size: 0.875rem; }
-.c-${component.id} .product-grid__cta { margin-top: auto; padding: 10px 16px; background: #111827; color: white; border: 0; border-radius: 8px; font-weight: 600; cursor: pointer; }
-.c-${component.id} .product-grid__cta:hover { background: #1F2937; }
-.c-${component.id} .product-grid__empty { grid-column: 1 / -1; padding: 64px; text-align: center; color: #9CA3AF; border: 2px dashed #E5E7EB; border-radius: 16px; }
+.c-${component.id} .product-grid__name { margin: 0; font-size: 1rem; font-weight: 600; color: ${T.text}; }
+.c-${component.id} .product-grid__price { font-weight: 600; color: ${T.text}; display: flex; gap: 8px; align-items: baseline; }
+.c-${component.id} .product-grid__compare { text-decoration: line-through; color: ${T.textSubtle}; font-weight: 400; font-size: 0.875rem; }
+.c-${component.id} .product-grid__cta { margin-top: auto; padding: 10px 16px; background: ${T.text}; color: white; border: 0; border-radius: 8px; font-weight: 600; cursor: pointer; }
+.c-${component.id} .product-grid__cta:hover { background: ${T.ctaBgHover}; }
+.c-${component.id} .product-grid__empty { grid-column: 1 / -1; padding: 64px; text-align: center; color: ${T.textSubtle}; border: 2px dashed ${T.border}; border-radius: 16px; }
 @media (max-width: 768px) {
   .c-${component.id}.product-grid { grid-template-columns: repeat(${Math.max(1, Math.min(2, cfg.columns))}, 1fr); }
 }
@@ -205,8 +206,8 @@ const cartIconDefinition: ComponentDefinition = {
   <span class="cart-icon__count" data-ob-cart-count>0</span>
 </button>`,
   generateCSS: (component) => `${generateResponsiveCSS(`.c-${component.id}`, component.styles)}
-.c-${component.id}.cart-icon { position: relative; padding: 8px; background: transparent; border: 0; cursor: pointer; color: #111827; }
-.c-${component.id} .cart-icon__count { position: absolute; top: -2px; right: -2px; min-width: 18px; height: 18px; padding: 0 5px; background: #EF4444; color: white; font-size: 0.6875rem; font-weight: 700; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; }
+.c-${component.id}.cart-icon { position: relative; padding: 8px; background: transparent; border: 0; cursor: pointer; color: ${T.text}; }
+.c-${component.id} .cart-icon__count { position: absolute; top: -2px; right: -2px; min-width: 18px; height: 18px; padding: 0 5px; background: ${T.danger}; color: white; font-size: 0.6875rem; font-weight: 700; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; }
 .c-${component.id} .cart-icon__count:empty, .c-${component.id} .cart-icon__count[data-empty='true'] { display: none; }`,
 };
 
@@ -230,10 +231,10 @@ const addToCartDefinition: ComponentDefinition = {
     }>${escapeHtml(cfg.label)}</button>`;
   },
   generateCSS: (component) => `${generateResponsiveCSS(`.c-${component.id}`, component.styles)}
-.c-${component.id}.add-to-cart { padding: 12px 24px; background: #111827; color: white; border: 0; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background 0.2s, transform 0.1s; }
-.c-${component.id}.add-to-cart:hover { background: #1F2937; }
+.c-${component.id}.add-to-cart { padding: 12px 24px; background: ${T.text}; color: white; border: 0; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background 0.2s, transform 0.1s; }
+.c-${component.id}.add-to-cart:hover { background: ${T.ctaBgHover}; }
 .c-${component.id}.add-to-cart:active { transform: scale(0.98); }
-.c-${component.id}.add-to-cart:disabled { background: #9CA3AF; cursor: not-allowed; }`,
+.c-${component.id}.add-to-cart:disabled { background: ${T.textSubtle}; cursor: not-allowed; }`,
 };
 
 /* ------------------------------------------------------------------ */
@@ -252,7 +253,7 @@ const checkoutButtonDefinition: ComponentDefinition = {
     return `<button class="c-${component.id} checkout-button" data-ob-checkout>${escapeHtml(label)}</button>`;
   },
   generateCSS: (component) => `${generateResponsiveCSS(`.c-${component.id}`, component.styles)}
-.c-${component.id}.checkout-button { padding: 14px 28px; background: linear-gradient(135deg, #3B82F6, #6366F1); color: white; border: 0; border-radius: 10px; font-weight: 600; font-size: 1rem; cursor: pointer; box-shadow: 0 6px 16px -4px rgba(99, 102, 241, 0.5); transition: transform 0.1s, box-shadow 0.2s; }
+.c-${component.id}.checkout-button { padding: 14px 28px; background: linear-gradient(135deg, ${T.primary}, ${T.secondary}); color: white; border: 0; border-radius: 10px; font-weight: 600; font-size: 1rem; cursor: pointer; box-shadow: 0 6px 16px -4px rgba(99, 102, 241, 0.5); transition: transform 0.1s, box-shadow 0.2s; }
 .c-${component.id}.checkout-button:hover { transform: translateY(-1px); box-shadow: 0 8px 20px -4px rgba(99, 102, 241, 0.6); }
 .c-${component.id}.checkout-button:active { transform: translateY(0); }`,
 };
@@ -277,7 +278,7 @@ const priceTagDefinition: ComponentDefinition = {
 </span>`;
   },
   generateCSS: (component) => `${generateResponsiveCSS(`.c-${component.id}`, component.styles)}
-.c-${component.id}.price-tag { color: #111827; font-weight: 700; }
+.c-${component.id}.price-tag { color: ${T.text}; font-weight: 700; }
 .c-${component.id}.price-tag--small { font-size: 0.875rem; }
 .c-${component.id}.price-tag--medium { font-size: 1.125rem; }
 .c-${component.id}.price-tag--large { font-size: 1.75rem; }`,

@@ -2,6 +2,9 @@ import { componentDefinitions } from '@/config/components';
 import type { Component, Animation } from '@/types/component';
 import type { CommerceSettings, Product } from '@/types/commerce';
 import { getCommerceRuntimeScript } from './commerceRuntime';
+import { findAnalyticsProvider } from './integrations/analytics';
+import { findFormProvider } from './integrations/forms';
+import type { IntegrationConfig } from './integrations/types';
 
 export class CodeGenerator {
   private htmlTemplate: any;
@@ -89,6 +92,10 @@ export class CodeGenerator {
       ogImage?: string;
       canonicalUrl?: string;
     };
+    integrations?: {
+      analytics?: IntegrationConfig | null;
+      forms?: IntegrationConfig | null;
+    };
   }): Promise<{
     html: string;
     css: string;
@@ -96,7 +103,12 @@ export class CodeGenerator {
   }> {
     await this.ensureInitialized();
     // Generate HTML for all components
-    const html = this.generateHTML(components);
+    let html = this.generateHTML(components);
+
+    // Inject form-provider action + hidden fields into [data-ob-form] elements
+    if (options?.integrations?.forms?.enabled) {
+      html = this.applyFormProvider(html, options.integrations.forms);
+    }
 
     // Generate CSS for all components
     const css = this.generateCSS(components, options);
@@ -113,21 +125,28 @@ export class CodeGenerator {
       allJS = `${getCommerceRuntimeScript(options.commerce.products, options.commerce.settings)}\n\n${allJS}`;
     }
 
+    // Inject newsletter/form AJAX runtime if any form provider is configured
+    if (options?.integrations?.forms?.enabled) {
+      allJS = `${this.getFormRuntimeScript()}\n\n${allJS}`;
+    }
+
     // Add global custom JavaScript
     if (options?.globalCustomCode?.javascript) {
       allJS = `${allJS}\n\n/* Global Custom JavaScript */\n${options.globalCustomCode.javascript}`;
     }
 
     const seoMeta = this.buildSeoMeta(projectName, options?.seo);
+    const analyticsHead = this.buildAnalyticsHead(options?.integrations?.analytics);
+    const analyticsBody = this.buildAnalyticsBodyEnd(options?.integrations?.analytics);
 
     // Generate full page
     const fullPage = this.htmlTemplate({
       title: options?.seo?.title || projectName,
       description: options?.seo?.description || 'Built with OpenBuild',
-      html: formattedHTML,
+      html: formattedHTML + (analyticsBody ? `\n${analyticsBody}` : ''),
       css: formattedCSS,
       js: allJS,
-      headHTML: `${seoMeta}\n${options?.globalCustomCode?.headHTML ?? ''}`,
+      headHTML: `${seoMeta}\n${analyticsHead}\n${options?.globalCustomCode?.headHTML ?? ''}`,
     });
     
     return {
@@ -135,6 +154,103 @@ export class CodeGenerator {
       css: formattedCSS,
       fullPage: await this.formatHTML(fullPage)
     };
+  }
+
+  /**
+   * Replace `data-ob-form-action="<kind>"` placeholders with the configured
+   * form provider's action URL, and inject any required hidden inputs before
+   * the closing `</form>`. Forms without the marker (manual action URLs) are
+   * left untouched.
+   */
+  private applyFormProvider(html: string, cfg: IntegrationConfig): string {
+    const provider = findFormProvider(cfg.providerId);
+    if (!provider) return html;
+    const built = provider.buildFormAction(cfg.values);
+    const hiddenFields = built.hiddenFields
+      .map(
+        (f) =>
+          `<input type="hidden" name="${this.attr(f.name)}" value="${this.attr(f.value)}">`,
+      )
+      .join('');
+
+    // Replace the marker with action="…" method="…"
+    let out = html.replace(
+      /data-ob-form-action="[^"]*"/g,
+      `action="${this.attr(built.action)}" method="${built.method}"`,
+    );
+
+    // For each <form data-ob-form="…"> insert hidden fields before </form>.
+    out = out.replace(
+      /(<form\b[^>]*data-ob-form="[^"]+"[^>]*>)([\s\S]*?)(<\/form>)/g,
+      (_match, open, inner, close) => `${open}${inner}${hiddenFields}${close}`,
+    );
+    return out;
+  }
+
+  /** Tiny vanilla-JS AJAX submitter for forms tagged with `data-ob-form`. */
+  private getFormRuntimeScript(): string {
+    return `(function(){
+  document.addEventListener('submit', async function(e){
+    var form = e.target;
+    if (!(form instanceof HTMLFormElement) || !form.hasAttribute('data-ob-form')) return;
+    e.preventDefault();
+    var status = form.parentElement ? form.parentElement.querySelector('.newsletter-status, [data-ob-form-status]') : null;
+    var setStatus = function(msg, state){
+      if (!status) return;
+      status.textContent = msg;
+      if (state) status.setAttribute('data-state', state); else status.removeAttribute('data-state');
+    };
+    setStatus('');
+    var submitBtn = form.querySelector('button[type="submit"]');
+    if (submitBtn) submitBtn.disabled = true;
+    try {
+      var data = new FormData(form);
+      var resp = await fetch(form.action, {
+        method: form.method || 'POST',
+        body: data,
+        headers: { 'Accept': 'application/json' }
+      });
+      if (resp.ok || resp.status === 200) {
+        setStatus(form.getAttribute('data-ob-success') || 'Thanks!', null);
+        form.reset();
+      } else {
+        setStatus('Something went wrong. Please try again.', 'error');
+      }
+    } catch (err) {
+      setStatus('Network error. Please try again.', 'error');
+    } finally {
+      if (submitBtn) submitBtn.disabled = false;
+    }
+  });
+})();`;
+  }
+
+  private attr(v: string): string {
+    return String(v).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+  }
+
+  /** Build the analytics <script> snippets to inject in <head>. */
+  private buildAnalyticsHead(cfg?: IntegrationConfig | null): string {
+    if (!cfg?.enabled) return '';
+    const provider = findAnalyticsProvider(cfg.providerId);
+    if (!provider) return '';
+    try {
+      return provider.buildSnippet(cfg.values).head ?? '';
+    } catch {
+      return '';
+    }
+  }
+
+  /** Build the analytics snippets to inject just before </body>. */
+  private buildAnalyticsBodyEnd(cfg?: IntegrationConfig | null): string {
+    if (!cfg?.enabled) return '';
+    const provider = findAnalyticsProvider(cfg.providerId);
+    if (!provider) return '';
+    try {
+      return provider.buildSnippet(cfg.values).bodyEnd ?? '';
+    } catch {
+      return '';
+    }
   }
 
   /**
