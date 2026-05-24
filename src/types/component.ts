@@ -22,9 +22,13 @@ export interface CustomCode {
 export interface ComponentProps {
   content?: string | Record<string, any>;
   attributes?: Record<string, string>;
+  // Settings carry per-component configuration (grid columns, gallery layout,
+  // etc.). Typed as a flexible bag since each component owns its own schema —
+  // the well-known keys are documented in the component definition.
   settings?: {
     visible?: boolean;
     animation?: AnimationSettings;
+    [key: string]: unknown;
   };
   animations?: Animation[];
   customCode?: CustomCode;
@@ -44,15 +48,28 @@ export interface ResponsiveStyles {
 }
 
 export interface CSSProperties {
-  [key: string]: string | number;
+  // Property values may be undefined when a style is conditionally absent in
+  // object literals (TypeScript widens unset keys to `undefined`).
+  [key: string]: string | number | undefined;
 }
 
 export type ComponentType =
-  | 'container' | 'section' | 'div' | 'grid' | 'flex' | 'spacer'
+  // Layout
+  | 'container' | 'section' | 'div' | 'grid' | 'flex' | 'spacer' | 'divider'
+  // Content
   | 'heading' | 'text' | 'button' | 'link' | 'image' | 'icon'
+  // Media
+  | 'video' | 'embed' | 'gallery'
+  // Blocks
   | 'hero' | 'features' | 'cta' | 'footer' | 'navigation'
+  | 'accordion' | 'tabs' | 'faq' | 'testimonials' | 'pricing'
+  | 'newsletter' | 'socialLinks'
+  // Forms
   | 'form' | 'input' | 'textarea' | 'select' | 'checkbox'
-  | 'radio' | 'label' | 'formGroup' | 'submitButton';
+  | 'radio' | 'label' | 'formGroup' | 'submitButton'
+  // Commerce
+  | 'product' | 'productGrid' | 'addToCart' | 'cartIcon'
+  | 'checkoutButton' | 'priceTag';
 
 export interface ComponentVariant {
   id: string;

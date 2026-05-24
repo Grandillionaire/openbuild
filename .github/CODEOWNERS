@@ -1,0 +1,14 @@
+# Default owner for everything
+*       @Grandillionaire
+
+# Critical paths: extra eyes please
+/src/services/commerceService.ts        @Grandillionaire
+/src/services/commerceRuntime.ts        @Grandillionaire
+/src/stores/commerce.ts                 @Grandillionaire
+/src/types/commerce.ts                  @Grandillionaire
+
+# Infra
+/.github/                               @Grandillionaire
+/scripts/                               @Grandillionaire
+/eslint.config.js                       @Grandillionaire
+/vite.config.ts                         @Grandillionaire

@@ -1,0 +1,47 @@
+name: Feature request
+description: Propose an improvement or new capability
+title: '[feature]: '
+labels: ['enhancement', 'triage']
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem are you trying to solve?
+      description: Describe the pain point — not the solution.
+      placeholder: "When I have 20+ products, finding the right one in the editor is slow because..."
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: How would you like OpenBuild to behave?
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: What workarounds did you try? What other approaches did you rule out and why?
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Scope
+      options:
+        - Editor UI
+        - Component library
+        - Commerce
+        - Export / code generation
+        - Plugin system
+        - Documentation
+        - Other
+    validations:
+      required: true
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Would you be willing to contribute this?
+      options:
+        - label: Yes, I'd like to send a PR
+        - label: I can help with testing
+        - label: I can help with docs

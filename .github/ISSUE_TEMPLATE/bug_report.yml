@@ -1,0 +1,64 @@
+name: Bug report
+description: Something is broken or behaves unexpectedly
+title: '[bug]: '
+labels: ['bug', 'triage']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to file a bug. Please fill in the sections below — the more context the faster we can help.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: A clear and concise description of the bug.
+      placeholder: When I drag a Product Grid onto a new page...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect to happen?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open the editor
+        2. Drag X onto the canvas
+        3. See error
+    validations:
+      required: true
+  - type: input
+    id: browser
+    attributes:
+      label: Browser & version
+      placeholder: Chrome 124, Firefox 125, Safari 17
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: Operating system
+      placeholder: macOS 14, Ubuntu 22.04, Windows 11
+  - type: input
+    id: openbuild-version
+    attributes:
+      label: OpenBuild version
+      placeholder: 2.0.0 (run `npm ls openbuild` or check package.json)
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Console output / network errors
+      render: shell
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      options:
+        - label: I agree to follow this project's Code of Conduct
+          required: true
