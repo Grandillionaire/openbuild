@@ -29,8 +29,13 @@
       <div class="empty-icon">
         <MousePointer2 :size="32" />
       </div>
-      <p>Select a component to edit</p>
-      <span class="hint">Click on any element in the canvas</span>
+      <p>Nothing selected</p>
+      <span class="hint">Click any element on the canvas to edit it.<br>Drag-drop components from the left to add new ones.</span>
+      <div class="empty-tips">
+        <div class="empty-tip"><kbd>?</kbd> show keyboard shortcuts</div>
+        <div class="empty-tip"><kbd>⌘K</kbd> command palette</div>
+        <div class="empty-tip"><kbd>⌘Z</kbd> undo · <kbd>⌘⇧Z</kbd> redo</div>
+      </div>
     </div>
     
     <div v-else class="editor-content">
@@ -138,15 +143,18 @@
       <!-- Layout Properties -->
       <div class="property-section">
         <div class="section-header" @click="toggleSection('layout')">
-          <ChevronDown 
-            :size="16" 
+          <ChevronDown
+            :size="16"
             :class="{ rotated: !collapsedSections.layout }"
           />
           <span class="section-title">
             <Layout :size="14" />
             Layout
           </span>
-          <ResponsiveToggle v-model="currentBreakpoint" />
+          <ResponsiveToggle
+            v-model="currentBreakpoint"
+            title="Edit styles for a specific screen size. Changes only apply at that breakpoint and up."
+          />
         </div>
         
         <div v-show="!collapsedSections.layout" class="section-content">
@@ -248,18 +256,23 @@
 
       <!-- Animations Section -->
       <div class="property-section">
-        <div class="section-header" @click="toggleSection('animations')">
-          <ChevronDown 
-            :size="16" 
+        <div
+          class="section-header"
+          title="Add entry / hover / scroll animations. Each one shows in the canvas as you build it."
+          @click="toggleSection('animations')"
+        >
+          <ChevronDown
+            :size="16"
             :class="{ rotated: !collapsedSections.animations }"
           />
           <span class="section-title">
             <Sparkles :size="14" />
             Animations
+            <span class="section-badge">Advanced</span>
           </span>
           <span class="count" v-if="animationCount > 0">{{ animationCount }}</span>
         </div>
-        
+
         <div v-show="!collapsedSections.animations" class="section-content no-padding">
           <AnimationEditor />
         </div>
@@ -267,17 +280,22 @@
 
       <!-- Custom Code Section -->
       <div class="property-section">
-        <div class="section-header" @click="toggleSection('code')">
-          <ChevronDown 
-            :size="16" 
+        <div
+          class="section-header"
+          title="Paste your own CSS / JavaScript. Useful for custom widgets, analytics snippets, or fine-grained styling."
+          @click="toggleSection('code')"
+        >
+          <ChevronDown
+            :size="16"
             :class="{ rotated: !collapsedSections.code }"
           />
           <span class="section-title">
             <Code2 :size="14" />
             Custom Code
+            <span class="section-badge">Advanced</span>
           </span>
         </div>
-        
+
         <div v-show="!collapsedSections.code" class="section-content no-padding">
           <CustomCodeEditor />
         </div>
@@ -336,17 +354,20 @@ const currentBreakpoint = ref<'base' | 'sm' | 'md' | 'lg' | 'xl'>('base');
 const searchQuery = ref('');
 
 // Collapsed sections state
+// Progressive disclosure: only Content + Appearance open by default. Everything
+// else is one click away. New users see a focused panel; power users still
+// have the full power once they click through.
 const collapsedSections = ref({
-  info: false,
+  info: true,
   content: false,
-  variants: false,
-  layout: false,
-  spacing: false,
-  typography: false,
+  variants: true,
+  layout: true,
+  spacing: true,
+  typography: true,
   appearance: false,
   effects: true,
-  animations: false,
-  code: true
+  animations: true,
+  code: true,
 });
 
 // Computed properties
@@ -524,6 +545,41 @@ watch(selectedComponent, (newComponent) => {
 .empty-state .hint {
   font-size: 13px;
   color: #9CA3AF;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.empty-tips {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  background: #F9FAFB;
+  border-radius: 10px;
+  border: 1px solid #F3F4F6;
+  width: 100%;
+  max-width: 240px;
+}
+
+.empty-tip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+  color: #6B7280;
+}
+
+.empty-tip kbd {
+  display: inline-block;
+  padding: 2px 6px;
+  background: white;
+  border: 1px solid #E5E7EB;
+  border-radius: 4px;
+  font-family: ui-monospace, monospace;
+  font-size: 0.6875rem;
+  color: #374151;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
 }
 
 .editor-content {
@@ -595,6 +651,18 @@ watch(selectedComponent, (newComponent) => {
 
 .section-title svg {
   color: #6B7280;
+}
+
+.section-badge {
+  margin-left: auto;
+  padding: 1px 7px;
+  background: #F3F4F6;
+  color: #6B7280;
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border-radius: 999px;
 }
 
 .component-type {
