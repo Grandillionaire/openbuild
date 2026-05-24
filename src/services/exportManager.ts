@@ -3,157 +3,206 @@ import { codeGenerator } from './codeGenerator';
 import type { Component } from '@/types/component';
 import { useThemeStore } from '@/stores/theme';
 import { useEditorStore } from '@/stores/editor';
+import { useCommerceStore } from '@/stores/commerce';
+import { usePagesStore, type Page } from '@/stores/pages';
+import { telemetry } from '@/lib/telemetry';
 
+export interface ExportOptions {
+  includeConfig?: boolean;
+  platform?: 'vercel' | 'netlify' | 'static';
+  includeTheme?: boolean;
+  /** Export all site pages, not just the current canvas. */
+  multiPage?: boolean;
+  /** Include the commerce runtime + catalog snapshot. */
+  includeCommerce?: boolean;
+}
+
+/**
+ * ExportManager produces a deployable ZIP from the in-memory project.
+ * Output is platform-agnostic static HTML/CSS/JS plus the commerce runtime
+ * and a sitemap when multi-page mode is on.
+ */
 export class ExportManager {
   async exportProject(
     components: Component[],
     projectName: string,
-    options: {
-      includeConfig?: boolean;
-      platform?: 'vercel' | 'netlify' | 'static';
-      includeTheme?: boolean;
-    } = {}
+    options: ExportOptions = {},
   ): Promise<void> {
     const startTime = performance.now();
-    
+
     try {
-      // Get theme variables if needed
-      let themeVariables: Record<string, string> | undefined;
-      if (options.includeTheme) {
-        const themeStore = useThemeStore();
-        themeVariables = themeStore.cssVariables;
-      }
-      
-      // Get global custom code
+      const themeStore = options.includeTheme ? useThemeStore() : null;
+      const themeVariables = themeStore?.cssVariables;
+
       const editorStore = useEditorStore();
       const globalCustomCode = editorStore.globalCustomCode;
-      
-      // Generate code
-      const { html, css, fullPage } = await codeGenerator.generateProject(
-        components,
-        projectName,
-        {
+
+      const commerceStore = options.includeCommerce ? useCommerceStore() : null;
+      const commerce = commerceStore
+        ? {
+            enabled: true,
+            products: commerceStore.activeProducts,
+            settings: commerceStore.settings,
+          }
+        : undefined;
+
+      const pagesStore = options.multiPage ? usePagesStore() : null;
+      const pages = pagesStore?.pages;
+
+      const JSZip = (await import('jszip')).default;
+      const zip = new JSZip();
+
+      if (pagesStore && pages && pages.length > 0) {
+        await this.writeMultiPage(zip, pages, {
+          projectName,
+          includeTheme: !!options.includeTheme,
+          themeVariables,
+          globalCustomCode,
+          commerce,
+        });
+        zip.file('sitemap.xml', this.generateSitemap(pages));
+        zip.file('robots.txt', this.generateRobots());
+      } else {
+        const { css, fullPage } = await codeGenerator.generateProject(components, projectName, {
           includeTheme: options.includeTheme,
           themeVariables,
-          globalCustomCode
-        }
-      );
-      
-      // Dynamic import to reduce bundle size
-      const JSZip = (await import('jszip')).default;
-      
-      // Create ZIP
-      const zip = new JSZip();
-      
-      // Ensure html/css are generated (suppress unused variable warning)
-      void html; void css;
-      
-      // Main files
-      zip.file('index.html', fullPage);
-      zip.file('styles.css', css);
-      
-      // Package.json
+          globalCustomCode,
+          commerce,
+        });
+        zip.file('index.html', fullPage);
+        zip.file('styles.css', css);
+      }
+
       if (options.includeConfig) {
         zip.file('package.json', this.generatePackageJson(projectName));
         zip.file('README.md', this.generateReadme(projectName));
         zip.file('.gitignore', this.generateGitignore());
-        
-        // Platform-specific config
+
         if (options.platform === 'vercel') {
           zip.file('vercel.json', this.generateVercelConfig());
         } else if (options.platform === 'netlify') {
           zip.file('netlify.toml', this.generateNetlifyConfig());
         }
       }
-      
-      // Generate and download ZIP
+
       const blob = await zip.generateAsync({
         type: 'blob',
         compression: 'DEFLATE',
-        compressionOptions: { level: 6 }
+        compressionOptions: { level: 6 },
       });
-      
+
       const fileName = `${projectName.toLowerCase().replace(/\s+/g, '-')}.zip`;
       saveAs(blob, fileName);
-      
-      // Log export performance
+
       const _exportTime = performance.now() - startTime;
-      
+      void _exportTime;
     } catch (error) {
-      // Preserve original error information for debugging
+      telemetry.captureException(error, { scope: 'exportManager.exportProject' });
       console.error('Export failed:', error);
-      
       if (error instanceof Error) {
         throw new Error(`Failed to export project: ${error.message}`, { cause: error });
-      } else {
-        throw new Error(`Failed to export project: ${String(error)}`);
       }
+      throw new Error(`Failed to export project: ${String(error)}`);
     }
   }
-  
-  private generatePackageJson(projectName: string): string {
-    return JSON.stringify({
-      name: projectName.toLowerCase().replace(/\s+/g, '-'),
-      version: '1.0.0',
-      description: `${projectName} - Built with OpenBuild`,
-      scripts: {
-        dev: 'vite',
-        build: 'vite build',
-        preview: 'vite preview',
-        serve: 'python -m SimpleHTTPServer 8000'
-      },
-      devDependencies: {
-        vite: '^5.0.0'
-      }
-    }, null, 2);
+
+  private async writeMultiPage(
+    zip: import('jszip'),
+    pages: ReadonlyArray<Page>,
+    ctx: {
+      projectName: string;
+      includeTheme: boolean;
+      themeVariables: Record<string, string> | undefined;
+      globalCustomCode: { css?: string; javascript?: string; headHTML?: string };
+      commerce: { enabled: boolean; products: ReadonlyArray<unknown>; settings: unknown } | undefined;
+    },
+  ): Promise<void> {
+    for (const page of pages) {
+      const { fullPage } = await codeGenerator.generateProject(page.components, ctx.projectName, {
+        includeTheme: ctx.includeTheme,
+        themeVariables: ctx.themeVariables,
+        globalCustomCode: ctx.globalCustomCode,
+        commerce: ctx.commerce as never,
+        seo: {
+          title: page.seo?.title || page.name,
+          description: page.seo?.description,
+          ogImage: page.seo?.ogImage,
+        },
+      });
+      const filename = page.isHomePage ? 'index.html' : `${page.slug || page.path.replace(/^\//, '')}.html`;
+      zip.file(filename, fullPage);
+    }
   }
-  
+
+  private generateSitemap(pages: ReadonlyArray<Page>): string {
+    const urls = pages
+      .map(
+        (p) => `  <url>
+    <loc>https://example.com${p.path}</loc>
+    <changefreq>weekly</changefreq>
+    <priority>${p.isHomePage ? '1.0' : '0.7'}</priority>
+  </url>`,
+      )
+      .join('\n');
+    return `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls}
+</urlset>
+`;
+  }
+
+  private generateRobots(): string {
+    return `User-agent: *
+Allow: /
+
+Sitemap: https://example.com/sitemap.xml
+`;
+  }
+
+  private generatePackageJson(projectName: string): string {
+    return JSON.stringify(
+      {
+        name: projectName.toLowerCase().replace(/\s+/g, '-'),
+        version: '1.0.0',
+        description: `${projectName} — built with OpenBuild`,
+        scripts: {
+          dev: 'vite',
+          build: 'vite build',
+          preview: 'vite preview',
+          serve: 'npx serve .',
+        },
+        devDependencies: {
+          vite: '^7.0.0',
+        },
+      },
+      null,
+      2,
+    );
+  }
+
   private generateReadme(projectName: string): string {
     return `# ${projectName}
 
-Built with [OpenBuild](https://github.com/yourusername/openbuild) - Open Source Website Builder
+Built with [OpenBuild](https://github.com/Grandillionaire/openbuild) — the open-source visual website builder with built-in commerce.
 
-## Getting Started
+## Run locally
 
-### Option 1: Simple HTTP Server
 \`\`\`bash
-# Python 3
-python -m http.server 8000
-
-# Python 2
-python -m SimpleHTTPServer 8000
-
-# Node.js
-npx serve
+npx serve .
 \`\`\`
 
-### Option 2: Vite Dev Server
-\`\`\`bash
-npm install
-npm run dev
-\`\`\`
+## Deploy
 
-## Deployment
-
-### Vercel
-\`\`\`bash
-npx vercel
-\`\`\`
-
-### Netlify
-\`\`\`bash
-npx netlify deploy
-\`\`\`
-
-### GitHub Pages
-Push to a GitHub repository and enable Pages in settings.
+- **Vercel:** \`npx vercel\`
+- **Netlify:** \`npx netlify deploy\`
+- **GitHub Pages:** push to a repo and enable Pages.
 
 ## License
 
 MIT
 `;
   }
-  
+
   private generateGitignore(): string {
     return `node_modules
 dist
@@ -161,35 +210,26 @@ dist
 *.log
 .env
 .vscode
-.idea`;
+.idea
+`;
   }
-  
+
   private generateVercelConfig(): string {
-    return JSON.stringify({
-      version: 2,
-      builds: [
-        {
-          src: 'index.html',
-          use: '@vercel/static'
-        }
-      ],
-      routes: [
-        {
-          src: '/(.*)',
-          dest: '/index.html'
-        }
-      ]
-    }, null, 2);
+    return JSON.stringify(
+      {
+        version: 2,
+        cleanUrls: true,
+        trailingSlash: false,
+      },
+      null,
+      2,
+    );
   }
-  
+
   private generateNetlifyConfig(): string {
     return `[build]
   publish = "."
-
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200`;
+`;
   }
 }
 

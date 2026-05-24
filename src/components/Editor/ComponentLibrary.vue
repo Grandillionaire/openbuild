@@ -122,7 +122,8 @@ const categories = [
       { ...componentDefinitions.section, description: 'Full-width section wrapper' },
       { ...componentDefinitions.grid, description: 'Responsive grid layout' },
       { ...componentDefinitions.flex, description: 'Flexible box layout' },
-      { ...componentDefinitions.spacer, description: 'Vertical spacing element' }
+      { ...componentDefinitions.spacer, description: 'Vertical spacing element' },
+      { ...componentDefinitions.divider, description: 'Horizontal divider, optional label' }
     ]
   },
   {
@@ -139,7 +140,10 @@ const categories = [
     name: 'media',
     label: 'Media',
     components: [
-      { ...componentDefinitions.image, description: 'Responsive image' }
+      { ...componentDefinitions.image, description: 'Responsive image' },
+      { ...componentDefinitions.video, description: 'YouTube / Vimeo / hosted video' },
+      { ...componentDefinitions.gallery, description: 'Responsive image gallery' },
+      { ...componentDefinitions.embed, description: 'Embed any HTML / iframe' }
     ]
   },
   {
@@ -150,7 +154,26 @@ const categories = [
       { ...componentDefinitions.features, description: 'Feature grid showcase' },
       { ...componentDefinitions.cta, description: 'Call-to-action section' },
       { ...componentDefinitions.footer, description: 'Site footer' },
-      { ...componentDefinitions.navigation, description: 'Navigation bar' }
+      { ...componentDefinitions.navigation, description: 'Navigation bar' },
+      { ...componentDefinitions.accordion, description: 'Collapsible content sections' },
+      { ...componentDefinitions.tabs, description: 'Tabbed content panels' },
+      { ...componentDefinitions.faq, description: 'FAQ with schema.org JSON-LD' },
+      { ...componentDefinitions.testimonials, description: 'Customer quote cards' },
+      { ...componentDefinitions.pricing, description: 'Pricing table with tiers' },
+      { ...componentDefinitions.newsletter, description: 'Email signup form' },
+      { ...componentDefinitions.socialLinks, description: 'Social media icons row' }
+    ]
+  },
+  {
+    name: 'commerce',
+    label: 'Commerce',
+    components: [
+      { ...componentDefinitions.product, description: 'Single product card' },
+      { ...componentDefinitions.productGrid, description: 'Grid of products from catalog' },
+      { ...componentDefinitions.priceTag, description: 'Live product price' },
+      { ...componentDefinitions.addToCart, description: 'Add-to-cart button' },
+      { ...componentDefinitions.cartIcon, description: 'Header cart icon with count' },
+      { ...componentDefinitions.checkoutButton, description: 'Begin checkout' }
     ]
   }
 ];

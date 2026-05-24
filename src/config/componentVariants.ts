@@ -1,6 +1,8 @@
 import type { ComponentType, ComponentVariant } from '@/types/component';
 
-export const componentVariants: Record<ComponentType, ComponentVariant[]> = {
+// `Partial` because new component types (commerce, gallery, faq, accordion, etc.)
+// don't have to ship preset variants on day one.
+export const componentVariants: Partial<Record<ComponentType, ComponentVariant[]>> = {
   // Button Variants
   button: [
     {

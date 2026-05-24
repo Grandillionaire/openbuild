@@ -1,6 +1,9 @@
 import type { ComponentDefinition, ComponentType, Component } from '@/types/component';
 import { componentVariants } from './componentVariants';
 import { formComponentDefinitions } from './formComponents';
+import { contentComponentDefinitions } from './contentComponents';
+import { commerceComponentDefinitions } from './commerceComponents';
+import { getRegisteredComponents } from '@/lib/plugins';
 import { escapeHtml, sanitizeUrl } from '@/utils/htmlEscape';
 
 // Helper function to add variants and theme support
@@ -666,14 +669,19 @@ const baseComponentDefinitions: Record<ComponentType, ComponentDefinition> = {
   }
 };
 
-// Merge base components with form components
+// Merge all component categories into a single registry. Plugin-provided
+// component types are layered on last so third-party authors can override
+// built-ins by registering the same type.
 export const componentDefinitions: Record<string, ComponentDefinition> = {
   ...baseComponentDefinitions,
-  ...formComponentDefinitions
+  ...formComponentDefinitions,
+  ...contentComponentDefinitions,
+  ...commerceComponentDefinitions,
+  ...Object.fromEntries(getRegisteredComponents().entries()),
 };
 
 // Apply variants to all components
-Object.keys(componentDefinitions).forEach(key => {
+Object.keys(componentDefinitions).forEach((key) => {
   const type = key as ComponentType;
   componentDefinitions[type] = addVariantsToDefinition(componentDefinitions[type]);
 });

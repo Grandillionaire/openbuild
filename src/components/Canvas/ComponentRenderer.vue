@@ -212,6 +212,17 @@
           <button class="cta-button">{{ typeof component.props.content === 'object' ? component.props.content?.buttonText : '' }}</button>
         </div>
       </template>
+
+      <!--
+        Generic fallback: any component type registered in `componentDefinitions`
+        but without an explicit editor template above will be rendered via its
+        own `generateHTML`. This is how the commerce, gallery, accordion,
+        pricing, FAQ, testimonials, etc. components show up live in the canvas.
+        Keeps the canvas in sync with the exported site (single source of truth).
+      -->
+      <template v-else-if="generatedHtmlPreview">
+        <div class="component-generated" v-html="generatedHtmlPreview"></div>
+      </template>
     </div>
     
     <!-- Drop Indicator -->
@@ -224,6 +235,8 @@ import { computed, ref, onMounted, onUnmounted, watch } from 'vue';
 import { useEditorStore } from '@/stores/editor';
 import { Move, Copy, Trash2, Plus } from 'lucide-vue-next';
 import type { Component, Animation } from '@/types/component';
+import { componentDefinitions } from '@/config/components';
+import { telemetry } from '@/lib/telemetry';
 
 const props = defineProps<{
   component: Component;
@@ -248,6 +261,27 @@ const hasChildren = computed(() =>
 const headingTag = computed(() => {
   const level = props.component.props.attributes?.level || props.component.props.level;
   return level ? `h${level}` : 'h2';
+});
+
+/**
+ * For component types that don't have a hand-written editor template above,
+ * we re-use the same generateHTML used by the export pipeline. This keeps the
+ * editor preview pixel-identical to what users will ship, and means new
+ * component types only need to define generateHTML/generateCSS to appear in
+ * both surfaces.
+ */
+const generatedHtmlPreview = computed<string | null>(() => {
+  const def = componentDefinitions[props.component.type];
+  if (!def?.generateHTML) return null;
+  try {
+    return def.generateHTML(props.component);
+  } catch (err) {
+    telemetry.captureException(err, {
+      scope: 'ComponentRenderer.generatedHtmlPreview',
+      tags: { type: props.component.type },
+    });
+    return `<div style="padding:24px;border:1px dashed #FCA5A5;color:#B91C1C;border-radius:8px;background:#FEF2F2">Preview failed for ${props.component.type}. See console for details.</div>`;
+  }
 });
 
 const computedStyles = computed(() => {

@@ -1,5 +1,7 @@
 import { componentDefinitions } from '@/config/components';
 import type { Component, Animation } from '@/types/component';
+import type { CommerceSettings, Product } from '@/types/commerce';
+import { getCommerceRuntimeScript } from './commerceRuntime';
 
 export class CodeGenerator {
   private htmlTemplate: any;
@@ -76,6 +78,17 @@ export class CodeGenerator {
       javascript?: string;
       headHTML?: string;
     };
+    commerce?: {
+      enabled: boolean;
+      products: ReadonlyArray<Product>;
+      settings: CommerceSettings;
+    };
+    seo?: {
+      title?: string;
+      description?: string;
+      ogImage?: string;
+      canonicalUrl?: string;
+    };
   }): Promise<{
     html: string;
     css: string;
@@ -84,30 +97,37 @@ export class CodeGenerator {
     await this.ensureInitialized();
     // Generate HTML for all components
     const html = this.generateHTML(components);
-    
+
     // Generate CSS for all components
     const css = this.generateCSS(components, options);
-    
+
     // Format with Prettier
     const formattedHTML = await this.formatHTML(html);
     const formattedCSS = await this.formatCSS(css);
-    
+
     // Generate all JavaScript (animations + custom code)
     let allJS = this.generateCustomJS(components);
-    
+
+    // Inject commerce runtime if enabled
+    if (options?.commerce?.enabled) {
+      allJS = `${getCommerceRuntimeScript(options.commerce.products, options.commerce.settings)}\n\n${allJS}`;
+    }
+
     // Add global custom JavaScript
     if (options?.globalCustomCode?.javascript) {
       allJS = `${allJS}\n\n/* Global Custom JavaScript */\n${options.globalCustomCode.javascript}`;
     }
-    
+
+    const seoMeta = this.buildSeoMeta(projectName, options?.seo);
+
     // Generate full page
     const fullPage = this.htmlTemplate({
-      title: projectName,
-      description: `Built with OpenBuild`,
+      title: options?.seo?.title || projectName,
+      description: options?.seo?.description || 'Built with OpenBuild',
       html: formattedHTML,
       css: formattedCSS,
       js: allJS,
-      headHTML: options?.globalCustomCode?.headHTML
+      headHTML: `${seoMeta}\n${options?.globalCustomCode?.headHTML ?? ''}`,
     });
     
     return {
@@ -116,7 +136,43 @@ export class CodeGenerator {
       fullPage: await this.formatHTML(fullPage)
     };
   }
-  
+
+  /**
+   * Build SEO / social metadata for the <head>. Caller passes optional values
+   * — anything we don't get is synthesized from the project name so exports
+   * always include the minimum recommended set.
+   */
+  private buildSeoMeta(
+    projectName: string,
+    seo?: { title?: string; description?: string; ogImage?: string; canonicalUrl?: string },
+  ): string {
+    const title = seo?.title || projectName;
+    const description = seo?.description || `${projectName} — built with OpenBuild`;
+    const ogImage = seo?.ogImage;
+    const canonical = seo?.canonicalUrl;
+    const esc = (s: string) =>
+      String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const tags: string[] = [
+      `<meta name="generator" content="OpenBuild">`,
+      `<meta property="og:title" content="${esc(title)}">`,
+      `<meta property="og:description" content="${esc(description)}">`,
+      `<meta property="og:type" content="website">`,
+      `<meta name="twitter:card" content="summary_large_image">`,
+      `<meta name="twitter:title" content="${esc(title)}">`,
+      `<meta name="twitter:description" content="${esc(description)}">`,
+    ];
+    if (ogImage) {
+      tags.push(`<meta property="og:image" content="${esc(ogImage)}">`);
+      tags.push(`<meta name="twitter:image" content="${esc(ogImage)}">`);
+    }
+    if (canonical) {
+      tags.push(`<link rel="canonical" href="${esc(canonical)}">`);
+      tags.push(`<meta property="og:url" content="${esc(canonical)}">`);
+    }
+    return tags.join('\n');
+  }
+
+
   private generateHTML(components: Component[]): string {
     return components.map(component => 
       this.generateComponentHTML(component)
