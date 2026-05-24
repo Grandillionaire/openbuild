@@ -17,6 +17,11 @@
           <option value="">— None —</option>
           <option v-for="p in analyticsProviders" :key="p.id" :value="p.id">{{ p.name }}</option>
         </select>
+        <small class="im-help">Privacy-friendly recommendations (no cookies, GDPR-easy):
+          <a href="https://plausible.io" target="_blank" rel="noopener">Plausible</a> ·
+          <a href="https://usefathom.com" target="_blank" rel="noopener">Fathom</a> ·
+          <a href="https://umami.is" target="_blank" rel="noopener">Umami</a>
+        </small>
       </label>
       <template v-if="activeAnalytics">
         <p class="im-docs">
@@ -58,6 +63,14 @@
           <option value="">— None —</option>
           <option v-for="p in formProviders" :key="p.id" :value="p.id">{{ p.name }}</option>
         </select>
+        <small class="im-help">All free tier-friendly:
+          <a href="https://formspree.io" target="_blank" rel="noopener">Formspree</a>
+          (50 submissions/mo free) ·
+          <a href="https://web3forms.com" target="_blank" rel="noopener">Web3Forms</a>
+          (250 submissions/mo free) ·
+          <a href="https://www.netlify.com/products/forms/" target="_blank" rel="noopener">Netlify Forms</a>
+          (100 submissions/mo free if you host there)
+        </small>
       </label>
       <template v-if="activeFormProvider">
         <p v-if="activeFormProvider.docsUrl" class="im-docs">
@@ -139,5 +152,7 @@ function toggleForms(enabled: boolean) {
 .im-docs { margin: 0; font-size: 0.75rem; }
 .im-docs a { color: #3B82F6; text-decoration: none; font-weight: 500; }
 .im-req { color: #EF4444; margin-left: 2px; }
-.im-help { color: #6B7280; font-size: 0.75rem; font-weight: 400; line-height: 1.4; }
+.im-help { color: #6B7280; font-size: 0.75rem; font-weight: 400; line-height: 1.5; margin-top: 4px; }
+.im-help a { color: #3B82F6; font-weight: 600; text-decoration: none; }
+.im-help a:hover { text-decoration: underline; }
 </style>

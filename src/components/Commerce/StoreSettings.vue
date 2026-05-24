@@ -41,15 +41,33 @@
           placeholder="https://api.yourstore.com/checkout"
           @input="updateEndpoint(($event.target as HTMLInputElement).value)"
         />
+        <small v-if="checkoutType === 'stripe-checkout-session'" class="ss-help">
+          Need an endpoint? Our
+          <a href="https://github.com/Grandillionaire/openbuild/blob/main/docs/COMMERCE.md#minimal-vercelnetlify-function-40-lines" target="_blank" rel="noopener noreferrer">40-line Vercel function template</a>
+          handles this — copy, paste your Stripe secret key, deploy.
+        </small>
       </label>
       <label v-if="checkoutType !== 'mock' && checkoutType !== 'custom-webhook'">
         <span>Stripe publishable key</span>
         <input
           :value="settings.stripePublishableKey || ''"
-          placeholder="pk_live_…"
+          placeholder="pk_test_… or pk_live_…"
           @input="update({ stripePublishableKey: ($event.target as HTMLInputElement).value || undefined })"
         />
+        <small class="ss-help">
+          <a href="https://dashboard.stripe.com/test/apikeys" target="_blank" rel="noopener noreferrer">Get a test key from Stripe →</a>
+          Test keys start with <code>pk_test_</code>; charge nothing real until you switch to <code>pk_live_</code>.
+        </small>
       </label>
+      <div v-if="checkoutType === 'stripe-payment-link'" class="ss-info">
+        <strong>How this works:</strong> in Stripe, create a Payment Link per product
+        (<a href="https://dashboard.stripe.com/payment-links" target="_blank" rel="noopener noreferrer">Dashboard → Payment Links → New ↗</a>).
+        Paste each URL on the matching product in the Products tab. OpenBuild redirects shoppers to that URL with the right quantity.
+        Single product per checkout — switch to "Checkout Session" mode for real carts.
+      </div>
+      <div v-if="checkoutType === 'mock'" class="ss-info ss-info--warn">
+        Demo mode: shows a toast instead of charging. Switch to Stripe Payment Links or Checkout Session before you ship.
+      </div>
     </section>
 
     <section class="ss-section">
@@ -147,4 +165,15 @@ function updateEndpoint(url: string): void {
 .ss-section input:focus, .ss-section select:focus { outline: none; border-color: #3B82F6; box-shadow: 0 0 0 3px rgba(59,130,246,0.15); }
 .ss-toggle { flex-direction: row; align-items: center; gap: 10px; cursor: pointer; }
 .ss-toggle input[type='checkbox'] { width: 18px; height: 18px; cursor: pointer; }
+.ss-help { font-size: 0.75rem; color: #6B7280; line-height: 1.5; margin-top: 4px; }
+.ss-help a { color: #3B82F6; font-weight: 600; text-decoration: none; }
+.ss-help a:hover { text-decoration: underline; }
+.ss-help code { font-family: ui-monospace, monospace; font-size: 0.6875rem; background: #F3F4F6; padding: 1px 6px; border-radius: 4px; color: #374151; }
+.ss-info {
+  font-size: 0.8125rem; color: #075985; line-height: 1.6;
+  padding: 12px 14px; background: #F0F9FF; border: 1px solid #BAE6FD; border-radius: 10px;
+}
+.ss-info a { color: #0369A1; font-weight: 600; text-decoration: none; }
+.ss-info a:hover { text-decoration: underline; }
+.ss-info--warn { background: #FEF3C7; border-color: #FCD34D; color: #92400E; }
 </style>

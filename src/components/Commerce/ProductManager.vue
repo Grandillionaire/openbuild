@@ -129,6 +129,10 @@
             <label>
               <span>Stripe Payment Link <a href="https://dashboard.stripe.com/payment-links" target="_blank" rel="noopener" class="pm-help">create in Stripe ↗</a></span>
               <input :value="editingProduct.stripePaymentLinkUrl || ''" placeholder="https://buy.stripe.com/…" @input="patch({ stripePaymentLinkUrl: ($event.target as HTMLInputElement).value || undefined })" />
+              <small class="pm-mini-help">
+                Open the link above, fill in price + product name, copy the resulting <code>buy.stripe.com/...</code> URL here.
+                Charges go straight to your Stripe balance — OpenBuild never touches the money.
+              </small>
             </label>
           </div>
 
@@ -494,6 +498,8 @@ function bulkDelete() {
 .pm-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .pm-help { color: #3B82F6; text-decoration: none; font-size: 0.75rem; font-weight: 500; margin-left: 6px; }
 .pm-hint { font-size: 0.75rem; color: #6B7280; line-height: 1.5; margin: 0; padding: 10px 12px; background: #F9FAFB; border-radius: 6px; }
+.pm-mini-help { font-size: 0.6875rem; color: #6B7280; line-height: 1.5; margin-top: 4px; }
+.pm-mini-help code { font-family: ui-monospace, monospace; font-size: 0.625rem; background: #F3F4F6; padding: 1px 5px; border-radius: 3px; color: #374151; }
 .pm-image-row { display: flex; gap: 8px; align-items: flex-start; padding: 8px; border: 1px solid #E5E7EB; border-radius: 8px; }
 .pm-image-row img { width: 48px; height: 48px; object-fit: cover; border-radius: 4px; flex-shrink: 0; }
 .pm-image-placeholder { width: 48px; height: 48px; background: #F3F4F6; border-radius: 4px; display: grid; place-items: center; font-size: 1rem; }

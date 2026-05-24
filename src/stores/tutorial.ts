@@ -255,13 +255,11 @@ export const useTutorialStore = defineStore('tutorial', () => {
   // Initialize on store creation
   loadProgress()
 
-  // Check if we should show the launcher on first visit
-  if (isFirstTime.value && preferences.value.autoStart) {
-    // Delay showing launcher to let the app initialize
-    setTimeout(() => {
-      showLauncher.value = true
-    }, 1500)
-  }
+  // Tutorial launcher is now opt-in only. The first-run wizard
+  // (src/components/UI/OnboardingWizard.vue) handles getting new users started,
+  // and the tutorial launcher is reachable from the header "Tutorials" button
+  // or its own floating button. Auto-opening it on top of the wizard caused
+  // overlapping modals that stole each other's clicks.
 
   return {
     // State

@@ -10,47 +10,69 @@
         </div>
         
         <div class="modal-body">
-          <div class="export-options">
-            <!-- Framework Selection -->
-            <div class="option framework-option">
-              <label>Export Format</label>
-              <div class="framework-buttons">
-                <button
-                  v-for="fw in frameworks"
-                  :key="fw.value"
-                  :class="['framework-btn', { active: framework === fw.value }]"
-                  @click="framework = fw.value"
-                >
-                  <component :is="fw.icon" :size="18" />
-                  <span>{{ fw.label }}</span>
-                </button>
-              </div>
-              <small v-if="framework === 'react'">Generates React JSX components with proper imports</small>
-              <small v-else-if="framework === 'vue'">Generates Vue SFC components with Composition API</small>
-              <small v-else>Standard HTML/CSS export</small>
+          <!-- One-click primary CTA. Smart defaults: clean HTML, all your
+               pages, theme tokens included, with package.json + README so
+               the export is publishable to anywhere (Vercel / Netlify /
+               GitHub Pages / S3 / `npx serve`). 90% of users want this. -->
+          <button class="btn-publish" @click="publishOneClick" :disabled="isExporting">
+            <Download v-if="!isExporting" :size="22" />
+            <Loader v-else :size="22" class="loading-spinner" />
+            <div class="btn-publish-text">
+              <span class="btn-publish-title">{{ isExporting ? 'Packaging your site…' : 'Download my site (.zip)' }}</span>
+              <span class="btn-publish-sub">Ready to host anywhere — Vercel, Netlify, GitHub Pages, S3</span>
             </div>
+          </button>
 
-            <label class="option">
-              <input v-model="includeConfig" type="checkbox" />
-              <span>Include configuration files</span>
-              <small>Adds package.json, README, and .gitignore</small>
-            </label>
-            
-            <label class="option">
-              <input v-model="minifyCode" type="checkbox" />
-              <span>Minify code</span>
-              <small>Reduces file size for production</small>
-            </label>
-            
-            <div class="option">
-              <label>Platform Configuration</label>
-              <select v-model="platform">
-                <option value="static">Static HTML</option>
-                <option value="vercel">Vercel</option>
-                <option value="netlify">Netlify</option>
-              </select>
+          <p class="publish-hint">
+            Drag the ZIP onto
+            <a href="https://app.netlify.com/drop" target="_blank" rel="noopener noreferrer">Netlify Drop</a>
+            for a free public URL in 30 seconds — no signup needed for testing.
+          </p>
+
+          <details class="advanced">
+            <summary>Advanced export options</summary>
+
+            <div class="export-options">
+              <div class="option framework-option">
+                <label>Export Format</label>
+                <div class="framework-buttons">
+                  <button
+                    v-for="fw in frameworks"
+                    :key="fw.value"
+                    :class="['framework-btn', { active: framework === fw.value }]"
+                    @click="framework = fw.value"
+                  >
+                    <component :is="fw.icon" :size="18" />
+                    <span>{{ fw.label }}</span>
+                  </button>
+                </div>
+                <small v-if="framework === 'react'">Generates React JSX components with proper imports</small>
+                <small v-else-if="framework === 'vue'">Generates Vue SFC components with Composition API</small>
+                <small v-else>Standard HTML/CSS export — works on any static host</small>
+              </div>
+
+              <label class="option">
+                <input v-model="includeConfig" type="checkbox" />
+                <span>Include configuration files</span>
+                <small>Adds package.json, README, and .gitignore</small>
+              </label>
+
+              <label class="option">
+                <input v-model="minifyCode" type="checkbox" />
+                <span>Minify code</span>
+                <small>Reduces file size for production</small>
+              </label>
+
+              <div class="option">
+                <label>Platform Configuration</label>
+                <select v-model="platform">
+                  <option value="static">Static HTML</option>
+                  <option value="vercel">Vercel</option>
+                  <option value="netlify">Netlify</option>
+                </select>
+              </div>
             </div>
-          </div>
+          </details>
           
           <div class="preview-section">
             <h3>Files to Export</h3>
@@ -118,7 +140,7 @@
           <button @click="handleExport" class="btn-export" :disabled="isExporting">
             <Download v-if="!isExporting" :size="16" />
             <Loader v-else :size="16" class="loading-spinner" />
-            <span>{{ isExporting ? 'Exporting...' : 'Export ZIP' }}</span>
+            <span>{{ isExporting ? 'Exporting…' : 'Export with advanced options' }}</span>
           </button>
         </div>
       </div>
@@ -170,18 +192,31 @@ const frameworks: ReadonlyArray<{ value: ExportFramework; label: string; icon: u
   { value: 'vue', label: 'Vue', icon: VueIcon },
 ];
 
+/** One-click publish: HTML export with sensible defaults. */
+async function publishOneClick() {
+  framework.value = 'html';
+  includeConfig.value = true;
+  platform.value = 'static';
+  await handleExport();
+}
+
 async function handleExport() {
   isExporting.value = true;
   
   try {
     if (framework.value === 'html') {
-      // Use existing HTML export
+      // Use existing HTML export. Always include theme + commerce + multi-page
+      // when their stores have data — first-time users shouldn't have to know
+      // these are options.
       await exportManager.exportProject(
         store.components,
         store.projectName,
         {
           includeConfig: includeConfig.value,
-          platform: platform.value as any
+          platform: platform.value as 'vercel' | 'netlify' | 'static',
+          includeTheme: true,
+          multiPage: true,
+          includeCommerce: true,
         }
       );
     } else {
@@ -222,6 +257,69 @@ async function handleExport() {
 </script>
 
 <style scoped>
+.btn-publish {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 18px 24px;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, #3B82F6, #6366F1);
+  color: white;
+  border: 0;
+  border-radius: 14px;
+  cursor: pointer;
+  text-align: left;
+  transition: transform 0.1s, box-shadow 0.2s;
+  box-shadow: 0 8px 20px -4px rgba(99, 102, 241, 0.5);
+}
+.btn-publish:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 28px -4px rgba(99, 102, 241, 0.6);
+}
+.btn-publish:disabled { opacity: 0.7; cursor: wait; }
+.btn-publish-text { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+.btn-publish-title { font-weight: 700; font-size: 1.0625rem; }
+.btn-publish-sub { font-size: 0.8125rem; opacity: 0.9; }
+.publish-hint {
+  margin: 0 0 20px;
+  padding: 12px 14px;
+  background: #F0F9FF;
+  border: 1px solid #BAE6FD;
+  border-radius: 10px;
+  color: #075985;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+.publish-hint a { color: #0369A1; font-weight: 600; text-decoration: none; }
+.publish-hint a:hover { text-decoration: underline; }
+.advanced {
+  margin-top: 8px;
+  background: #F9FAFB;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  padding: 4px 16px;
+}
+.advanced summary {
+  cursor: pointer;
+  padding: 10px 0;
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.875rem;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.advanced summary::before {
+  content: '▸';
+  transition: transform 0.15s;
+  color: #6B7280;
+}
+.advanced[open] summary::before { transform: rotate(90deg); }
+.advanced .export-options { padding-bottom: 16px; }
+
+
 .modal {
   position: fixed;
   top: 50%;

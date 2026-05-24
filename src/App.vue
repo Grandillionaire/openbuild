@@ -70,11 +70,12 @@
       <!-- Tutorial Launcher -->
       <TutorialLauncher />
 
-      <!-- Welcome Guide (only for first-time users) -->
-      <WelcomeGuide
-        v-if="showWelcomeGuide"
-        @close="handleWelcomeClose"
-        @start-tutorial="handleStartTutorial"
+      <!-- First-run onboarding wizard. Replaces the older WelcomeGuide +
+           tutorial-launcher auto-popups; both were shown simultaneously and
+           confused first-time users (item E in the idiot-proof pass). -->
+      <OnboardingWizard
+        :open="showOnboarding"
+        @close="handleOnboardingClose"
       />
 
       <!-- Command Palette (⌘K) -->
@@ -145,7 +146,7 @@ import TemplateLibrary from '@/components/Templates/TemplateLibrary.vue';
 import QuickActionsBar from '@/components/UI/QuickActionsBar.vue';
 import TutorialOverlay from '@/components/Tutorial/TutorialOverlay.vue';
 import TutorialLauncher from '@/components/Tutorial/TutorialLauncher.vue';
-import WelcomeGuide from '@/components/UI/WelcomeGuide.vue';
+import OnboardingWizard from '@/components/UI/OnboardingWizard.vue';
 import CommandPalette from '@/components/UI/CommandPalette.vue';
 import AIComponentGenerator from '@/components/Editor/AIComponentGenerator.vue';
 import KeyboardHelpModal from '@/components/UI/KeyboardHelpModal.vue';
@@ -165,7 +166,7 @@ const commandPaletteRef = ref<InstanceType<typeof CommandPalette>>();
 const showTemplateLibrary = ref(false);
 
 // Welcome guide state
-const showWelcomeGuide = ref(false);
+const showOnboarding = ref(false);
 
 // AI Generator state
 const showAIGenerator = ref(false);
@@ -196,21 +197,13 @@ function handleAssetSelect(asset: any) {
   store.addAsset(asset);
 }
 
-/**
- * Handle welcome guide close
- */
-function handleWelcomeClose() {
-  showWelcomeGuide.value = false;
-  localStorage.setItem('welcomeGuideShown', 'true');
-}
-
-/**
- * Handle starting a tutorial from the welcome guide
- */
-function handleStartTutorial(tutorialId: string) {
-  showWelcomeGuide.value = false;
-  localStorage.setItem('welcomeGuideShown', 'true');
-  tutorialStore.startTutorial(tutorialId);
+function handleOnboardingClose() {
+  showOnboarding.value = false;
+  try {
+    localStorage.setItem('openbuild_onboarded_v2', 'true');
+    // Also flip the legacy keys so older entry points stop firing.
+    localStorage.setItem('welcomeGuideShown', 'true');
+  } catch { /* opaque origin */ }
 }
 
 
@@ -234,20 +227,15 @@ onMounted(async () => {
     }
   }
 
-  // Check if we should show welcome guide for first-time users
-  const welcomeShown = localStorage.getItem('welcomeGuideShown');
-  const hasCompletedTutorial = tutorialStore.completedTutorials.size > 0;
-
-  if (!welcomeShown && !hasCompletedTutorial && store.components.length === 0) {
-    // Show welcome guide for new users with no project
+  // Onboarding: show ONE wizard for first-time users with an empty canvas.
+  // The old flow popped a welcome guide AND auto-opened the tutorial launcher
+  // 2s later — the two overlapped and stole each other's clicks. Tutorial
+  // launcher is now opt-in only (via its own FAB or the Tutorials header button).
+  const onboardedV2 = localStorage.getItem('openbuild_onboarded_v2');
+  if (!onboardedV2 && store.components.length === 0) {
     setTimeout(() => {
-      showWelcomeGuide.value = true;
-    }, 1000);
-  } else if (tutorialStore.isFirstTime && !tutorialStore.preferences.neverShowAgain) {
-    // Show tutorial launcher for returning users who haven't completed any tutorials
-    setTimeout(() => {
-      tutorialStore.showLauncher = true;
-    }, 2000);
+      showOnboarding.value = true;
+    }, 600);
   }
 
   // Setup beforeunload handler
