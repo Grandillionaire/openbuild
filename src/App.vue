@@ -350,7 +350,9 @@ onMounted(async () => {
 /* AI Floating Action Button */
 .ai-fab {
   position: fixed;
-  bottom: 24px;
+  /* Stacked above the tutorial launcher (right: 24, bottom: 24) so the two
+     don't overlap and steal each other's clicks. */
+  bottom: 96px;
   right: 24px;
   width: 56px;
   height: 56px;
