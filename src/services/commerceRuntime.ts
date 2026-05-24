@@ -392,8 +392,28 @@ export function getCommerceRuntimeScript(
     ensureDrawer();
     syncCartUI();
 
-    // Optional checkout success handler
+    // Optional checkout success handler. Snapshot the cart-as-it-was BEFORE
+    // clearing so a merchant browsing their own site sees a local order record
+    // in the editor (useful for end-to-end testing of checkout configuration).
     if (location.search.indexOf("ob_checkout=success") >= 0){
+      try {
+        var snapshot = loadCart();
+        if (snapshot.length > 0){
+          var subtotalSnap = cartSubtotal();
+          var sessionId = new URLSearchParams(location.search).get('session_id') || null;
+          var pending = JSON.parse(localStorage.getItem('openbuild_orders_pending') || '[]');
+          pending.unshift({
+            id: 'ord_' + Math.random().toString(36).slice(2, 14),
+            items: snapshot,
+            totals: { subtotal: subtotalSnap, discount: { amount: 0, currency: subtotalSnap && subtotalSnap.currency }, tax: { amount: 0, currency: subtotalSnap && subtotalSnap.currency }, shipping: { amount: 0, currency: subtotalSnap && subtotalSnap.currency }, total: subtotalSnap },
+            customer: { email: '' },
+            status: 'paid',
+            stripeCheckoutSessionId: sessionId,
+            createdAt: new Date().toISOString()
+          });
+          localStorage.setItem('openbuild_orders_pending', JSON.stringify(pending.slice(0, 100)));
+        }
+      } catch(e){ /* don't let order capture break the thank-you flow */ }
       clearCart();
       toast("Order received — thank you!");
     }

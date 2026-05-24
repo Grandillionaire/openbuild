@@ -173,12 +173,14 @@ export interface CommerceSettings {
   };
 }
 
+export type OrderStatus = 'pending' | 'paid' | 'fulfilled' | 'refunded' | 'cancelled';
+
 export interface Order {
-  readonly id: string;
-  readonly items: ReadonlyArray<CartLineItem>;
-  readonly totals: CartTotals;
-  readonly customer: { email: string; name?: string };
-  readonly shippingAddress?: {
+  id: string;
+  items: ReadonlyArray<CartLineItem>;
+  totals: CartTotals;
+  customer: { email: string; name?: string };
+  shippingAddress?: {
     line1: string;
     line2?: string;
     city: string;
@@ -186,7 +188,11 @@ export interface Order {
     postalCode: string;
     country: string;
   };
-  readonly status: 'pending' | 'paid' | 'fulfilled' | 'refunded' | 'cancelled';
-  readonly stripeCheckoutSessionId?: string;
-  readonly createdAt: string;
+  status: OrderStatus;
+  stripeCheckoutSessionId?: string;
+  createdAt: string;
+  /** Updated whenever the status changes. */
+  updatedAt: string;
+  /** Free-form fulfillment notes (tracking numbers, refund reasons). */
+  notes?: string;
 }

@@ -63,6 +63,14 @@
           <Search :size="18" />
         </button>
         <button
+          @click="showCommerce = true"
+          title="Store: products, orders, integrations"
+          class="header-btn-store"
+        >
+          <ShoppingBag :size="18" />
+          <span class="btn-label">Store</span>
+        </button>
+        <button
           @click="showMarketplace = true"
           title="Template Marketplace"
         >
@@ -155,6 +163,9 @@
     
     <!-- Template Library -->
     <TemplateLibrary :isOpen="showTemplateLibrary" @close="showTemplateLibrary = false" />
+
+    <!-- Commerce admin -->
+    <CommerceModal :open="showCommerce" @close="showCommerce = false" />
     
     <!-- Theme Modal -->
     <ThemeModal :isOpen="showThemeModal" @close="showThemeModal = false" />
@@ -282,6 +293,7 @@ import {
   X,
   GraduationCap,
   BarChart3,
+  ShoppingBag,
   Users,
   Share2,
   Copy
@@ -296,6 +308,7 @@ import PagesManager from '../Editor/PagesManager.vue';
 import SEOPanel from '../Editor/SEOPanel.vue';
 import SEOAnalyzer from '../Tools/SEOAnalyzer.vue';
 import MarketplaceModal from '../Marketplace/MarketplaceModal.vue';
+import CommerceModal from '../Commerce/CommerceModal.vue';
 import FigmaImportModal from '../UI/FigmaImportModal.vue';
 import AnalyticsDashboard from '../Analytics/AnalyticsDashboard.vue';
 import { useToast } from '@/composables/useToast';
@@ -341,6 +354,7 @@ const showSEOPanel = ref(false);
 // New feature modals
 const showSEOAnalyzer = ref(false);
 const showMarketplace = ref(false);
+const showCommerce = ref(false);
 const showFigmaImport = ref(false);
 const showAnalytics = ref(false);
 const showCollabPanel = ref(false);

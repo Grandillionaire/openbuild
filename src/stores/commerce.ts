@@ -20,6 +20,8 @@ import type {
   CurrencyCode,
   DiscountCode,
   Money,
+  Order,
+  OrderStatus,
   Product,
   ProductCategory,
   ShippingZone,
@@ -36,6 +38,7 @@ interface PersistedState {
   discounts: DiscountCode[];
   shippingZones: ShippingZone[];
   taxRules: TaxRule[];
+  orders: Order[];
 }
 
 function defaultSettings(): CommerceSettings {
@@ -72,6 +75,7 @@ export const useCommerceStore = defineStore('commerce', () => {
   const discounts = ref<DiscountCode[]>(persisted.discounts ?? []);
   const shippingZones = ref<ShippingZone[]>(persisted.shippingZones ?? []);
   const taxRules = ref<TaxRule[]>(persisted.taxRules ?? []);
+  const orders = ref<Order[]>(persisted.orders ?? []);
 
   const cartItems = ref<CartLineItem[]>([]);
   const activeDiscountCode = ref<string | null>(null);
@@ -113,7 +117,7 @@ export const useCommerceStore = defineStore('commerce', () => {
   /* ---------- Persist ---------- */
 
   watch(
-    [settings, products, categories, discounts, shippingZones, taxRules],
+    [settings, products, categories, discounts, shippingZones, taxRules, orders],
     () => {
       try {
         const payload: PersistedState = {
@@ -123,6 +127,7 @@ export const useCommerceStore = defineStore('commerce', () => {
           discounts: discounts.value,
           shippingZones: shippingZones.value,
           taxRules: taxRules.value,
+          orders: orders.value,
         };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
       } catch (err) {
@@ -275,6 +280,123 @@ export const useCommerceStore = defineStore('commerce', () => {
     settings.value = { ...settings.value, ...patch };
   }
 
+  /* ---------- Orders ---------- */
+
+  /**
+   * Record a checkout that just completed. The runtime calls this via a
+   * `localStorage` bridge — see commerceRuntime — when a customer lands on a
+   * `?ob_checkout=success` URL. Falling back to a no-op if essential data is
+   * missing keeps malformed payloads from poisoning the store.
+   */
+  function recordOrder(input: Partial<Order> & { items: ReadonlyArray<CartLineItem>; totals: Order['totals'] }): Order {
+    const now = new Date().toISOString();
+    const order: Order = {
+      id: input.id ?? nanoid(12),
+      items: input.items,
+      totals: input.totals,
+      customer: input.customer ?? { email: '' },
+      shippingAddress: input.shippingAddress,
+      status: input.status ?? 'paid',
+      stripeCheckoutSessionId: input.stripeCheckoutSessionId,
+      createdAt: input.createdAt ?? now,
+      updatedAt: now,
+      notes: input.notes,
+    };
+    orders.value.unshift(order);
+    return order;
+  }
+
+  function updateOrderStatus(id: string, status: OrderStatus, notes?: string): void {
+    const idx = orders.value.findIndex((o) => o.id === id);
+    if (idx === -1) return;
+    orders.value.splice(idx, 1, {
+      ...orders.value[idx],
+      status,
+      notes: notes ?? orders.value[idx].notes,
+      updatedAt: new Date().toISOString(),
+    });
+  }
+
+  function deleteOrder(id: string): void {
+    orders.value = orders.value.filter((o) => o.id !== id);
+  }
+
+  /**
+   * Reads any pending-order snapshots the commerce runtime wrote during a
+   * checkout-success redirect (when the merchant tests their own site in the
+   * same browser) and merges them into the orders list. Idempotent — orders
+   * already present (by id) are skipped.
+   */
+  function consumePendingOrders(): number {
+    try {
+      const raw = localStorage.getItem('openbuild_orders_pending');
+      if (!raw) return 0;
+      const pending = JSON.parse(raw) as Partial<Order>[];
+      let added = 0;
+      for (const p of pending) {
+        if (!p || !p.id || !p.items || !p.totals) continue;
+        if (orders.value.some((o) => o.id === p.id)) continue;
+        recordOrder({ ...p, items: p.items, totals: p.totals } as never);
+        added++;
+      }
+      localStorage.removeItem('openbuild_orders_pending');
+      return added;
+    } catch (err) {
+      telemetry.captureException(err, { scope: 'commerceStore.consumePendingOrders' });
+      return 0;
+    }
+  }
+
+  /* ---------- Variant helpers ---------- */
+
+  /**
+   * Generates the Cartesian product of attribute values into product variants.
+   * Existing variants matching an attribute combo are preserved (so pricing,
+   * inventory and SKU survive when a new size is added). Removed combos are dropped.
+   */
+  function rebuildVariants(
+    productId: string,
+    attributes: ReadonlyArray<{ name: string; values: ReadonlyArray<string> }>,
+    basePrice: Money,
+  ): void {
+    const product = products.value.find((p) => p.id === productId);
+    if (!product) return;
+    if (attributes.length === 0 || attributes.every((a) => a.values.length === 0)) {
+      updateProduct(productId, { variants: [] });
+      return;
+    }
+    const combos = attributes.reduce<Array<Array<{ name: string; value: string }>>>(
+      (acc, attr) => {
+        if (attr.values.length === 0) return acc;
+        if (acc.length === 0) return attr.values.map((v) => [{ name: attr.name, value: v }]);
+        return acc.flatMap((existing) =>
+          attr.values.map((v) => [...existing, { name: attr.name, value: v }]),
+        );
+      },
+      [],
+    );
+    const next = combos.map((combo) => {
+      const name = combo.map((c) => c.value).join(' / ');
+      const previous = product.variants.find(
+        (v) => v.attributes.length === combo.length
+          && v.attributes.every((a, i) => a.name === combo[i].name && a.value === combo[i].value),
+      );
+      return {
+        id: previous?.id ?? nanoid(8),
+        name,
+        sku: previous?.sku,
+        price: previous?.price ?? basePrice,
+        compareAtPrice: previous?.compareAtPrice,
+        inventory: previous?.inventory ?? null,
+        attributes: combo,
+        imageId: previous?.imageId,
+        stripePriceId: previous?.stripePriceId,
+        stripePaymentLinkUrl: previous?.stripePaymentLinkUrl,
+      };
+    });
+    updateProduct(productId, { variants: next });
+  }
+
   /* ---------- Demo seed ---------- */
 
   function seedDemoCatalog(): void {
@@ -322,6 +444,7 @@ export const useCommerceStore = defineStore('commerce', () => {
     discounts,
     shippingZones,
     taxRules,
+    orders,
     cartItems,
     activeDiscountCode,
     currency,
@@ -346,6 +469,11 @@ export const useCommerceStore = defineStore('commerce', () => {
     clearDiscount,
     updateSettings,
     seedDemoCatalog,
+    recordOrder,
+    updateOrderStatus,
+    deleteOrder,
+    consumePendingOrders,
+    rebuildVariants,
   };
 });
 

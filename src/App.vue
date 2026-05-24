@@ -87,8 +87,8 @@
       />
 
       <!-- AI Floating Button -->
-      <button 
-        class="ai-fab" 
+      <button
+        class="ai-fab"
         @click="showAIGenerator = true"
         title="Generate component with AI"
       >
