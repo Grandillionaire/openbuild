@@ -26,6 +26,23 @@ describe('Safe Serialization Utils', () => {
       expect(result).toContain('[Circular]');
     });
 
+    it('should serialize shared (non-circular) references in full', () => {
+      const shared = { source: 'all', columns: 3 };
+      const components = [{ props: { content: shared } }, { props: { content: shared } }];
+
+      const result = safeParse(safeStringify(components));
+
+      expect(result[0].props.content).toEqual(shared);
+      expect(result[1].props.content).toEqual(shared);
+    });
+
+    it('should serialize a repeated sibling reference in an array', () => {
+      const shared = { a: 1 };
+      const result = safeStringify([shared, shared]);
+
+      expect(result).toBe('[{"a":1},{"a":1}]');
+    });
+
     it('should handle functions', () => {
       const obj = {
         name: 'test',

@@ -16,6 +16,12 @@ export interface ExportOptions {
   multiPage?: boolean;
   /** Include the commerce runtime + catalog snapshot. */
   includeCommerce?: boolean;
+  /**
+   * Absolute origin the site will be published under, e.g. `https://mystore.com`.
+   * Required for sitemap.xml — search engines reject `<loc>` values outside the
+   * property being verified, so without it no sitemap is written at all.
+   */
+  siteUrl?: string;
 }
 
 /**
@@ -68,8 +74,11 @@ export class ExportManager {
           commerce,
           integrations,
         });
-        zip.file('sitemap.xml', this.generateSitemap(pages));
-        zip.file('robots.txt', this.generateRobots());
+        const siteUrl = this.normalizeSiteUrl(options.siteUrl);
+        if (siteUrl) {
+          zip.file('sitemap.xml', this.generateSitemap(pages, siteUrl));
+        }
+        zip.file('robots.txt', this.generateRobots(siteUrl));
       } else {
         const { css, fullPage } = await codeGenerator.generateProject(components, projectName, {
           includeTheme: options.includeTheme,
@@ -145,11 +154,24 @@ export class ExportManager {
     }
   }
 
-  private generateSitemap(pages: ReadonlyArray<Page>): string {
+  /** Returns the origin without a trailing slash, or undefined if unusable. */
+  private normalizeSiteUrl(siteUrl?: string): string | undefined {
+    const raw = siteUrl?.trim();
+    if (!raw) return undefined;
+    try {
+      const url = new URL(raw);
+      if (url.protocol !== 'http:' && url.protocol !== 'https:') return undefined;
+      return `${url.origin}${url.pathname.replace(/\/$/, '')}`;
+    } catch {
+      return undefined;
+    }
+  }
+
+  private generateSitemap(pages: ReadonlyArray<Page>, siteUrl: string): string {
     const urls = pages
       .map(
         (p) => `  <url>
-    <loc>https://example.com${p.path}</loc>
+    <loc>${this.xmlEscape(`${siteUrl}${p.path}`)}</loc>
     <changefreq>weekly</changefreq>
     <priority>${p.isHomePage ? '1.0' : '0.7'}</priority>
   </url>`,
@@ -162,12 +184,20 @@ ${urls}
 `;
   }
 
-  private generateRobots(): string {
+  private xmlEscape(value: string): string {
+    return value
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&apos;');
+  }
+
+  private generateRobots(siteUrl?: string): string {
+    const sitemap = siteUrl ? `\nSitemap: ${siteUrl}/sitemap.xml\n` : '';
     return `User-agent: *
 Allow: /
-
-Sitemap: https://example.com/sitemap.xml
-`;
+${sitemap}`;
   }
 
   private generatePackageJson(projectName: string): string {

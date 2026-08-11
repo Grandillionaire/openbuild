@@ -589,7 +589,8 @@ document.querySelectorAll('[data-click-animation]').forEach((element) => {
 
   private generateCustomCSS(components: Component[]): string {
     const customStyles: string[] = [];
-    
+    const scope = (css: string, id: string) => this.scopeCustomCSS(css, `#${id}`);
+
     // Collect custom CSS from all components
     function collectCustomCSS(comps: Component[]) {
       comps.forEach(component => {
@@ -598,38 +599,127 @@ document.querySelectorAll('[data-click-animation]').forEach((element) => {
         if (!customCode || !customCode.css) {
           return;
         }
-        
+
         // Ensure css is a string
         const cssContent = typeof customCode.css === 'string' ? customCode.css : '';
-        
+
         if (cssContent.trim()) {
-          const lines = cssContent.split('\n');
-          const scopedCSS = lines
-            .map(line => {
-              // Simple scoping - prepend component ID to selectors
-              if (line.trim() && !line.trim().startsWith('/*') && !line.trim().startsWith('*')) {
-                if (line.includes('{')) {
-                  return `#${component.id} ${line}`;
-                }
-              }
-              return line;
-            })
-            .join('\n');
-          
+          const scopedCSS = scope(cssContent, component.id);
+
           customStyles.push(`/* Custom CSS for #${component.id} */\n${scopedCSS}`);
         }
-        
+
         if (component.children) {
           collectCustomCSS(component.children);
         }
       });
     }
-    
+
     collectCustomCSS(components);
-    
-    return customStyles.length > 0 
+
+    return customStyles.length > 0
       ? `\n/* Custom Component Styles */\n${customStyles.join('\n\n')}`
       : '';
+  }
+
+  /**
+   * Prefix every selector in a component's custom CSS with its element scope.
+   *
+   * Prefixing any line that contains `{` corrupts at-rules: `@media (…) {`
+   * becomes `#id @media (…) {`, which browsers discard along with everything
+   * the malformed block swallows. So we walk the rules instead:
+   *   - conditional group at-rules (`@media`, `@supports`, `@container`,
+   *     `@layer`) keep their prelude and get their body scoped recursively;
+   *   - other at-rules (`@keyframes`, `@font-face`) are emitted untouched —
+   *     their inner blocks are keyframe selectors, not element selectors;
+   *   - bare declarations written without a selector are wrapped in the scope.
+   */
+  private scopeCustomCSS(css: string, scope: string): string {
+    const out: string[] = [];
+    let prelude = '';
+    let loose = '';
+    let i = 0;
+
+    const flushLoose = () => {
+      if (loose.trim()) out.push(`${scope} {\n${loose.trim()}\n}`);
+      loose = '';
+    };
+
+    while (i < css.length) {
+      const char = css[i];
+
+      if (char === '/' && css[i + 1] === '*') {
+        const close = css.indexOf('*/', i + 2);
+        const end = close === -1 ? css.length : close + 2;
+        prelude += css.slice(i, end);
+        i = end;
+        continue;
+      }
+
+      if (char === '{') {
+        const body = this.readBlockBody(css, i);
+        const head = prelude.trim();
+        prelude = '';
+        i = body.end;
+        flushLoose();
+
+        if (head.startsWith('@')) {
+          const name = head.slice(1).split(/[\s({]/, 1)[0].toLowerCase();
+          if (['media', 'supports', 'container', 'layer', 'scope'].includes(name)) {
+            out.push(`${head} {\n${this.scopeCustomCSS(body.content, scope)}\n}`);
+          } else {
+            out.push(`${head} {${body.content}}`);
+          }
+        } else if (head) {
+          const selectors = head
+            .split(',')
+            .map(s => s.trim())
+            .filter(Boolean)
+            .map(s => `${scope} ${s}`)
+            .join(',\n');
+          out.push(`${selectors} {${body.content}}`);
+        } else {
+          out.push(`${scope} {${body.content}}`);
+        }
+        continue;
+      }
+
+      if (char === ';') {
+        if (prelude.trim().startsWith('@')) {
+          // Statement at-rule (`@import`, `@charset`) — pass through verbatim.
+          flushLoose();
+          out.push(`${prelude.trim()};`);
+        } else {
+          // A declaration at the top level — the user gave no selector.
+          loose += prelude + char;
+        }
+        prelude = '';
+        i++;
+        continue;
+      }
+
+      prelude += char;
+      i++;
+    }
+
+    loose += prelude;
+    flushLoose();
+
+    return out.join('\n\n');
+  }
+
+  /** Read a `{ … }` block starting at `start`, honouring nesting. */
+  private readBlockBody(css: string, start: number): { content: string; end: number } {
+    let depth = 0;
+    for (let i = start; i < css.length; i++) {
+      if (css[i] === '{') depth++;
+      else if (css[i] === '}') {
+        depth--;
+        if (depth === 0) return { content: css.slice(start + 1, i), end: i + 1 };
+      }
+    }
+    // Unbalanced input — treat the remainder as the body.
+    return { content: css.slice(start + 1), end: css.length };
   }
 
   private generateCustomJS(components: Component[]): string {

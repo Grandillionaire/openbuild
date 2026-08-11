@@ -131,7 +131,10 @@ export const useEditorStore = defineStore('editor', () => {
       id: nanoid(8),
       type,
       displayName: definition.displayName,
-      props: { ...definition.defaultProps },
+      // Deep clone: a shallow spread leaves every component of this type
+      // sharing the definition's nested `content` object, so editing one
+      // grid/section silently rewrites the defaults and every sibling.
+      props: safeClone(definition.defaultProps),
       styles: safeClone(definition.defaultStyles),
       children: definition.acceptsChildren ? [] : undefined
     };

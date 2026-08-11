@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { setActivePinia, createPinia } from 'pinia';
 import { useEditorStore } from '@/stores/editor';
+import { componentDefinitions } from '@/config/components';
 
 describe('Editor Store', () => {
   beforeEach(() => {
@@ -39,6 +40,20 @@ describe('Editor Store', () => {
       expect(parent?.children).toHaveLength(1);
       expect(parent?.children![0].id).toBe(child?.id);
       expect(child?.parent).toBe(parent?.id);
+    });
+
+    it('should give each component its own deep copy of the default props', () => {
+      const store = useEditorStore();
+
+      const first = store.addComponent('productGrid');
+      const second = store.addComponent('productGrid');
+      (first!.props.content as any).columns = 99;
+
+      expect((second!.props.content as any).columns).not.toBe(99);
+      expect(first!.props.content).not.toBe(second!.props.content);
+      expect(first!.props.content).not.toBe(
+        componentDefinitions.productGrid.defaultProps.content
+      );
     });
 
     it('should update a component', () => {

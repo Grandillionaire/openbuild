@@ -3,6 +3,7 @@ import type { Component } from '@/types/component';
 import { nanoid } from 'nanoid';
 import { useEditorStore } from '@/stores/editor';
 import { safeStringify, safeParse } from '@/utils/safeSerialize';
+import { telemetry } from '@/lib/telemetry';
 
 export interface Project {
   id: string;
@@ -29,49 +30,64 @@ class StorageService extends Dexie {
   }
   
   private setupAutoSave() {
-    // Auto-save every 30 seconds
+    // Auto-save every 30 seconds. autoSave() never rejects — an unhandled
+    // rejection on a timer would fire forever with nothing to catch it.
     setInterval(() => {
-      this.autoSave();
+      void this.autoSave();
     }, 30000);
-    
+
     // Save before page unload
     window.addEventListener('beforeunload', () => {
-      this.autoSave();
+      void this.autoSave();
     });
   }
-  
+
   private async autoSave() {
-    const store = useEditorStore();
-    if (store.components.length > 0) {
+    try {
+      const store = useEditorStore();
+      if (store.components.length === 0) return;
+
+      // Carry the stored createdAt and version forward: re-stamping them on
+      // every tick would reset each project's age and version counter to now/1.
+      const existing = await this.projects.get(store.projectId);
       await this.saveProject({
         id: store.projectId,
         name: store.projectName,
         components: store.components,
-        createdAt: new Date(),
-        updatedAt: new Date()
+        createdAt: existing?.createdAt ?? new Date(),
+        updatedAt: new Date(),
+        version: existing?.version
       });
+    } catch (error) {
+      telemetry.captureException(error, { scope: 'storageService.autoSave' });
     }
   }
-  
+
   async saveProject(project: Project): Promise<void> {
     try {
       // Generate thumbnail
       const thumbnail = await this.generateThumbnail(project.components);
-      
+
       await this.projects.put({
         ...project,
         thumbnail,
         updatedAt: new Date(),
         version: (project.version || 0) + 1
       });
-      
-      // Save to localStorage as backup
-      localStorage.setItem('lastProjectId', project.id);
-      localStorage.setItem(`project_backup_${project.id}`, safeStringify(project.components));
-      
     } catch (error) {
+      telemetry.captureException(error, { scope: 'storageService.saveProject' });
       console.error('Failed to save project:', error);
       throw error;
+    }
+
+    // Best-effort localStorage backup. The whole tree is mirrored into a ~5 MB
+    // budget, so a QuotaExceededError here is expected on large projects — it
+    // must not fail a save that already succeeded in IndexedDB.
+    try {
+      localStorage.setItem('lastProjectId', project.id);
+      localStorage.setItem(`project_backup_${project.id}`, safeStringify(project.components));
+    } catch (error) {
+      telemetry.captureException(error, { scope: 'storageService.backupToLocalStorage' });
     }
   }
   

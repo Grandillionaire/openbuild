@@ -149,6 +149,52 @@ describe('CodeGenerator Service', () => {
       expect(result.css).toContain('@media (min-width: 1024px)');
     });
 
+    it('should scope component custom CSS selectors', async () => {
+      const component = createComponent({
+        props: {
+          content: 'Test Heading',
+          customCode: { css: '.badge { color: red; }' }
+        }
+      });
+
+      const result = await codeGenerator.generateProject([component], 'Test');
+
+      expect(result.css).toContain('#test-123 .badge');
+    });
+
+    it('should keep at-rules intact when scoping component custom CSS', async () => {
+      const component = createComponent({
+        props: {
+          content: 'Test Heading',
+          customCode: {
+            css: '@media (max-width: 600px) { .badge { color: red; } }\n.badge { color: blue; }'
+          }
+        }
+      });
+
+      const result = await codeGenerator.generateProject([component], 'Test');
+
+      expect(result.css).not.toContain('#test-123 @media');
+      expect(result.css).toContain('@media (max-width: 600px)');
+      // The rule inside the at-rule is scoped, and rules after it survive.
+      expect(result.css).toContain('#test-123 .badge');
+      expect(result.css).toContain('color: blue');
+    });
+
+    it('should wrap bare declarations in custom CSS with the component scope', async () => {
+      const component = createComponent({
+        props: {
+          content: 'Test Heading',
+          customCode: { css: 'color: green;' }
+        }
+      });
+
+      const result = await codeGenerator.generateProject([component], 'Test');
+
+      expect(result.css).toContain('#test-123 {');
+      expect(result.css).toContain('color: green');
+    });
+
     it('should include CSS reset', async () => {
       const components = [createComponent()];
       const result = await codeGenerator.generateProject(components, 'Test');

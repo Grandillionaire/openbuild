@@ -13,17 +13,35 @@
  *
  * The script is intentionally framework-free and dependency-free (~10 KB
  * minified) so exported sites stay snappy.
+ *
+ * Scope note: the runtime shows a SUBTOTAL only. Discount codes, shipping
+ * zones and tax rules (see commerceService) are editor-side today — the final
+ * amount charged is whatever the payment provider computes at checkout. Do not
+ * present the drawer figure to customers as a final, tax-inclusive total.
  */
 
 import type { CommerceSettings, Product } from '@/types/commerce';
+
+/**
+ * Serialize a value for inlining inside a `<script>` element.
+ *
+ * Plain `JSON.stringify` output can contain `</script>` (a product name or
+ * description is enough), which terminates the script element mid-array and
+ * turns the rest of the catalog into raw markup — a syntax error at best,
+ * stored XSS at worst. Escaping every `<` as the JSON escape sequence for
+ * U+003C is valid JSON *and* valid JS, and makes `</script>` unrepresentable.
+ */
+function inlineJson(value: unknown): string {
+  return JSON.stringify(value).replace(/</g, '\\u003c');
+}
 
 export function getCommerceRuntimeScript(
   catalog: ReadonlyArray<Product>,
   settings: CommerceSettings,
 ): string {
   // We serialize the catalog inline so each exported site is fully static.
-  const catalogJson = JSON.stringify(catalog);
-  const settingsJson = JSON.stringify(settings);
+  const catalogJson = inlineJson(catalog);
+  const settingsJson = inlineJson(settings);
 
   return `(function(){
   "use strict";
@@ -43,6 +61,13 @@ export function getCommerceRuntimeScript(
   }
   function variantOf(p, vid){ return vid ? (p.variants || []).find(function(v){ return v.id === vid; }) : null; }
   function unitPrice(p, vid){ var v = variantOf(p, vid); return v ? v.price : p.price; }
+  /* Mirrors commerceService.unitPriceFor: the catalog price wins, the price
+     captured at add-to-cart time is only a fallback for products that have
+     since left the catalog. Keeps the exported cart in step with the editor. */
+  function lineUnitPrice(item){
+    var p = productMap[item.productId];
+    return p ? unitPrice(p, item.variantId) : item.capturedPrice;
+  }
 
   function loadCart(){
     try {
@@ -61,9 +86,9 @@ export function getCommerceRuntimeScript(
     var items = loadCart();
     if (items.length === 0) return null;
     var total = 0;
-    var currency = items[0].capturedPrice.currency;
+    var currency = lineUnitPrice(items[0]).currency;
     items.forEach(function(item){
-      total += item.capturedPrice.amount * item.quantity;
+      total += lineUnitPrice(item).amount * item.quantity;
     });
     return { amount: total, currency: currency };
   }
@@ -106,7 +131,7 @@ export function getCommerceRuntimeScript(
     if (!product) return;
     var primary = (product.images || []).find(function(img){ return img.isPrimary; }) || product.images[0];
     var img = el.querySelector("[data-ob-product-image]");
-    if (img && primary){ img.src = primary.url; img.alt = primary.alt || product.name; }
+    if (img && primary){ img.src = safeUrl(primary.url); img.alt = primary.alt || product.name; }
     var name = el.querySelector("[data-ob-product-name]");
     if (name) name.textContent = product.name;
     var price = el.querySelector("[data-ob-product-price]");
@@ -140,9 +165,9 @@ export function getCommerceRuntimeScript(
     el.innerHTML = products.map(function(product){
       var primary = (product.images || [])[0];
       return '' +
-        '<article class="product-grid__item" data-ob-product="' + product.id + '">' +
-          '<a class="product-grid__media" href="/product/' + product.slug + '">' +
-            (primary ? '<img src="' + primary.url + '" alt="' + (primary.alt || product.name).replace(/"/g, "&quot;") + '" loading="lazy">' : '') +
+        '<article class="product-grid__item" data-ob-product="' + escapeAttr(product.id) + '">' +
+          '<a class="product-grid__media" href="' + escapeAttr("/product/" + product.slug) + '">' +
+            (primary ? '<img src="' + escapeAttr(safeUrl(primary.url)) + '" alt="' + escapeAttr(primary.alt || product.name) + '" loading="lazy">' : '') +
           '</a>' +
           '<div class="product-grid__body">' +
             '<h3 class="product-grid__name">' + escapeText(product.name) + '</h3>' +
@@ -150,7 +175,7 @@ export function getCommerceRuntimeScript(
               '<span>' + formatMoney(product.price) + '</span>' +
               (product.compareAtPrice ? '<span class="product-grid__compare">' + formatMoney(product.compareAtPrice) + '</span>' : '') +
             '</div>' : '') +
-            (cfg.showAddToCart !== false ? '<button class="product-grid__cta" data-ob-add-to-cart="' + product.id + '">Add to cart</button>' : '') +
+            (cfg.showAddToCart !== false ? '<button class="product-grid__cta" data-ob-add-to-cart="' + escapeAttr(product.id) + '">Add to cart</button>' : '') +
           '</div>' +
         '</article>';
     }).join("");
@@ -160,6 +185,18 @@ export function getCommerceRuntimeScript(
     var div = document.createElement("div");
     div.textContent = String(s == null ? "" : s);
     return div.innerHTML;
+  }
+
+  /* Catalog data is merchant-authored text, not trusted markup: escape it
+     before it ever reaches innerHTML, both as text and inside attributes. */
+  function escapeAttr(s){
+    return String(s == null ? "" : s)
+      .replace(/&/g, "&amp;").replace(/"/g, "&quot;")
+      .replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  function safeUrl(u){
+    var s = String(u == null ? "" : u).trim();
+    return /^(https?:|mailto:|tel:|blob:|data:image\\/|\\/|\\.\\/|#)/i.test(s) ? s : "#";
   }
 
   function hydratePriceTag(el){
@@ -246,11 +283,11 @@ export function getCommerceRuntimeScript(
       if (!product) return "";
       var image = (product.images || [])[0];
       var variant = variantOf(product, item.variantId);
-      return '<div class="ob-cart-item" data-ob-item="' + item.productId + '" data-ob-item-variant="' + (item.variantId || "") + '">' +
-        (image ? '<img src="' + image.url + '" alt="">' : '<div style="width:64px;height:64px;background:#F3F4F6;border-radius:8px"></div>') +
+      return '<div class="ob-cart-item" data-ob-item="' + escapeAttr(item.productId) + '" data-ob-item-variant="' + escapeAttr(item.variantId || "") + '">' +
+        (image ? '<img src="' + escapeAttr(safeUrl(image.url)) + '" alt="">' : '<div style="width:64px;height:64px;background:#F3F4F6;border-radius:8px"></div>') +
         '<div class="ob-cart-item-body">' +
           '<div class="ob-cart-item-name">' + escapeText(product.name + (variant ? " — " + variant.name : "")) + '</div>' +
-          '<div class="ob-cart-item-price">' + formatMoney(item.capturedPrice) + '</div>' +
+          '<div class="ob-cart-item-price">' + formatMoney(lineUnitPrice(item)) + '</div>' +
           '<div class="ob-cart-item-qty">' +
             '<button data-ob-qty="-1" aria-label="Decrease quantity">−</button>' +
             '<span>' + item.quantity + '</span>' +
@@ -297,13 +334,15 @@ export function getCommerceRuntimeScript(
         return;
       }
       if (mode.type === "stripe-checkout-session" || mode.type === "custom-webhook"){
+        var sub = cartSubtotal();
         var resp = await fetch(mode.endpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             items: items.map(function(i){ return { productId: i.productId, variantId: i.variantId, quantity: i.quantity }; }),
             successUrl: buildSuccessUrl(),
-            cancelUrl: buildCancelUrl()
+            cancelUrl: buildCancelUrl(),
+            currency: sub ? sub.currency : SETTINGS.defaultCurrency
           })
         });
         if (!resp.ok){ toast("Checkout error (" + resp.status + ")"); return; }
@@ -392,23 +431,28 @@ export function getCommerceRuntimeScript(
     ensureDrawer();
     syncCartUI();
 
-    // Optional checkout success handler. Snapshot the cart-as-it-was BEFORE
-    // clearing so a merchant browsing their own site sees a local order record
-    // in the editor (useful for end-to-end testing of checkout configuration).
+    // Optional checkout-return handler. This runs purely on the strength of a
+    // URL the visitor can type, so the snapshot is recorded as 'pending' and
+    // never as 'paid' — only the payment provider (webhook / Checkout Session
+    // lookup) can confirm money actually moved. The record lives in the
+    // STORE's localStorage, so the editor only picks it up when the merchant
+    // is testing their own site in the same browser.
     if (location.search.indexOf("ob_checkout=success") >= 0){
       try {
         var snapshot = loadCart();
         if (snapshot.length > 0){
           var subtotalSnap = cartSubtotal();
+          var snapCurrency = subtotalSnap && subtotalSnap.currency;
           var sessionId = new URLSearchParams(location.search).get('session_id') || null;
           var pending = JSON.parse(localStorage.getItem('openbuild_orders_pending') || '[]');
           pending.unshift({
             id: 'ord_' + Math.random().toString(36).slice(2, 14),
             items: snapshot,
-            totals: { subtotal: subtotalSnap, discount: { amount: 0, currency: subtotalSnap && subtotalSnap.currency }, tax: { amount: 0, currency: subtotalSnap && subtotalSnap.currency }, shipping: { amount: 0, currency: subtotalSnap && subtotalSnap.currency }, total: subtotalSnap },
+            totals: { subtotal: subtotalSnap, discount: { amount: 0, currency: snapCurrency }, tax: { amount: 0, currency: snapCurrency }, shipping: { amount: 0, currency: snapCurrency }, total: subtotalSnap },
             customer: { email: '' },
-            status: 'paid',
+            status: 'pending',
             stripeCheckoutSessionId: sessionId,
+            notes: 'Unverified: recorded from a checkout-return URL. Confirm against your payment provider before fulfilling. Totals are subtotal only — tax and shipping are charged by the provider.',
             createdAt: new Date().toISOString()
           });
           localStorage.setItem('openbuild_orders_pending', JSON.stringify(pending.slice(0, 100)));

@@ -14,15 +14,22 @@
             <p>To deploy to Vercel, you'll need an API token.</p>
             <ol class="steps">
               <li>Go to <a href="https://vercel.com/account/tokens" target="_blank">Vercel Tokens</a></li>
-              <li>Create a new token</li>
+              <li>Create a new token — scope it to a single project, and give it the shortest expiry you can</li>
               <li>Paste it below</li>
             </ol>
-            
+
+            <p class="token-warning">
+              A Vercel token can create, redeploy and delete <strong>every</strong> project on your
+              account. It is used for this deploy only and is never stored — you'll paste it again
+              next time.
+            </p>
+
             <div class="form-group">
               <label>Vercel API Token</label>
               <input
                 v-model="token"
                 type="password"
+                autocomplete="off"
                 placeholder="Enter your Vercel token"
               />
             </div>
@@ -96,7 +103,10 @@ const emit = defineEmits<{
 const store = useEditorStore();
 const { showToast } = useToast();
 
-const token = ref(sessionStorage.getItem('vercel_token') || '');
+// Kept in memory for this modal only. A Vercel PAT is account-wide, and this
+// editor renders user-authored HTML and runs user-authored JavaScript — any of
+// which could read the token back out of session/local storage.
+const token = ref('');
 const projectName = ref(store.projectName.toLowerCase().replace(/\s+/g, '-'));
 const isDeploying = ref(false);
 const deploymentUrl = ref('');
@@ -108,9 +118,6 @@ async function handleDeploy() {
   isDeploying.value = true;
   
   try {
-    // Save token for future use
-    sessionStorage.setItem('vercel_token', token.value);
-    
     // Generate code
     const { fullPage } = await codeGenerator.generateProject(
       store.components,
@@ -175,6 +182,17 @@ async function handleDeploy() {
 .token-section p {
   color: #6B7280;
   margin-bottom: 16px;
+}
+
+.token-warning {
+  padding: 12px 14px;
+  margin-bottom: 20px;
+  border: 1px solid #FDE68A;
+  border-radius: 8px;
+  background: #FFFBEB;
+  color: #92400E;
+  font-size: 13px;
+  line-height: 1.5;
 }
 
 .steps {

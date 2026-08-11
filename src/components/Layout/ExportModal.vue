@@ -71,6 +71,12 @@
                   <option value="netlify">Netlify</option>
                 </select>
               </div>
+
+              <div class="option">
+                <label>Site URL</label>
+                <input v-model="siteUrl" type="url" placeholder="https://mystore.com" />
+                <small>The domain you'll publish to. Needed for sitemap.xml — without it, search engines reject the sitemap.</small>
+              </div>
             </div>
           </details>
           
@@ -183,6 +189,8 @@ const { showToast } = useToast();
 const includeConfig = ref(true);
 const minifyCode = ref(false);
 const platform = ref('static');
+// Remembered between exports so a merchant sets their domain once.
+const siteUrl = ref(localStorage.getItem('openbuild.siteUrl') || '');
 const framework = ref<ExportFramework>('html');
 const isExporting = ref(false);
 
@@ -202,8 +210,10 @@ async function publishOneClick() {
 
 async function handleExport() {
   isExporting.value = true;
-  
+
   try {
+    localStorage.setItem('openbuild.siteUrl', siteUrl.value.trim());
+
     if (framework.value === 'html') {
       // Use existing HTML export. Always include theme + commerce + multi-page
       // when their stores have data — first-time users shouldn't have to know
@@ -217,6 +227,7 @@ async function handleExport() {
           includeTheme: true,
           multiPage: true,
           includeCommerce: true,
+          siteUrl: siteUrl.value,
         }
       );
     } else {

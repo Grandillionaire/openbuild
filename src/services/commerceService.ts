@@ -121,17 +121,33 @@ export function chooseShipping(
   return { method, price: method.price };
 }
 
+/**
+ * How well a rule matches a destination. -1 = does not apply.
+ * Country+region (3) beats country (2) beats wildcard+region (1) beats wildcard (0),
+ * so a catch-all rule can never shadow a country-specific VAT rate regardless of
+ * the order the merchant happened to add them in.
+ */
+function taxRuleSpecificity(rule: TaxRule, country: string, region?: string): number {
+  if (rule.country !== country && rule.country !== '*') return -1;
+  if (rule.region && rule.region !== region) return -1;
+  return (rule.country === country ? 2 : 0) + (rule.region ? 1 : 0);
+}
+
 export function calculateTax(
   taxableAmount: Money,
   rules: ReadonlyArray<TaxRule>,
   country: string,
   region?: string,
 ): Money {
-  const applicable = rules.find(
-    (r) =>
-      (r.country === country || r.country === '*') &&
-      (!r.region || r.region === region),
-  );
+  let applicable: TaxRule | undefined;
+  let bestScore = -1;
+  for (const rule of rules) {
+    const score = taxRuleSpecificity(rule, country, region);
+    if (score > bestScore) {
+      applicable = rule;
+      bestScore = score;
+    }
+  }
   if (!applicable || applicable.includedInPrice) {
     return zeroMoney(taxableAmount.currency);
   }

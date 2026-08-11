@@ -203,6 +203,23 @@ describe('calculateTax', () => {
   it('applies UK VAT exclusive of price', () => {
     expect(calculateTax(usd(10000), rules, 'GB')).toEqual(usd(2000));
   });
+
+  it('prefers a country rule over an earlier wildcard rule', () => {
+    const withCatchAllFirst: TaxRule[] = [
+      { id: 'w', name: 'Catch-all', country: '*', rate: 0, includedInPrice: false },
+      { id: 'de', name: 'German VAT', country: 'DE', rate: 0.19, includedInPrice: false },
+    ];
+    expect(calculateTax(usd(10000), withCatchAllFirst, 'DE')).toEqual(usd(1900));
+  });
+
+  it('prefers a country+region rule over an earlier country-only rule', () => {
+    const withCountryFirst: TaxRule[] = [
+      { id: 'us', name: 'US baseline', country: 'US', rate: 0.05, includedInPrice: false },
+      { id: 'ca', name: 'California', country: 'US', region: 'CA', rate: 0.0725, includedInPrice: false },
+    ];
+    expect(calculateTax(usd(10000), withCountryFirst, 'US', 'CA')).toEqual(usd(725));
+    expect(calculateTax(usd(10000), withCountryFirst, 'US', 'TX')).toEqual(usd(500));
+  });
 });
 
 describe('calculateTotals', () => {

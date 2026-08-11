@@ -3,7 +3,7 @@ import { componentVariants } from './componentVariants';
 import { formComponentDefinitions } from './formComponents';
 import { contentComponentDefinitions } from './contentComponents';
 import { commerceComponentDefinitions } from './commerceComponents';
-import { getRegisteredComponents } from '@/lib/plugins';
+import { getRegisteredComponents, onRegistryChange } from '@/lib/plugins';
 import { escapeHtml, sanitizeUrl } from '@/utils/htmlEscape';
 import { responsiveImage } from '@/utils/imageOpt';
 
@@ -694,7 +694,6 @@ export const componentDefinitions: Record<string, ComponentDefinition> = {
   ...formComponentDefinitions,
   ...contentComponentDefinitions,
   ...commerceComponentDefinitions,
-  ...Object.fromEntries(getRegisteredComponents().entries()),
 };
 
 // Apply variants to all components
@@ -702,6 +701,37 @@ Object.keys(componentDefinitions).forEach((key) => {
   const type = key as ComponentType;
   componentDefinitions[type] = addVariantsToDefinition(componentDefinitions[type]);
 });
+
+// Snapshot of the built-ins, so unregistering a plugin that overrode one puts
+// the original back rather than leaving the plugin's version behind.
+const builtInComponentDefinitions: Record<string, ComponentDefinition> = { ...componentDefinitions };
+let pluginComponentTypes: string[] = [];
+
+/**
+ * Re-apply the plugin registry on top of the built-ins.
+ *
+ * Reading the registry once at module-eval time would drop every plugin
+ * registered afterwards — which is all of them, since this module is imported
+ * transitively by App.vue before any user code runs.
+ */
+function syncPluginComponents(): void {
+  for (const type of pluginComponentTypes) {
+    if (type in builtInComponentDefinitions) {
+      componentDefinitions[type] = builtInComponentDefinitions[type];
+    } else {
+      delete componentDefinitions[type];
+    }
+  }
+  pluginComponentTypes = [];
+
+  for (const [type, definition] of getRegisteredComponents()) {
+    componentDefinitions[type] = addVariantsToDefinition(definition);
+    pluginComponentTypes.push(type);
+  }
+}
+
+syncPluginComponents();
+onRegistryChange(syncPluginComponents);
 
 // Helper function to add animation attributes to HTML element
 function addAnimationAttributes(component: Component, tagName: string, attributes: string = ''): string {

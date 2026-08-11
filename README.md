@@ -69,12 +69,17 @@ Where most "free" website builders force you onto a hosted plan the moment you w
 - **Stripe Checkout Sessions** — point at your own endpoint for multi-item carts
 - **Custom webhook** mode — plug in any payment processor
 - **25 currencies** including JPY zero-decimal handling
-- **Tax rules** by country / region with `included-in-price` support
-- **Shipping zones** with free-shipping thresholds
-- **Discount codes** (percentage and fixed) with min-subtotal and expiry
+- **Tax rules** by country / region with `included-in-price` support — editor-side only
+- **Shipping zones** with free-shipping thresholds — editor-side only
+- **Discount codes** (percentage and fixed) with min-subtotal and expiry — editor-side only
 - **FAQ component** emits schema.org JSON-LD for richer search results
 - **SEO** with auto-generated meta, OG, Twitter Card and canonical tags
-- **Multi-page export** with `sitemap.xml` and `robots.txt`
+- **Multi-page export** with `sitemap.xml` and `robots.txt` (set your Site URL in the export options — the sitemap needs an absolute domain)
+
+> Tax, shipping and discounts are modelled and calculated in the editor
+> (`src/services/commerceService.ts`). The exported storefront runtime shows a
+> **subtotal** and hands the final amount to your payment provider — it does not
+> compute tax or shipping in the customer's browser.
 
 ### Engineering
 - **TypeScript strict** across the codebase
@@ -142,7 +147,7 @@ Read the full deep-dive in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 Add a custom component without forking:
 
 ```ts
-import { registerPlugin } from 'openbuild/lib/plugins';
+import { registerPlugin } from '@/lib/plugins';
 
 registerPlugin({
   id: 'my-org.calendar',
@@ -161,7 +166,10 @@ registerPlugin({
 });
 ```
 
-Plugins also register **exporters** (e.g. ship a custom static-site framework adapter) and **integrations** (Stripe, Mailchimp, Google Analytics, anything with a config schema).
+Components registered this way appear in the editor immediately, including after
+the editor has booted. The registry also accepts **exporters** and
+**integrations** (`getRegisteredExporters()` / `getRegisteredIntegrations()`) —
+the interfaces are stable, but the editor does not consume them yet.
 
 ## Project quality
 

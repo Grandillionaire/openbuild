@@ -326,6 +326,10 @@ export const useCommerceStore = defineStore('commerce', () => {
    * checkout-success redirect (when the merchant tests their own site in the
    * same browser) and merges them into the orders list. Idempotent — orders
    * already present (by id) are skipped.
+   *
+   * The payload is untrusted — it comes from a localStorage key any visitor
+   * can write — so imported orders always land as 'pending', never 'paid'.
+   * Confirm them against the payment provider before fulfilling.
    */
   function consumePendingOrders(): number {
     try {
@@ -336,7 +340,7 @@ export const useCommerceStore = defineStore('commerce', () => {
       for (const p of pending) {
         if (!p || !p.id || !p.items || !p.totals) continue;
         if (orders.value.some((o) => o.id === p.id)) continue;
-        recordOrder({ ...p, items: p.items, totals: p.totals } as never);
+        recordOrder({ ...p, items: p.items, totals: p.totals, status: 'pending' } as never);
         added++;
       }
       localStorage.removeItem('openbuild_orders_pending');

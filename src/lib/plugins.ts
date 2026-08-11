@@ -67,6 +67,29 @@ const registry: Registry = {
   integrations: new Map(),
 };
 
+type RegistryListener = () => void;
+
+const listeners = new Set<RegistryListener>();
+
+/**
+ * Subscribe to registry changes; returns an unsubscribe function.
+ *
+ * The editor's component table (`config/components.ts`) is a plain object built
+ * when that module is first evaluated — which happens long before user code can
+ * call `registerPlugin`. Consumers listen here so late registrations still land
+ * instead of being silently dropped.
+ */
+export function onRegistryChange(listener: RegistryListener): () => void {
+  listeners.add(listener);
+  return () => {
+    listeners.delete(listener);
+  };
+}
+
+function notifyRegistryChange(): void {
+  for (const listener of listeners) listener();
+}
+
 export function registerPlugin(plugin: OpenBuildPlugin): void {
   if (registry.plugins.has(plugin.id)) {
     if (import.meta.env.DEV) {
@@ -84,6 +107,7 @@ export function registerPlugin(plugin: OpenBuildPlugin): void {
   for (const integ of plugin.integrations ?? []) {
     registry.integrations.set(integ.id, integ);
   }
+  notifyRegistryChange();
 }
 
 export function unregisterPlugin(id: string): void {
@@ -93,6 +117,7 @@ export function unregisterPlugin(id: string): void {
   for (const def of plugin.components ?? []) registry.components.delete(def.type);
   for (const exp of plugin.exporters ?? []) registry.exporters.delete(exp.id);
   for (const integ of plugin.integrations ?? []) registry.integrations.delete(integ.id);
+  notifyRegistryChange();
 }
 
 export function getRegisteredComponents(): ReadonlyMap<ComponentType, ComponentDefinition> {
@@ -117,4 +142,5 @@ export function __resetRegistryForTests(): void {
   registry.components.clear();
   registry.exporters.clear();
   registry.integrations.clear();
+  notifyRegistryChange();
 }
