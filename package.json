@@ -15,13 +15,13 @@
     "open-source"
   ],
   "license": "MIT",
-  "author": "Grandillionaire (Maximillian Grand)",
+  "author": "maximilliangrand (Maximillian Grand)",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Grandillionaire/openbuild.git"
+    "url": "https://github.com/maximilliangrand/openbuild.git"
   },
-  "homepage": "https://github.com/Grandillionaire/openbuild",
-  "bugs": "https://github.com/Grandillionaire/openbuild/issues",
+  "homepage": "https://github.com/maximilliangrand/openbuild",
+  "bugs": "https://github.com/maximilliangrand/openbuild/issues",
   "type": "module",
   "engines": {
     "node": ">=20.0.0",
@@ -96,7 +96,12 @@
     "vue-tsc": "^3.0.7"
   },
   "lint-staged": {
-    "*.{ts,tsx,vue,js}": ["eslint --fix", "prettier --write"],
-    "*.{json,md,css}": ["prettier --write"]
+    "*.{ts,tsx,vue,js}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,css}": [
+      "prettier --write"
+    ]
   }
 }

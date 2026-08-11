@@ -4,11 +4,12 @@ First off, thank you for considering contributing to OpenBuild! It's people like
 
 ## Attribution
 
-OpenBuild was originally created by **Grandillionaire (Maximillian Grand)**. Please ensure any use, modification, or distribution of this software includes attribution to the original creator.
+OpenBuild was originally created by **maximilliangrand (Maximillian Grand)**. Please ensure any use, modification, or distribution of this software includes attribution to the original creator.
 
 ## Code of Conduct
 
 By participating in this project, you are expected to uphold our values:
+
 - Be respectful and inclusive
 - Welcome newcomers and help them get started
 - Focus on constructive criticism
@@ -84,34 +85,40 @@ openbuild/
 ## Coding Guidelines
 
 ### Vue Components
+
 - Use Composition API with `<script setup>`
 - Follow single-file component structure
 - Keep components focused and small
 - Use TypeScript for props and emits
 
 ### TypeScript
+
 - Always define types for props, emits, and function parameters
 - Avoid using `any` type
 - Use interfaces over type aliases when possible
 
 ### Styling
+
 - Use UnoCSS utility classes
 - Keep component-specific styles in `<style scoped>`
 - Follow mobile-first responsive design
 
 ### Naming Conventions
+
 - Components: PascalCase (e.g., `ComponentRenderer.vue`)
 - Composables: camelCase with 'use' prefix (e.g., `useKeyboardShortcuts.ts`)
 - Files: kebab-case for non-components
 - CSS classes: kebab-case
 
 ### Git Commit Messages
+
 - Use present tense ("Add feature" not "Added feature")
 - Use imperative mood ("Move cursor to..." not "Moves cursor to...")
 - Limit first line to 72 characters
 - Reference issues and pull requests
 
 Examples:
+
 ```
 feat: Add animation timeline editor
 fix: Resolve memory leak in component renderer

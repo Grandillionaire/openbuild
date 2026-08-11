@@ -43,6 +43,7 @@ We take the security of OpenBuild seriously. If you have discovered a security v
    - Rotate keys regularly
 
 2. **Dependencies**: Keep dependencies updated
+
    ```bash
    npm audit
    npm audit fix
@@ -111,13 +112,14 @@ We take the security of OpenBuild seriously. If you have discovered a security v
 ### Environment Variables
 
 Required environment variables for secure deployment:
+
 - `VITE_UNSPLASH_KEY`: Unsplash API key (optional)
 - `VITE_PEXELS_KEY`: Pexels API key (optional)
 - `VITE_VERCEL_TOKEN`: Vercel deployment token (optional)
 
 ## Attribution
 
-Security policy maintained by **Grandillionaire (Maximillian Grand)** and the OpenBuild community.
+Security policy maintained by **maximilliangrand (Maximillian Grand)** and the OpenBuild community.
 
 ## Resources
 

@@ -37,20 +37,21 @@ Where most "free" website builders force you onto a hosted plan the moment you w
 
 ## Why OpenBuild
 
-| | Squarespace | Wix | Webflow | **OpenBuild** |
-|---|:---:|:---:|:---:|:---:|
-| Monthly fee | $16+ | $17+ | $14+ | **$0** |
-| Own your code & data | ❌ | ❌ | Partial | **✅** |
-| Self-host anywhere | ❌ | ❌ | ❌ | **✅** |
-| Drag & drop editor | ✅ | ✅ | ✅ | **✅** |
-| Built-in Stripe checkout | ✅ | ✅ | Plugin | **✅** |
-| Export to clean HTML | ❌ | ❌ | Limited | **✅** |
-| Open source | ❌ | ❌ | ❌ | **✅ MIT** |
-| Plugin system | ❌ | ❌ | ❌ | **✅** |
+|                          | Squarespace | Wix  | Webflow | **OpenBuild** |
+| ------------------------ | :---------: | :--: | :-----: | :-----------: |
+| Monthly fee              |    $16+     | $17+ |  $14+   |    **$0**     |
+| Own your code & data     |     ❌      |  ❌  | Partial |    **✅**     |
+| Self-host anywhere       |     ❌      |  ❌  |   ❌    |    **✅**     |
+| Drag & drop editor       |     ✅      |  ✅  |   ✅    |    **✅**     |
+| Built-in Stripe checkout |     ✅      |  ✅  | Plugin  |    **✅**     |
+| Export to clean HTML     |     ❌      |  ❌  | Limited |    **✅**     |
+| Open source              |     ❌      |  ❌  |   ❌    |  **✅ MIT**   |
+| Plugin system            |     ❌      |  ❌  |   ❌    |    **✅**     |
 
 ## Features
 
 ### Visual editor
+
 - **45+ components** across layout, content, media, blocks, forms and commerce
 - **Drag & drop** with smart snapping, alignment guides and live preview
 - **Responsive design** with per-breakpoint overrides (mobile / tablet / desktop)
@@ -62,6 +63,7 @@ Where most "free" website builders force you onto a hosted plan the moment you w
 - **AI component generator** — describe what you want in plain English
 
 ### Commerce (built in, free, no subscription)
+
 - **Products** with images, variants (size/color), inventory, SKUs, compare-at pricing
 - **Categories, tags, collections**
 - **Cart drawer** with localStorage persistence — works on any exported site
@@ -82,6 +84,7 @@ Where most "free" website builders force you onto a hosted plan the moment you w
 > compute tax or shipping in the customer's browser.
 
 ### Engineering
+
 - **TypeScript strict** across the codebase
 - **ESLint flat config** with `--max-warnings=0` in CI
 - **Vitest** unit tests with v8 coverage, **Playwright** for end-to-end
@@ -95,7 +98,7 @@ Where most "free" website builders force you onto a hosted plan the moment you w
 ## Quick start
 
 ```bash
-git clone https://github.com/Grandillionaire/openbuild.git
+git clone https://github.com/maximilliangrand/openbuild.git
 cd openbuild
 npm install
 npm run dev
@@ -153,16 +156,18 @@ registerPlugin({
   id: 'my-org.calendar',
   name: 'Calendar widget',
   version: '1.0.0',
-  components: [{
-    type: 'calendar' as never,
-    displayName: 'Calendar',
-    category: 'blocks',
-    icon: 'calendar',
-    defaultProps: { content: { calendarUrl: '' } },
-    defaultStyles: { base: { width: '100%' } },
-    generateHTML: (c) => `<iframe src="${c.props.content.calendarUrl}" loading="lazy"></iframe>`,
-    generateCSS: () => '',
-  }],
+  components: [
+    {
+      type: 'calendar' as never,
+      displayName: 'Calendar',
+      category: 'blocks',
+      icon: 'calendar',
+      defaultProps: { content: { calendarUrl: '' } },
+      defaultStyles: { base: { width: '100%' } },
+      generateHTML: (c) => `<iframe src="${c.props.content.calendarUrl}" loading="lazy"></iframe>`,
+      generateCSS: () => '',
+    },
+  ],
 });
 ```
 
@@ -173,22 +178,22 @@ the interfaces are stable, but the editor does not consume them yet.
 
 ## Project quality
 
-| Signal | Status |
-|---|---|
-| TypeScript | strict, `noUnusedLocals`, `noUnusedParameters` |
-| Lint | ESLint 9 flat config, 0 warnings tolerated in CI |
-| Tests | Vitest + Playwright, per-PR coverage upload |
-| CI | Node 20.x + 22.x matrix, bundle budget, license audit, npm audit |
-| Performance | < 250 KB gzipped initial route, code-split editor & UI chunks |
-| Accessibility | semantic HTML across components, ARIA on interactive bits |
-| Security | sandboxed embed wrappers, sanitized URLs, CSP-friendly export |
+| Signal        | Status                                                           |
+| ------------- | ---------------------------------------------------------------- |
+| TypeScript    | strict, `noUnusedLocals`, `noUnusedParameters`                   |
+| Lint          | ESLint 9 flat config, 0 warnings tolerated in CI                 |
+| Tests         | Vitest + Playwright, per-PR coverage upload                      |
+| CI            | Node 20.x + 22.x matrix, bundle budget, license audit, npm audit |
+| Performance   | < 250 KB gzipped initial route, code-split editor & UI chunks    |
+| Accessibility | semantic HTML across components, ARIA on interactive bits        |
+| Security      | sandboxed embed wrappers, sanitized URLs, CSP-friendly export    |
 
 ## Deployment
 
 One-click:
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FGrandillionaire%2Fopenbuild)
-[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/Grandillionaire/openbuild)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fmaximilliangrand%2Fopenbuild)
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/maximilliangrand/openbuild)
 
 Docker:
 
@@ -217,7 +222,7 @@ MIT. See [LICENSE](LICENSE).
 
 ## Credits
 
-OpenBuild was originally created by **[Grandillionaire (Maximillian Grand)](https://github.com/Grandillionaire)** and is built on Vue 3, Pinia, TypeScript, UnoCSS, CodeMirror 6, Dexie and Vite — every one of them open source, every one of them excellent.
+OpenBuild was originally created by **[maximilliangrand (Maximillian Grand)](https://github.com/maximilliangrand)** and is built on Vue 3, Pinia, TypeScript, UnoCSS, CodeMirror 6, Dexie and Vite — every one of them open source, every one of them excellent.
 
 <div align="center">
   <p><strong>If OpenBuild helps you ship something, star the repo ⭐</strong></p>

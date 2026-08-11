@@ -33,7 +33,7 @@ export class ExportManager {
   async exportProject(
     components: Component[],
     projectName: string,
-    options: ExportOptions = {},
+    options: ExportOptions = {}
   ): Promise<void> {
     const startTime = performance.now();
 
@@ -132,9 +132,11 @@ export class ExportManager {
       includeTheme: boolean;
       themeVariables: Record<string, string> | undefined;
       globalCustomCode: { css?: string; javascript?: string; headHTML?: string };
-      commerce: { enabled: boolean; products: ReadonlyArray<unknown>; settings: unknown } | undefined;
+      commerce:
+        | { enabled: boolean; products: ReadonlyArray<unknown>; settings: unknown }
+        | undefined;
       integrations: { analytics: unknown; forms: unknown };
-    },
+    }
   ): Promise<void> {
     for (const page of pages) {
       const { fullPage } = await codeGenerator.generateProject(page.components, ctx.projectName, {
@@ -149,7 +151,9 @@ export class ExportManager {
           ogImage: page.seo?.ogImage,
         },
       });
-      const filename = page.isHomePage ? 'index.html' : `${page.slug || page.path.replace(/^\//, '')}.html`;
+      const filename = page.isHomePage
+        ? 'index.html'
+        : `${page.slug || page.path.replace(/^\//, '')}.html`;
       zip.file(filename, fullPage);
     }
   }
@@ -174,7 +178,7 @@ export class ExportManager {
     <loc>${this.xmlEscape(`${siteUrl}${p.path}`)}</loc>
     <changefreq>weekly</changefreq>
     <priority>${p.isHomePage ? '1.0' : '0.7'}</priority>
-  </url>`,
+  </url>`
       )
       .join('\n');
     return `<?xml version="1.0" encoding="UTF-8"?>
@@ -217,14 +221,14 @@ ${sitemap}`;
         },
       },
       null,
-      2,
+      2
     );
   }
 
   private generateReadme(projectName: string): string {
     return `# ${projectName}
 
-Built with [OpenBuild](https://github.com/Grandillionaire/openbuild) — the open-source visual website builder with built-in commerce.
+Built with [OpenBuild](https://github.com/maximilliangrand/openbuild) — the open-source visual website builder with built-in commerce.
 
 ## Run locally
 
@@ -263,7 +267,7 @@ dist
         trailingSlash: false,
       },
       null,
-      2,
+      2
     );
   }
 
